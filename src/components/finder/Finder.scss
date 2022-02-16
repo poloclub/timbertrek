@@ -1,0 +1,45 @@
+@import '../../define';
+
+.main-app {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: calc(100vh - 5px);
+  max-height: 800px;
+  width: 100vw;
+  box-sizing: border;
+}
+
+.finder-wrapper {
+  border: 1px solid $gray-light-border;
+  background: $mauve-01;
+  border-radius: $border-radius;
+  box-shadow: 0px 0px 2px hsla(0, 0%, 0%, 0.03),
+    0px 0px 10px hsla(0, 0%, 0%, 0.05);
+}
+
+.header {
+  height: 50px;
+  border-bottom: 1px solid $gray-light-border;
+  padding: 3px 16px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  font-size: 1.2rem;
+}
+
+.content {
+  display: flex;
+  flex-direction: row;
+}
+
+.ring {
+  width: 600px;
+  height: 600px;
+}
+
+.feature-list {
+  width: 200px;
+  border-left: 1px solid $gray-light-border;
+}
