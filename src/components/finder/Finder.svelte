@@ -1,5 +1,6 @@
 <script lang='ts'>
   import {onMount} from 'svelte';
+  import Sunburst from '../sunburst/Sunburst.svelte';
 
   onMount(() => {
     // console.log('mounted!');
@@ -27,7 +28,7 @@
     <div class='content'>
 
       <div class='ring'>
-
+        <Sunburst />
       </div>
 
       <div class='feature-list'>

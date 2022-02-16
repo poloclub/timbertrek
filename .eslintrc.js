@@ -4,6 +4,7 @@ module.exports = {
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:@typescript-eslint/recommended-requiring-type-checking",
+    "prettier"
   ],
   parserOptions: {
     ecmaVersion: 2020,
@@ -26,7 +27,7 @@ module.exports = {
     "svelte3/typescript": require("typescript"),
     "svelte3/ignore-styles": () => true,
   },
-  plugins: ["svelte3", "@typescript-eslint"],
+  plugins: ["svelte3", "@typescript-eslint", "prettier"],
   ignorePatterns: ["node_modules"],
   rules: {
     indent: ["error", 2, { SwitchCase: 1 }],
@@ -40,5 +41,6 @@ module.exports = {
         code: 80,
       },
     ],
+    "prettier/prettier": 2
   },
 };
