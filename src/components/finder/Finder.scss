@@ -1,16 +1,6 @@
 @import '../../define';
 
-.main-app {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: calc(100vh - 5px);
-  max-height: 800px;
-  width: 100vw;
-  box-sizing: border;
-}
-
-.finder-wrapper {
+.finder {
   border: 1px solid $gray-light-border;
   background: $mauve-01;
   border-radius: $border-radius;

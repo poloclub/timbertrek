@@ -3,7 +3,7 @@
 </svelte:head>
 
 <script lang="ts">
-  import Finder from './components/finder/Finder.svelte';
+  import Article from './components/article/Article.svelte';
 </script>
 
 <style lang='scss'>
@@ -18,5 +18,5 @@
 </style>
 
 <div class='stand-alone-page'>
-	<Finder />
+	<Article />
 </div>
