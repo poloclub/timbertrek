@@ -27,8 +27,11 @@ import {
   curveStepAfter,
   curveBasis,
   curveMonotoneX,
-  curveMonotoneY
+  curveMonotoneY,
+  arc
 } from 'd3-shape';
+
+import { hierarchy, partition } from 'd3-hierarchy';
 
 import { brush } from 'd3-brush';
 
@@ -74,5 +77,8 @@ export default {
   curveMonotoneX,
   curveMonotoneY,
   curveBasis,
-  timeFormat
+  timeFormat,
+  hierarchy,
+  partition,
+  arc
 };

@@ -7,5 +7,6 @@
   height: calc(100vh - 5px);
   max-height: 800px;
   width: 100vw;
-  box-sizing: border;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }

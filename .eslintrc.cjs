@@ -11,7 +11,7 @@ module.exports = {
     sourceType: "module",
     tsconfigRootDir: __dirname,
     project: ["./tsconfig.json"],
-    extraFileExtensions: [".svelte"],
+    extraFileExtensions: [".svelte", ".cjs"],
   },
   env: {
     es6: true,
@@ -42,6 +42,7 @@ module.exports = {
       },
     ],
     "prettier/prettier": 2,
-    "@typescript-eslint/no-floating-promises": "off"
+    "@typescript-eslint/no-floating-promises": "off",
+    "@typescript-eslint/no-unsafe-return": "off"
   },
 };
