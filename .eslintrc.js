@@ -41,6 +41,7 @@ module.exports = {
         code: 80,
       },
     ],
-    "prettier/prettier": 2
+    "prettier/prettier": 2,
+    "@typescript-eslint/no-floating-promises": "off"
   },
 };

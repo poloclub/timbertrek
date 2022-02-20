@@ -1,13 +1,23 @@
 <script lang='ts'>
   import {onMount} from 'svelte';
   import Sunburst from '../sunburst/Sunburst.svelte';
+  import d3 from '../../utils/d3-import';
 
   let component: HTMLElement | null = null;
 
-  onMount(() => {
-    // console.log('mounted!');
-  });
+  // Load the data and pass to child components
+  let data: object | null | undefined = null;
 
+  const initData = async () => {
+    // Init the model
+    data = await d3.json('/data/campas.json');
+  };
+
+  initData();
+
+  onMount(() => {
+    console.log('mounted!');
+  });
 </script>
 
 <style lang='scss'>
@@ -28,8 +38,10 @@
 
   <div class='content'>
 
-    <div class='ring'>
-      <Sunburst />
+    <div class='sunburst'>
+      <Sunburst
+        data={data}
+      />
     </div>
 
     <!-- <div class='feature-list'>
