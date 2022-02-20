@@ -25,6 +25,25 @@ interface HierarchyData {
   s: number | undefined;
 }
 
+// Define the arc path generator
+interface ArcPartition extends d3.DefaultArcObject {
+  x0: number;
+  x1: number;
+  y0: number;
+  y1: number;
+}
+
+interface HierarchyNode extends d3.HierarchyRectangularNode<unknown> {
+  current?: d3.HierarchyRectangularNode<unknown>;
+}
+
+interface Padding {
+  top: number;
+  bottom: number;
+  left: number;
+  right: number;
+}
+
 /**
  * Sunburst class that represents a sunburst chart
  */
@@ -32,10 +51,18 @@ export class Sunburst {
   svg: d3.Selection<d3.BaseType, unknown, null, undefined>;
   width: number;
   height: number;
-  radius: number;
+  level: number;
   data: HierarchyData;
-  partition: object;
-  arc: object;
+  partition: d3.HierarchyRectangularNode<unknown>;
+  arc: d3.Arc<any, d3.DefaultArcObject>;
+  padding: Padding;
+
+  /**
+   * The radius is determined by the number of levels to show.
+   */
+  get radius(): number {
+    return this.width / (2 * (this.level + 1));
+  }
 
   /**
    * Initialize a sunburst object
@@ -44,17 +71,20 @@ export class Sunburst {
    * @param data Hierarchy data loaded from a JSON file
    * @param width SVG width
    * @param height SVG height
+   * @param level Number of tree levels to show
    */
   constructor({
     component,
     data,
     width = 600,
-    height = 600
+    height = 600,
+    level = null
   }: {
     component: HTMLElement;
     data: object;
     width?: number;
     height?: number;
+    level?: number | null;
   }) {
     console.log('Init sunburst');
     console.log(data);
@@ -68,22 +98,30 @@ export class Sunburst {
       .attr('viewbox', '0 0 600 600')
       .attr('preserveAspectRatio', 'none');
 
-    this.width = width;
-    this.height = height;
-    this.radius = this.width / 6;
+    // Configure the view size
+    this.padding = {
+      top: 10,
+      bottom: 10,
+      left: 10,
+      right: 10
+    };
+
+    this.width = width - this.padding.left - this.padding.right;
+    this.height = height - this.padding.top - this.padding.bottom;
 
     // Transform the data
     this.data = data as HierarchyData;
-    this.partition = this._partition_data();
+    this.partition = this.#partitionData();
 
-    // Define the arc path generator
-    interface ArcPartition extends d3.DefaultArcObject {
-      x0: number;
-      x1: number;
-      y0: number;
-      y1: number;
+    // Figure out how many levels to show at the beginning
+    // If `level` is not given, we show all the levels by default
+    if (level === null) {
+      this.level = this.partition.height;
+    } else {
+      this.level = level;
     }
 
+    // Set up the arc generator
     this.arc = d3
       .arc()
       .startAngle((d) => (d as ArcPartition).x0)
@@ -101,13 +139,15 @@ export class Sunburst {
       );
 
     // Draw the initial view
-    this._initView();
+    console.time('Draw sunburst');
+    this.#initView();
+    console.timeEnd('Draw sunburst');
   }
 
   /**
    * Prepare the data for drawing.
    */
-  private _partition_data = () => {
+  #partitionData() {
     const root = d3
       .hierarchy(this.data, (d) => d.c)
       // Count the leaves (trees)
@@ -120,17 +160,38 @@ export class Sunburst {
     const partition = d3.partition().size([2 * Math.PI, root.height + 1])(root);
 
     return partition;
-  };
+  }
 
   /**
    * Draw the initial view.
    */
-  private _initView = () => {
-    this.svg
-      .append('circle')
-      .attr('cx', 300)
-      .attr('cy', 300)
-      .attr('r', 100)
-      .style('fill', 'navy');
-  };
+  #initView() {
+    // Save a copy of initial state of each node for animation
+    this.partition.each((d) => {
+      (d as HierarchyNode).current = d;
+    });
+
+    const content = this.svg
+      .append('g')
+      .attr('class', 'content-group')
+      .attr(
+        'transform',
+        `translate(${this.padding.left + this.width / 2}, ${
+          this.padding.top + this.height / 2
+        })`
+      );
+
+    // Draw the arcs
+    const arcGroup = content.append('g').attr('class', 'arc-group');
+
+    arcGroup
+      .selectAll('path.arc')
+      .data(this.partition.descendants().slice(1) as HierarchyNode[])
+      .join('path')
+      .attr('class', 'arc')
+      .style('fill', 'skyblue')
+      .style('fill-opacity', 0.5)
+      // @ts-ignore
+      .attr('d', (d) => this.arc(d.current));
+  }
 }

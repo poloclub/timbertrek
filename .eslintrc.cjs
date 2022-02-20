@@ -43,6 +43,7 @@ module.exports = {
     ],
     "prettier/prettier": 2,
     "@typescript-eslint/no-floating-promises": "off",
-    "@typescript-eslint/no-unsafe-return": "off"
+    "@typescript-eslint/no-unsafe-return": "off",
+    "@typescript-eslint/ban-ts-comment": "off"
   },
 };
