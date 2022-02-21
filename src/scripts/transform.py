@@ -1,4 +1,5 @@
 import numpy as np
+import re
 
 from json import load, dump
 from matplotlib import pyplot as plt
@@ -159,3 +160,41 @@ def get_hierarchy_dict(trie, metric='objective'):
         subtrie['c'].append(get_sub_trie(trie[k], k, direction))
 
     return subtrie
+
+
+def get_feature_map(feature_header, feature_description_map):
+    """Generate a feature map that maps the feature id number to their feature
+    definition. It also transform the feature name into a more readable format.
+
+    Args:
+        feature_header (list): _description_
+        feature_description_map (dict): Dictionary map feature name to {
+            'info': a readable short description
+            'type': a string from ['is', 'count', 'yes']
+        }
+
+    Returns:
+        dict: A feature map
+    """
+
+    feature_map = {}
+
+    for (i, item) in enumerate(feature_header):
+        feature_name = re.sub(r'(.*):.*', r'\1', item)
+        feature_value = re.sub(r'.*:(.*)', r'\1', item)
+
+        # Translate the feature name into a more readable format
+        feature_type = feature_description_map[feature_name]['type']
+        feature_name = feature_description_map[feature_name]['info']
+
+        if feature_type == 'is':
+            feature_value = 'is ' + feature_value
+            feature_map[i] = [feature_name, feature_value]
+        elif feature_type == 'count':
+            feature_value = re.sub(r'([>=<])(.*)', r'\1\2', feature_value)
+            feature_map[i] = [feature_name, feature_value]
+        elif feature_type == 'yes':
+            feature_value = ''
+            feature_map[i] = [feature_name, feature_value]
+
+    return feature_map
