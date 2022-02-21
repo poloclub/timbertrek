@@ -31,7 +31,10 @@
 
     <div class='logo'>
       <div class='logo-icon'>
-        Tree Finder
+        Forager
+      </div>
+      <div class='logo-tag'>
+        Identify accurate decision trees that reflect domain knowledge
       </div>
     </div>
   </div>

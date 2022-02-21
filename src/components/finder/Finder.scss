@@ -2,7 +2,7 @@
 
 .finder {
   border: 1px solid $gray-light-border;
-  background: $mauve-01;
+  background: $gray-50;
   border-radius: $border-radius;
   box-shadow: 0px 0px 2px hsla(0, 0%, 0%, 0.03),
     0px 0px 10px hsla(0, 0%, 0%, 0.05);
@@ -16,7 +16,28 @@
   flex-direction: row;
   align-items: center;
 
-  font-size: 1.2rem;
+  background-color: $gray-800;
+  border-top-left-radius: $border-radius;
+  border-top-right-radius: $border-radius;
+}
+
+.logo {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+
+  .logo-icon {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: $gray-50;
+  }
+
+  .logo-tag {
+    font-size: 1rem;
+    font-weight: 300;
+    color: $gray-400;
+    margin-left: 8px;
+  }
 }
 
 .content {
