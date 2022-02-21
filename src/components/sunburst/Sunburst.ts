@@ -148,6 +148,9 @@ export class Sunburst {
    * Prepare the data for drawing.
    */
   #partitionData() {
+    // Parse the feature names
+
+    // Construct d3 hierarchy
     const root = d3
       .hierarchy(this.data, (d) => d.c)
       // Count the leaves (trees)
@@ -188,9 +191,10 @@ export class Sunburst {
       .selectAll('path.arc')
       .data(this.partition.descendants().slice(1) as HierarchyNode[])
       .join('path')
-      .attr('class', 'arc')
-      .style('fill', 'skyblue')
-      .style('fill-opacity', 0.5)
+      .attr('class', (d) => `arc feature-${d.data['f']}`)
+      .classed('leaf', (d) => d.data['f'] === '_')
+      .style('fill', (d) => (d.data['f'] === '_' ? 'null' : 'skyblue'))
+      // .style('fill-opacity', 0.5)
       // @ts-ignore
       .attr('d', (d) => this.arc(d.current));
   }

@@ -1,6 +1,6 @@
 <script lang='ts'>
   import {onMount} from 'svelte';
-  import Finder from '../finder/Finder.svelte';
+  import Forager from '../forager/Forager.svelte';
 
   let component: HTMLElement | null = null;
 
@@ -16,6 +16,6 @@
 
 <div class='main-app' bind:this={component}>
 
-  <Finder />
+  <Forager />
 
 </div>

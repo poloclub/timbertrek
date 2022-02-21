@@ -21,11 +21,11 @@
 </script>
 
 <style lang='scss'>
-  @import './Finder.scss';
+  @import './Forager.scss';
 </style>
 
 
-<div class='finder' bind:this={component}>
+<div class='forager' bind:this={component}>
 
   <div class='header'>
 
@@ -34,7 +34,7 @@
         Forager
       </div>
       <div class='logo-tag'>
-        Identify accurate decision trees that reflect domain knowledge
+        Identify accurate decision trees that reflect human knowledge
       </div>
     </div>
   </div>
