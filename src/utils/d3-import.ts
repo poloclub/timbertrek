@@ -2,9 +2,17 @@ import { select, selectAll } from 'd3-selection';
 
 import { json } from 'd3-fetch';
 
-import { scaleLinear, scalePoint, scaleBand, scalePow } from 'd3-scale';
+import {
+  scaleLinear,
+  scalePoint,
+  scaleBand,
+  scalePow,
+  scaleOrdinal
+} from 'd3-scale';
 
-import { schemeTableau10 } from 'd3-scale-chromatic';
+import { schemeTableau10, interpolateRainbow } from 'd3-scale-chromatic';
+
+import { quantize } from 'd3-interpolate';
 
 import { max, maxIndex, min, minIndex, extent, sum } from 'd3-array';
 
@@ -52,6 +60,9 @@ export default {
   scaleBand,
   scalePow,
   schemeTableau10,
+  interpolateRainbow,
+  quantize,
+  scaleOrdinal,
   max,
   maxIndex,
   min,
