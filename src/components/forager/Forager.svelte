@@ -43,21 +43,14 @@
 
   <div class='content'>
 
-    <!-- <div class='toolbar'>
+    <div class='toolbar'>
       <Toolbar />
-    </div> -->
+    </div>
 
     <div class='sunburst'>
       <Sunburst
         data={data}
       />
-    </div>
-
-    <!-- <div class='feature-list'>
-    </div> -->
-
-    <div class='toolbar'>
-      <Toolbar />
     </div>
 
   </div>

@@ -1,7 +1,8 @@
 <script lang='ts'>
   import { onMount } from 'svelte';
   import { preProcessSVG } from '../../utils/utils';
-  import iconGear from '../../imgs/icon-gear.svg?raw';
+  import iconBrush from '../../imgs/icon-brush.svg?raw';
+  import iconSearch from '../../imgs/icon-search.svg?raw';
   import iconStar from '../../imgs/icon-star.svg?raw';
   import iconDepth from '../../imgs/icon-depth.svg?raw';
 
@@ -9,7 +10,7 @@
   let component: HTMLElement | null = null;
   export let data: object | null = null;
   let mounted = false;
-  let levelNum = 6;
+  let maxDepth = 6;
 
   // Process SVG strings
   const processedIconDepth = iconDepth.replaceAll('black', 'currentcolor');
@@ -27,30 +28,47 @@
 
 <div class='toolbar' bind:this={component}>
 
-
-  <div class='tools'>
-
-    <div class=svg-icon>
-      {@html iconGear}
+  <div class='depths'>
+    <div class='depth-label'>
+      Show Depth
     </div>
 
-    <div class=svg-icon>
-      {@html iconStar}
-    </div>
-
-  </div>
-
-  <div class='levels'>
-
-    <div class='svg-icon level-icon'>
-      {@html processedIconDepth}
-    </div>
-
-    {#each [...Array(levelNum).keys()] as i}
-      <div class='level-box'>
+    {#each [...Array(maxDepth).keys()] as i}
+      <div class='depth-box'>
         {i + 1}
       </div>
     {/each}
+  </div>
+
+  <div class='tools'>
+
+    <div class='tool-button'>
+      <span class='svg-icon icon-brush'>
+        {@html iconBrush}
+      </span>
+      <span class='tool-name'>
+        Appearance
+      </span>
+    </div>
+
+    <div class='tool-button'>
+      <span class='svg-icon icon-brush'>
+        {@html iconStar}
+      </span>
+      <span class='tool-name'>
+        Favorites
+      </span>
+    </div>
+
+    <div class='tool-button'>
+      <span class='svg-icon icon-brush'>
+        {@html iconSearch}
+      </span>
+      <span class='tool-name'>
+        Search
+      </span>
+    </div>
 
   </div>
+
 </div>

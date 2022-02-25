@@ -44,7 +44,7 @@
 
 .content {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
 }
 
 .sunburst {
@@ -55,8 +55,7 @@
 .sidebar {
   position: absolute;
   right: 0px;
-  // top: $toolbar-height + $header-height - 1px;
-  top: -1px;
+  top: $header-height;
   transform: translateX(calc(100% - 2px));
 
   // clip-path: inset(0px 0px 0px -15px);

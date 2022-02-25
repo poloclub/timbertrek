@@ -6,11 +6,12 @@
   align-items: center;
 
   width: 200px;
-  height: $sunburst-width + $header-height - 1px;
+  min-height: 400px;
+  max-height: $sunburst-width + $toolbar-height - 1px;
 }
 
 .header {
-  height: $header-height;
+  height: $toolbar-height;
   width: 100%;
   border-bottom: 1px solid $gray-light-border2;
   padding: 2px 12px;
