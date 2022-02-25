@@ -17,51 +17,82 @@
 .depths {
   display: flex;
   flex-direction: row;
+  justify-content: space-between;
   align-items: baseline;
-  gap: 8px;
+
   color: $gray-800;
-}
 
-.depth-box {
-  border: 1px solid $gray-300;
-  width: 20px;
-  height: 20px;
-  border-radius: 5px;
+  .depth-label {
+    margin-right: 6px;
+  }
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  .depth-box-container {
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+    gap: 8px;
+    position: relative;
 
-  user-select: none;
+    &::after {
+      position: absolute;
+      z-index: 1;
+      content: '';
+      width: 100%;
+      border-bottom: 1px solid $gray-400;
+      top: 50%;
+      left: 0px;
+    }
+  }
+
+  .depth-box {
+    z-index: 2;
+    flex-shrink: 0;
+
+    width: 20px;
+    height: 20px;
+    border-radius: 5px;
+
+    border: 1px solid $gray-300;
+    background-color: $gray-light-background;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    user-select: none;
+  }
 }
 
 .tools {
   display: flex;
   gap: 3px;
   flex-direction: row;
-}
 
-.tool-button {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 3px;
+  .tool-button {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 2px;
 
-  border-radius: 5px;
-  padding: 4px 5px;
-  user-select: none;
+    border-radius: 5px;
+    padding: 4px 6px;
+    user-select: none;
 
-  color: $gray-700;
-  // border: 1px solid $gray-300;
+    color: $gray-700;
+    // border: 1px solid $gray-300;
+    // background-color: $gray-100;
 
-  transition: background-color 100ms ease-in-out, fill 100ms ease-in-out, color 100ms ease-in-out;
+    transition: background-color 100ms ease-in-out, fill 100ms ease-in-out,
+      color 100ms ease-in-out;
 
-  &:hover {
-    background-color: $gray-200;
-  }
+    &:hover {
+      background-color: $gray-200;
+    }
 
-  &:active {
-    color: adjust-color($color: $gray-700, $lightness: -20%);
+    &:active {
+      background-color: adjust-color($color: $gray-200, $lightness: -6%);
+      color: adjust-color($color: $gray-700, $lightness: -10%);
+    }
   }
 }
 
@@ -73,7 +104,7 @@
   color: currentColor;
 
   :global(svg) {
-    width: 1em;
-    height: 1em;
+    width: 0.92em;
+    height: 0.92em;
   }
 }

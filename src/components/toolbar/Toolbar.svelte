@@ -33,11 +33,13 @@
       Show Depth
     </div>
 
-    {#each [...Array(maxDepth).keys()] as i}
-      <div class='depth-box'>
-        {i + 1}
-      </div>
-    {/each}
+    <div class='depth-box-container'>
+      {#each [...Array(maxDepth).keys()] as i}
+        <div class='depth-box'>
+          {i + 1}
+        </div>
+      {/each}
+    </div>
   </div>
 
   <div class='tools'>

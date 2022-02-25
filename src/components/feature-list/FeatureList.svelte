@@ -17,6 +17,5 @@
 </style>
 
 <div class='feature-list' bind:this={component}>
-  <div class='header'>Preferences</div>
-
+  <div class='header'>Appearance</div>
 </div>
