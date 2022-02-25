@@ -34,7 +34,7 @@ export const preProcessSVG = (svgString: string, resetColors = []) => {
     .replaceAll('fill:none', 'fill:currentcolor')
     .replaceAll('stroke:none', 'fill:currentcolor');
 
-  resetColors.forEach((c) => {
+  resetColors.forEach(c => {
     newString = newString.replaceAll(c, 'currentcolor');
   });
 
@@ -47,7 +47,7 @@ export const preProcessSVG = (svgString: string, resetColors = []) => {
  * @param {Icon[]} iconList A list of icon mappings (class => icon string)
  */
 export const bindInlineSVG = (component: HTMLElement, iconList: Icon[]) => {
-  iconList.forEach((d) => {
+  iconList.forEach(d => {
     d3.select(component)
       .selectAll(`.svg-icon.${d.class}`)
       .each((_, i, g) => {

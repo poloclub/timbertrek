@@ -1,6 +1,8 @@
 <script lang='ts'>
   import {onMount} from 'svelte';
+  import Toolbar from '../toolbar/Toolbar.svelte';
   import Sunburst from '../sunburst/Sunburst.svelte';
+  import FeatureList from '../feature-list/FeatureList.svelte';
   import d3 from '../../utils/d3-import';
 
   let component: HTMLElement | null = null;
@@ -41,6 +43,10 @@
 
   <div class='content'>
 
+    <!-- <div class='toolbar'>
+      <Toolbar />
+    </div> -->
+
     <div class='sunburst'>
       <Sunburst
         data={data}
@@ -50,5 +56,13 @@
     <!-- <div class='feature-list'>
     </div> -->
 
+    <div class='toolbar'>
+      <Toolbar />
+    </div>
+
+  </div>
+
+  <div class='sidebar'>
+    <FeatureList />
   </div>
 </div>

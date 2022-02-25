@@ -13,6 +13,7 @@ $gray-light: hsl(26, 10%, 65%);
 $gray-light-background: hsla(0, 0%, 99%, 1);
 $gray-border: hsla(0, 0%, 0%, 0.2);
 $gray-light-border: hsla(0, 0%, 0%, 0.12);
+$gray-light-border2: hsla(0, 0%, 0%, 0.05);
 
 $brown-50: hsl(20, 16%, 99%);
 
@@ -38,7 +39,11 @@ $shadow-border-large: 0 8px 24px hsla(212, 9%, 59%, 0.2);
 
 // Layouts
 $border-radius: 5px;
-$panel-h-padding: 25px;
+$panel-h-padding: 16px;
+$panel-v-padding: 6px;
+$header-height: 40px;
+$toolbar-height: 32px;
+$sunburst-width: 600px;
 
 // Material design color
 $red-50: hsl(350, 100.0%, 96.08%);

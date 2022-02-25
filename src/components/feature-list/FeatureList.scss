@@ -1,0 +1,38 @@
+@import '../../define';
+
+.feature-list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  width: 200px;
+  height: $sunburst-width + $header-height - 1px;
+}
+
+.header {
+  height: $header-height;
+  width: 100%;
+  border-bottom: 1px solid $gray-light-border2;
+  padding: 2px 12px;
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+}
+
+// .svg-icon {
+//   display: flex;
+//   justify-content: center;
+//   align-items: center;
+//   fill: $gray-500;
+//   color: $gray-500;
+//   cursor: pointer;
+
+//   :global(svg) {
+//     width: 1.2rem;
+//     height: 1.2rem;
+//   }
+
+//   &:hover {
+//     fill: adjust-color($color: $gray-500, $lightness: -10%);
+//   }
+// }

@@ -1,0 +1,35 @@
+@import '../../define';
+
+.toolbar {
+  height: $toolbar-height;
+  padding: 3px $panel-h-padding;
+  border-bottom: 1px solid $gray-light-border;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tools {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+}
+
+.svg-icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  fill: $gray-500;
+  color: $gray-500;
+  cursor: pointer;
+
+  :global(svg) {
+    width: 1.2rem;
+    height: 1.2rem;
+  }
+
+  &:hover {
+    fill: adjust-color($color: $gray-500, $lightness: -10%);
+  }
+}

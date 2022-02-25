@@ -1,0 +1,62 @@
+@import '../../define';
+
+.toolbar {
+  // height: $toolbar-height;
+  height: 100%;
+  width: 40px;
+  padding: 10px 10px;
+  border-left: 1px solid $gray-light-border2;
+
+  display: flex;
+  flex-direction: column;
+  // justify-content: space-between;
+  align-items: center;
+}
+
+.tools {
+  display: flex;
+  gap: 12px;
+  flex-direction: column;
+  border-bottom: 1px solid $gray-light-border;
+  padding-bottom: 10px;
+}
+
+.levels {
+  margin-top: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+
+  .level-icon {
+    margin-bottom: 5px;
+  }
+}
+
+.level-box {
+  border: 1px solid $gray-light-border;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5px;
+}
+
+.svg-icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  fill: $blue-800;
+  color: $gray-800;
+  cursor: pointer;
+
+  :global(svg) {
+    width: 1.3rem;
+    height: 1.3rem;
+  }
+
+  &:hover {
+    fill: adjust-color($color: $gray-500, $lightness: -10%);
+  }
+}
