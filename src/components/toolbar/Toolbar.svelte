@@ -1,25 +1,42 @@
 <script lang='ts'>
   import { onMount } from 'svelte';
   import { preProcessSVG } from '../../utils/utils';
+  import { ToolbarEventHandler } from './Toolbar';
+  import type { Writable } from 'svelte/store';
+  import type { AppearanceStoreValue } from 'src/stores';
+
   import iconBrush from '../../imgs/icon-brush.svg?raw';
   import iconSearch from '../../imgs/icon-search.svg?raw';
   import iconStar from '../../imgs/icon-star.svg?raw';
   import iconDepth from '../../imgs/icon-depth.svg?raw';
 
   // Component variables
+  // export let data: object | null = null;
+  export let appearanceStore: Writable<AppearanceStoreValue> = null;
+
   let component: HTMLElement | null = null;
-  export let data: object | null = null;
   let mounted = false;
   let maxDepth = 6;
 
   // Process SVG strings
   const processedIconDepth = iconDepth.replaceAll('black', 'currentcolor');
 
+  // Create the event handler object
+  let handler: ToolbarEventHandler = null;
+
   onMount(() => {
     mounted = true;
   });
 
-  $: data && mounted;
+  const handlerUpdated = () => {
+    handler = handler;
+  };
+
+  const initView = () => {
+    handler = new ToolbarEventHandler(handlerUpdated, appearanceStore);
+  };
+
+  $: appearanceStore && initView();
 </script>
 
 <style lang='scss'>
@@ -44,7 +61,10 @@
 
   <div class='tools'>
 
-    <div class='tool-button'>
+    <div class='tool-button'
+      on:click={() => {handler?.appearanceClicked();}}
+      class:shown={handler?.appearanceStoreValue.shown}
+    >
       <span class='svg-icon icon-brush'>
         {@html iconBrush}
       </span>

@@ -49,8 +49,8 @@
     z-index: 2;
     flex-shrink: 0;
 
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
     border-radius: 5px;
 
     border: 1px solid $gray-300;
@@ -61,6 +61,9 @@
     justify-content: center;
 
     user-select: none;
+
+    transition: background-color 100ms ease-in-out, fill 100ms ease-in-out,
+      color 100ms ease-in-out;
 
     &:hover {
       background-color: adjust-color($color: white, $lightness: -7%);
@@ -93,6 +96,10 @@
 
     transition: background-color 100ms ease-in-out, fill 100ms ease-in-out,
       color 100ms ease-in-out;
+
+    &.shown {
+      background-color: adjust-color($color: white, $lightness: -10%);
+    }
 
     &:hover {
       background-color: adjust-color($color: white, $lightness: -7%);

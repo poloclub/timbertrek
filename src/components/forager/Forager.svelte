@@ -1,8 +1,9 @@
 <script lang='ts'>
-  import {onMount} from 'svelte';
+  import { onMount } from 'svelte';
+  import { getAppearanceStore } from '../../stores';
   import Toolbar from '../toolbar/Toolbar.svelte';
   import Sunburst from '../sunburst/Sunburst.svelte';
-  import FeatureList from '../feature-list/FeatureList.svelte';
+  import AppearancePanel from '../appearance-panel/AppearancePanel.svelte';
   import d3 from '../../utils/d3-import';
 
   let component: HTMLElement | null = null;
@@ -16,6 +17,9 @@
   };
 
   initData();
+
+  // Construct stores
+  const appearanceStore = getAppearanceStore();
 
   onMount(() => {
     console.log('mounted!');
@@ -44,7 +48,9 @@
   <div class='content'>
 
     <div class='toolbar'>
-      <Toolbar />
+      <Toolbar
+        appearanceStore={appearanceStore}
+      />
     </div>
 
     <div class='sunburst'>
@@ -56,6 +62,8 @@
   </div>
 
   <div class='sidebar'>
-    <FeatureList />
+    <AppearancePanel
+      appearanceStore={appearanceStore}
+    />
   </div>
 </div>

@@ -1,4 +1,4 @@
-// svg.d.ts
+// Custom types
 
 declare module '*.svg' {
   const value: string;
