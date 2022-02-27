@@ -1,4 +1,5 @@
 import d3 from '../../utils/d3-import';
+import { config } from '../../config';
 
 interface FeatureMap {
   [featureID: number]: string[];
@@ -97,8 +98,8 @@ export class Sunburst {
   constructor({
     component,
     data,
-    width = 600,
-    height = 600,
+    width = config.layout.sunburstWidth,
+    height = config.layout.sunburstWidth,
     level = null
   }: {
     component: HTMLElement;

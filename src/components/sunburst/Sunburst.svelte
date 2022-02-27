@@ -1,6 +1,7 @@
 <script lang='ts'>
   import { Sunburst } from './Sunburst';
   import { onMount } from 'svelte';
+  import { config } from '../../config';
 
   // Component variables
   let component: HTMLElement | null = null;
@@ -8,8 +9,8 @@
   let mounted = false;
 
   // View variables
-  const width = 600;
-  const height = 600;
+  const width = config.layout.sunburstWidth;
+  const height = config.layout.sunburstWidth;
   let sunburst: Sunburst | null = null;
 
   onMount(() => {
