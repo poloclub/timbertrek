@@ -1,6 +1,6 @@
 <script lang='ts'>
   import { onMount } from 'svelte';
-  import { getAppearanceStore } from '../../stores';
+  import { getAppearanceStore, getSunburstStore } from '../../stores';
   import Toolbar from '../toolbar/Toolbar.svelte';
   import Sunburst from '../sunburst/Sunburst.svelte';
   import AppearancePanel from '../appearance-panel/AppearancePanel.svelte';
@@ -20,6 +20,7 @@
 
   // Construct stores
   const appearanceStore = getAppearanceStore();
+  const sunburstStore = getSunburstStore();
 
   onMount(() => {
     console.log('mounted!');
@@ -50,12 +51,14 @@
     <div class='toolbar'>
       <Toolbar
         appearanceStore={appearanceStore}
+        sunburstStore={sunburstStore}
       />
     </div>
 
     <div class='sunburst'>
       <Sunburst
         data={data}
+        sunburstStore={sunburstStore}
       />
     </div>
 

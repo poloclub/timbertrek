@@ -2,10 +2,14 @@
   import { Sunburst } from './Sunburst';
   import { onMount } from 'svelte';
   import { config } from '../../config';
+  import type { Writable } from 'svelte/store';
+  import type { SunburstStoreValue } from '../../stores';
 
   // Component variables
-  let component: HTMLElement | null = null;
   export let data: object | null = null;
+  export let sunburstStore: Writable<SunburstStoreValue> | null = null;
+
+  let component: HTMLElement | null = null;
   let mounted = false;
 
   // View variables
@@ -19,13 +23,13 @@
 
   const initView = () => {
     if (component && data) {
-      sunburst = new Sunburst({ component, data, width, height });
+      sunburst = new Sunburst({ component, data, sunburstStore, width, height });
     }
 
     console.log(sunburst);
   };
 
-  $: data && mounted && component && initView();
+  $: data && sunburstStore && mounted && component && initView();
 </script>
 
 <style lang='scss'>

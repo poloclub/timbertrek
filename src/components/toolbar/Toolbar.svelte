@@ -3,7 +3,7 @@
   import { preProcessSVG } from '../../utils/utils';
   import { ToolbarEventHandler } from './Toolbar';
   import type { Writable } from 'svelte/store';
-  import type { AppearanceStoreValue } from 'src/stores';
+  import type { AppearanceStoreValue, SunburstStoreValue } from 'src/stores';
 
   import iconBrush from '../../imgs/icon-brush.svg?raw';
   import iconSearch from '../../imgs/icon-search.svg?raw';
@@ -13,13 +13,13 @@
   // Component variables
   // export let data: object | null = null;
   export let appearanceStore: Writable<AppearanceStoreValue> = null;
+  export let sunburstStore: Writable<SunburstStoreValue> = null;
 
   let component: HTMLElement | null = null;
   let mounted = false;
-  let maxDepth = 6;
 
   // Process SVG strings
-  const processedIconDepth = iconDepth.replaceAll('black', 'currentcolor');
+  // const processedIconDepth = iconDepth.replaceAll('black', 'currentcolor');
 
   // Create the event handler object
   let handler: ToolbarEventHandler = null;
@@ -33,7 +33,9 @@
   };
 
   const initView = () => {
-    handler = new ToolbarEventHandler(handlerUpdated, appearanceStore);
+    handler = new ToolbarEventHandler(handlerUpdated, appearanceStore,
+      sunburstStore
+    );
   };
 
   $: appearanceStore && initView();
@@ -51,8 +53,10 @@
     </div>
 
     <div class='depth-box-container'>
-      {#each [...Array(maxDepth).keys()] as i}
-        <div class='depth-box'>
+      {#each [...Array(handler?.sunburstStoreValue.depthMax).keys()] as i}
+        <div class='depth-box'
+          on:click={() => handler?.depthBoxClicked(i + 1)}
+        >
           {i + 1}
         </div>
       {/each}

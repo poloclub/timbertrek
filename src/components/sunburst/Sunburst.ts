@@ -1,5 +1,7 @@
 import d3 from '../../utils/d3-import';
 import { config } from '../../config';
+import type { Writable } from 'svelte/store';
+import type { SunburstStoreValue } from 'src/stores';
 
 interface FeatureMap {
   [featureID: number]: string[];
@@ -69,6 +71,8 @@ enum FeaturePosition {
  */
 export class Sunburst {
   svg: d3.Selection<d3.BaseType, unknown, null, undefined>;
+  sunburstStore: Writable<SunburstStoreValue>;
+  sunburstStoreValue: SunburstStoreValue;
   width: number;
   height: number;
   level: number;
@@ -90,6 +94,7 @@ export class Sunburst {
    * Initialize a sunburst object
    * @param args Named parameters
    * @param args.component Sunburst component
+   * @param args.sunburstStore sunburstStore
    * @param data Hierarchy data loaded from a JSON file
    * @param width SVG width
    * @param height SVG height
@@ -98,12 +103,14 @@ export class Sunburst {
   constructor({
     component,
     data,
+    sunburstStore,
     width = config.layout.sunburstWidth,
     height = config.layout.sunburstWidth,
     level = null
   }: {
     component: HTMLElement;
     data: object;
+    sunburstStore: Writable<SunburstStoreValue>;
     width?: number;
     height?: number;
     level?: number | null;
@@ -169,6 +176,11 @@ export class Sunburst {
 
     // Parse the feature map as a map
     this.colorScale = this.#getColorScale();
+
+    // Initialize the store
+    this.sunburstStore = sunburstStore;
+    this.sunburstStoreValue = null;
+    this.#initStore();
 
     // Draw the initial view
     console.time('Draw sunburst');
@@ -298,6 +310,22 @@ export class Sunburst {
     // console.log(d3.schemeTableau10);
 
     return mainColorScale;
+  }
+
+  /**
+   * Initialize the sunburst store
+   */
+  #initStore() {
+    this.sunburstStore.subscribe(value => {
+      this.sunburstStoreValue = value;
+    });
+
+    // Figure out the height of the trie and initialize the depth
+    this.sunburstStoreValue.depthMax = this.partition.height;
+    this.sunburstStoreValue.depthLow = 1;
+    this.sunburstStoreValue.depthLow = this.sunburstStoreValue.depthMax;
+
+    this.sunburstStore.set(this.sunburstStoreValue);
   }
 
   /**
