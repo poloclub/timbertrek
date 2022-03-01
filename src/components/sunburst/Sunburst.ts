@@ -56,6 +56,13 @@ interface Padding {
   right: number;
 }
 
+interface ArcDomain {
+  x0: number;
+  x1: number;
+  y0: number;
+  y1: number;
+}
+
 /**
  * This enum defines which feature to extract. The node can include two
  * features.
@@ -100,6 +107,7 @@ export class Sunburst {
   arc: d3.Arc<any, d3.DefaultArcObject>;
   featureMap: Map<number, string[]>;
   colorScale: d3.ScaleOrdinal<string, string, never>;
+  arcDomainStack: ArcDomain[];
 
   /**
    * The radius is determined by the number of levels to show.
@@ -187,6 +195,9 @@ export class Sunburst {
       .clamp(true);
 
     this.yScale = d3.scaleLinear().domain([0, 1]).range([0, this.maxRadius]);
+
+    // Push the initial domain
+    this.arcDomainStack = [];
 
     // Set up the arc generator
     this.arc = d3
@@ -534,14 +545,10 @@ export class Sunburst {
   }
 
   /**
-   * Event handler for arc clicking.
-   * @param e Event
-   * @param d Datum
+   * Zoom in or out of one arc with transitions
+   * @param newDomain Target domain
    */
-  #arcClicked(e: MouseEvent, d: HierarchyNode) {
-    e.stopPropagation();
-    e.preventDefault();
-
+  #arcZoom(newDomain: ArcDomain) {
     // Customize an interpolator for the transition
     // We animate the domains of x and y scales
     const transition = this.svg
@@ -550,14 +557,15 @@ export class Sunburst {
       .duration(800)
       .ease(d3.easeCubicInOut)
       .tween('zoom', () => {
-        console.log(d.x0, d.x1, d.y0, d.y1);
-
         const xInterpolator = d3.interpolate(this.xScale.domain(), [
-          d.x0,
-          d.x1
+          newDomain.x0,
+          newDomain.x1
         ]);
 
-        const yInterpolator = d3.interpolate(this.yScale.domain(), [d.y0, 1]);
+        const yInterpolator = d3.interpolate(this.yScale.domain(), [
+          newDomain.y0,
+          1
+        ]);
 
         // At each frame, overwrite the x and y scale domains
         return (t: number) => {
@@ -570,5 +578,44 @@ export class Sunburst {
     transition
       .selectAll('.arc')
       .attrTween('d', d => () => this.arc(d as d3.DefaultArcObject));
+  }
+
+  /**
+   * Event handler for arc clicking.
+   * @param e Event
+   * @param d Datum
+   */
+  #arcClicked(e: MouseEvent, d: HierarchyNode) {
+    e.stopPropagation();
+    e.preventDefault();
+
+    let targetDomain: ArcDomain = { x0: 0, x1: 1, y0: 0, y1: 1 };
+
+    // Detect if the user clicks the center
+    const curXDomain = this.xScale.domain();
+
+    if (d.x0 == curXDomain[0] && d.x1 == curXDomain[1]) {
+      // Transition to the last domain in the domain stack
+      targetDomain = this.arcDomainStack.pop();
+    } else {
+      // The user clicks an arc, zoom into it
+      targetDomain = {
+        x0: d.x0,
+        x1: d.x1,
+        y0: d.y0,
+        y1: 1
+      };
+
+      // Save the current domain in the stack
+      const curDomain: ArcDomain = {
+        x0: curXDomain[0],
+        x1: curXDomain[1],
+        y0: this.yScale.domain()[0],
+        y1: this.yScale.domain()[1]
+      };
+      this.arcDomainStack.push(curDomain);
+    }
+
+    this.#arcZoom(targetDomain);
   }
 }
