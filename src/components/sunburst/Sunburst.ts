@@ -67,6 +67,14 @@ enum FeaturePosition {
 }
 
 /**
+ * Type of feature string encodings
+ */
+enum featureValuePairType {
+  PairArray,
+  PairString
+}
+
+/**
  * Sunburst class that represents a sunburst chart
  */
 export class Sunburst {
@@ -78,6 +86,8 @@ export class Sunburst {
   level: number;
   data: HierarchyData;
   partition: d3.HierarchyRectangularNode<unknown>;
+  featureCount: Map<string, number>;
+  featureValueCount: Map<string, Map<string, number>>;
   arc: d3.Arc<any, d3.DefaultArcObject>;
   padding: Padding;
   featureMap: Map<number, string[]>;
@@ -147,6 +157,8 @@ export class Sunburst {
       this.featureMap.set(parseInt(k), v as string[]);
     }
 
+    this.featureCount = new Map<string, number>();
+    this.featureValueCount = new Map<string, Map<string, number>>();
     this.partition = this.#partitionData();
 
     // Figure out how many levels to show at the beginning
@@ -196,75 +208,29 @@ export class Sunburst {
   #getFeatureInfo(f: string) {
     const featureInfo = {
       name: '',
-      value: ''
+      value: '',
+      nameValue: ''
     };
     const parsedInt = parseInt(f);
     if (!isNaN(parsedInt)) {
       featureInfo.name = this.featureMap.get(parsedInt)[0];
       featureInfo.value = this.featureMap.get(parsedInt)[1];
+      featureInfo.nameValue = `${featureInfo.name}:${featureInfo.value}`;
     }
     return featureInfo;
-  }
-
-  /**
-   * Prepare the data for drawing.
-   */
-  #partitionData() {
-    /**
-     * Step 1: Construct d3 hierarchy
-     */
-    let root = d3
-      .hierarchy(this.data, d => d.c)
-      // Count the leaves (trees)
-      .sum(d => (d.f === '_' ? 1 : 0));
-
-    /**
-     * Step 2: Figure out the feature order (based on first split frequency)
-     */
-    const featureCount = new Map<string, number>();
-    root.children.forEach(d => {
-      const featureName = this.#getFeatureName(d.data.f);
-      if (featureCount.has(featureName)) {
-        featureCount.set(featureName, featureCount.get(featureName) + d.value);
-      } else {
-        featureCount.set(featureName, d.value);
-      }
-    });
-
-    // Handle leaf node
-    featureCount.set('', 0);
-
-    /**
-     * Sort by the feature name, then by the # of children
-     * The feature name needs to be carefully compared by the # of children
-     * fall in to the feature category
-     */
-    root = root.sort((a, b) => {
-      const aName = this.#getFeatureInfo(a.data.f).name;
-      const bName = this.#getFeatureInfo(b.data.f).name;
-      const aFeatureCount = featureCount.get(aName);
-      const bFeatureCount = featureCount.get(bName);
-      return bFeatureCount - aFeatureCount || b.value - a.value;
-    });
-
-    /**
-     * Step 3: Convert the hierarchy data into a partition
-     * It gives [x0, y0, x1, y1] of each node
-     */
-    const partition = d3.partition().size([2 * Math.PI, root.height + 1])(root);
-
-    return partition;
   }
 
   /**
    * Translate the raw feature label to feature name
    * @param rawFeatureString Feature label from the JSON file
    * @param order Order to parse the feature if there are two
-   * @returns Feature name
+   * @param returnValue Return [name, value] array or 'name:value' string
+   * @returns Feature name and value
    */
-  #getFeatureName(
+  #getFeatureNameValue(
     rawFeatureString: string,
-    order: FeaturePosition = FeaturePosition.First
+    order: FeaturePosition = FeaturePosition.First,
+    returnValue: featureValuePairType = featureValuePairType.PairArray
   ) {
     let stringID = -1;
     if (rawFeatureString.includes(' ')) {
@@ -286,7 +252,84 @@ export class Sunburst {
       stringID = +rawFeatureString;
     }
 
-    return this.featureMap.get(stringID)[0];
+    switch (returnValue) {
+      case featureValuePairType.PairArray:
+        return this.featureMap.get(stringID);
+      case featureValuePairType.PairString: {
+        const tempArray = this.featureMap.get(stringID);
+        return `${tempArray[0]}:${tempArray[1]}`;
+      }
+    }
+  }
+
+  /**
+   * Prepare the data for drawing.
+   */
+  #partitionData() {
+    /**
+     * Step 1: Construct d3 hierarchy
+     */
+    let root = d3
+      .hierarchy(this.data, d => d.c)
+      // Count the leaves (trees)
+      .sum(d => (d.f === '_' ? 1 : 0));
+
+    /**
+     * Step 2: Figure out the feature order (based on first split frequency)
+     */
+    root.children.forEach(d => {
+      const [featureName, featureValue] = this.#getFeatureNameValue(d.data.f);
+
+      // Check if this feature name is created
+      if (this.featureCount.has(featureName)) {
+        this.featureCount.set(
+          featureName,
+          this.featureCount.get(featureName) + d.value
+        );
+
+        // Check if this value is created
+        if (this.featureValueCount.get(featureName).has(featureValue)) {
+          this.featureValueCount
+            .get(featureName)
+            .set(
+              featureValue,
+              this.featureValueCount.get(featureName).get(featureValue) +
+                d.value
+            );
+        } else {
+          this.featureValueCount.get(featureName).set(featureValue, d.value);
+        }
+      } else {
+        this.featureCount.set(featureName, d.value);
+        const tempMap = new Map<string, number>();
+        tempMap.set(featureValue, d.value);
+        this.featureValueCount.set(featureName, tempMap);
+      }
+    });
+
+    // Handle leaf node
+    this.featureCount.set('', 0);
+
+    /**
+     * Sort by the feature name, then by the # of children
+     * The feature name needs to be carefully compared by the # of children
+     * fall in to the feature category
+     */
+    root = root.sort((a, b) => {
+      const aName = this.#getFeatureInfo(a.data.f).name;
+      const bName = this.#getFeatureInfo(b.data.f).name;
+      const aFeatureCount = this.featureCount.get(aName);
+      const bFeatureCount = this.featureCount.get(bName);
+      return bFeatureCount - aFeatureCount || b.value - a.value;
+    });
+
+    /**
+     * Step 3: Convert the hierarchy data into a partition
+     * It gives [x0, y0, x1, y1] of each node
+     */
+    const partition = d3.partition().size([2 * Math.PI, root.height + 1])(root);
+
+    return partition;
   }
 
   /**
@@ -295,19 +338,80 @@ export class Sunburst {
    * group, then tune the lightness in the LCH space.
    */
   #getColorScale() {
-    const featureNameSet = new Set(
-      Array.from(this.featureMap.values()).map(d => d[0])
-    );
+    const featureStrings: string[] = [];
+    const featureColors: string[] = [];
+    // const minL = 20;
+    const maxLGap = 20;
+    const maxL = 92;
 
-    // Get the hue from the less angry rainbow scale
-    // const mainColorScale = d3.scaleOrdinal(
-    //   d3.quantize(d3.interpolateRainbow, featureNameSet.size + 1)
-    // );
+    const tableau9 = [
+      d3.lch(49.184, 30.07, 260.445), // blue
+      d3.lch(68.968, 73.064, 62.176), // orange
+      d3.lch(56.278, 61.87, 27.615), // red
+      d3.lch(60.11, 50.293, 135.863), // green
+      d3.lch(82.442, 65.798, 87.008), // yellow
+      d3.lch(69.948, 22.911, 191.071), // sky
+      d3.lch(57.703, 28.677, 334.556), // purple
+      d3.lch(52.777, 22.881, 53.64), // brown
+      d3.lch(75.303, 39.883, 16.269) // pink
+    ];
+
+    // Sort the feature by (1) feature name; (2) feature value by # of trees use
+    // them in the first split
+    const sortedFeatureNames = Array.from(this.featureCount.keys())
+      .filter(a => a !== '')
+      .sort((a, b) => this.featureCount.get(b) - this.featureCount.get(a));
+
+    sortedFeatureNames.forEach((featureName, i) => {
+      if (i > 8) {
+        console.error('Number of feature is greater than 9');
+      }
+
+      const curColor = d3.lch(d3.color(tableau9[i % 8]));
+
+      // Get the number of values using this feature
+      const sortedFeatureValues = Array.from(
+        this.featureValueCount.get(featureName).keys()
+      ).sort(
+        (a, b) =>
+          this.featureValueCount.get(featureName).get(b) -
+          this.featureValueCount.get(featureName).get(a)
+      );
+
+      // Create different lightness based on the number of values
+      const valueNum = sortedFeatureValues.length;
+
+      // If there are not many values, we can just use the maxLGap to decrease L
+      if (curColor.l + valueNum * maxLGap <= maxL) {
+        sortedFeatureValues.forEach((value, j) => {
+          const newFeatureString = `${featureName}:${value}`;
+          const newFeatureColor = d3.lch(
+            curColor.l + j * maxLGap,
+            curColor.c,
+            curColor.h
+          );
+          featureStrings.push(newFeatureString);
+          featureColors.push(newFeatureColor.formatHsl());
+        });
+      } else {
+        // If there are too many values, we equally divide the lightness
+        const curLGap = (maxL - curColor.l) / valueNum;
+        sortedFeatureValues.forEach((value, j) => {
+          const newFeatureString = `${featureName}:${value}`;
+          const newFeatureColor = d3.lch(
+            curColor.l + j * curLGap,
+            curColor.c,
+            curColor.h
+          );
+          featureStrings.push(newFeatureString);
+          featureColors.push(newFeatureColor.formatHsl());
+        });
+      }
+    });
 
     const mainColorScale = d3
-      .scaleOrdinal(d3.schemeTableau10.slice(0, 9))
-      .domain(featureNameSet);
-    // console.log(d3.schemeTableau10);
+      .scaleOrdinal(featureColors)
+      .domain(featureStrings);
 
     return mainColorScale;
   }
@@ -364,7 +468,11 @@ export class Sunburst {
 
         // Determine the color
         const color = this.colorScale(
-          this.#getFeatureName(d.data['f'] as string)
+          this.#getFeatureNameValue(
+            d.data['f'] as string,
+            FeaturePosition.First,
+            featureValuePairType.PairString
+          ) as string
         );
         return color;
       })
