@@ -15,7 +15,7 @@ import { schemeTableau10, interpolateRainbow } from 'd3-scale-chromatic';
 
 import { lch, hsl, color } from 'd3-color';
 
-import { quantize } from 'd3-interpolate';
+import { quantize, interpolate } from 'd3-interpolate';
 
 import { max, maxIndex, min, minIndex, extent, sum } from 'd3-array';
 
@@ -69,6 +69,7 @@ export default {
   hsl,
   color,
   quantize,
+  interpolate,
   scaleOrdinal,
   max,
   maxIndex,

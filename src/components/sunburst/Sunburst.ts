@@ -511,9 +511,10 @@ export class Sunburst {
       .data(this.partition.descendants().slice(1) as HierarchyNode[])
       .join('path')
       .attr('class', d => `arc feature-${d.data['f']}`)
+      .classed('leaf', d => d.data['f'] === '_')
       // @ts-ignore
       .attr('d', d => this.arc(d.current))
-      .classed('leaf', d => d.data['f'] === '_')
+      .on('click', (e, d) => this.#arcClicked(e as MouseEvent, d))
       .style('fill', d => {
         // Let CSS handle the color for leaf nodes
         if (d.data['f'] === '_') {
@@ -530,5 +531,44 @@ export class Sunburst {
         );
         return color;
       });
+  }
+
+  /**
+   * Event handler for arc clicking.
+   * @param e Event
+   * @param d Datum
+   */
+  #arcClicked(e: MouseEvent, d: HierarchyNode) {
+    e.stopPropagation();
+    e.preventDefault();
+
+    // Customize an interpolator for the transition
+    // We animate the domains of x and y scales
+    const transition = this.svg
+      .select('.arc-group')
+      .transition()
+      .duration(800)
+      .ease(d3.easeCubicInOut)
+      .tween('zoom', () => {
+        console.log(d.x0, d.x1, d.y0, d.y1);
+
+        const xInterpolator = d3.interpolate(this.xScale.domain(), [
+          d.x0,
+          d.x1
+        ]);
+
+        const yInterpolator = d3.interpolate(this.yScale.domain(), [d.y0, 1]);
+
+        // At each frame, overwrite the x and y scale domains
+        return (t: number) => {
+          this.xScale.domain(xInterpolator(t));
+          this.yScale.domain(yInterpolator(t));
+        };
+      });
+
+    // Update the view
+    transition
+      .selectAll('.arc')
+      .attrTween('d', d => () => this.arc(d as d3.DefaultArcObject));
   }
 }
