@@ -186,9 +186,6 @@ export class Sunburst {
         )
       );
 
-    // Parse the feature map as a map
-    this.colorScale = this.#getColorScale();
-
     // Initialize the store
     this.sunburstStore = sunburstStore;
     this.sunburstStoreValue = null;
@@ -254,8 +251,14 @@ export class Sunburst {
 
     switch (returnValue) {
       case featureValuePairType.PairArray:
+        if (isNaN(stringID)) {
+          return ['', ''];
+        }
         return this.featureMap.get(stringID);
       case featureValuePairType.PairString: {
+        if (isNaN(stringID)) {
+          return '';
+        }
         const tempArray = this.featureMap.get(stringID);
         return `${tempArray[0]}:${tempArray[1]}`;
       }
@@ -310,17 +313,42 @@ export class Sunburst {
     // Handle leaf node
     this.featureCount.set('', 0);
 
+    this.colorScale = this.#getColorScale();
+
     /**
      * Sort by the feature name, then by the # of children
      * The feature name needs to be carefully compared by the # of children
      * fall in to the feature category
+     * One hack is to sort the sectors by the color's lightness, because we have
+     * already sorted the lightness mapping in #getColorScale()
      */
     root = root.sort((a, b) => {
       const aName = this.#getFeatureInfo(a.data.f).name;
       const bName = this.#getFeatureInfo(b.data.f).name;
       const aFeatureCount = this.featureCount.get(aName);
       const bFeatureCount = this.featureCount.get(bName);
-      return bFeatureCount - aFeatureCount || b.value - a.value;
+
+      const aLightness = d3.lch(
+        this.colorScale(
+          this.#getFeatureNameValue(
+            a.data.f,
+            FeaturePosition.First,
+            featureValuePairType.PairString
+          ) as string
+        )
+      ).l;
+
+      const bLightness = d3.lch(
+        this.colorScale(
+          this.#getFeatureNameValue(
+            b.data.f,
+            FeaturePosition.First,
+            featureValuePairType.PairString
+          ) as string
+        )
+      ).l;
+
+      return bFeatureCount - aFeatureCount || aLightness - bLightness;
     });
 
     /**
