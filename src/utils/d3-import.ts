@@ -4,6 +4,7 @@ import { json } from 'd3-fetch';
 
 import {
   scaleLinear,
+  scaleSqrt,
   scalePoint,
   scaleBand,
   scalePow,
@@ -58,6 +59,7 @@ export default {
   selectAll,
   json,
   scaleLinear,
+  scaleSqrt,
   scalePoint,
   scaleBand,
   scalePow,

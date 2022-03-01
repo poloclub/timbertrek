@@ -81,15 +81,23 @@ export class Sunburst {
   svg: d3.Selection<d3.BaseType, unknown, null, undefined>;
   sunburstStore: Writable<SunburstStoreValue>;
   sunburstStoreValue: SunburstStoreValue;
+
+  padding: Padding;
   width: number;
   height: number;
   level: number;
+
+  maxRadius: number;
+  xScale: d3.ScaleLinear<number, number, never>;
+  yScale: d3.ScaleLinear<number, number, never>;
+
   data: HierarchyData;
   partition: d3.HierarchyRectangularNode<unknown>;
+
   featureCount: Map<string, number>;
   featureValueCount: Map<string, Map<string, number>>;
+
   arc: d3.Arc<any, d3.DefaultArcObject>;
-  padding: Padding;
   featureMap: Map<number, string[]>;
   colorScale: d3.ScaleOrdinal<string, string, never>;
 
@@ -134,7 +142,7 @@ export class Sunburst {
       .select('svg')
       .attr('width', width)
       .attr('height', height)
-      .attr('viewbox', '0 0 600 600')
+      .attr('viewbox', '0 0 650 650')
       .attr('preserveAspectRatio', 'none');
 
     // Configure the view size
@@ -157,6 +165,7 @@ export class Sunburst {
       this.featureMap.set(parseInt(k), v as string[]);
     }
 
+    // Partition the data
     this.featureCount = new Map<string, number>();
     this.featureValueCount = new Map<string, Map<string, number>>();
     this.partition = this.#partitionData();
@@ -169,20 +178,35 @@ export class Sunburst {
       this.level = level;
     }
 
+    // Create scales
+    this.maxRadius = this.width / 2;
+    this.xScale = d3
+      .scaleLinear()
+      .domain([0, 1])
+      .range([0, 2 * Math.PI])
+      .clamp(true);
+
+    this.yScale = d3.scaleLinear().domain([0, 1]).range([0, this.maxRadius]);
+
     // Set up the arc generator
     this.arc = d3
       .arc()
-      .startAngle(d => (d as ArcPartition).x0)
-      .endAngle(d => (d as ArcPartition).x1)
+      .startAngle(d => this.xScale((d as ArcPartition).x0))
+      .endAngle(d => this.xScale((d as ArcPartition).x1))
       .padAngle(d =>
-        Math.min(((d as ArcPartition).x1 - (d as ArcPartition).x0) / 2, 0.005)
+        Math.min(
+          ((this.xScale((d as ArcPartition).x1) -
+            this.xScale((d as ArcPartition).x0)) /
+            2,
+          0.002)
+        )
       )
       .padRadius(this.radius * 1.5)
-      .innerRadius(d => (d as ArcPartition).y0 * this.radius)
+      .innerRadius(d => Math.max(0, this.yScale((d as ArcPartition).y0)))
       .outerRadius(d =>
         Math.max(
-          (d as ArcPartition).y0 * this.radius,
-          (d as ArcPartition).y1 * this.radius - 1
+          this.yScale((d as ArcPartition).y0),
+          this.yScale((d as ArcPartition).y1) - 1
         )
       );
 
@@ -355,7 +379,7 @@ export class Sunburst {
      * Step 3: Convert the hierarchy data into a partition
      * It gives [x0, y0, x1, y1] of each node
      */
-    const partition = d3.partition().size([2 * Math.PI, root.height + 1])(root);
+    const partition = d3.partition()(root);
 
     return partition;
   }
@@ -487,6 +511,8 @@ export class Sunburst {
       .data(this.partition.descendants().slice(1) as HierarchyNode[])
       .join('path')
       .attr('class', d => `arc feature-${d.data['f']}`)
+      // @ts-ignore
+      .attr('d', d => this.arc(d.current))
       .classed('leaf', d => d.data['f'] === '_')
       .style('fill', d => {
         // Let CSS handle the color for leaf nodes
@@ -503,9 +529,6 @@ export class Sunburst {
           ) as string
         );
         return color;
-      })
-      // .style('fill-opacity', 0.5)
-      // @ts-ignore
-      .attr('d', d => this.arc(d.current));
+      });
   }
 }
