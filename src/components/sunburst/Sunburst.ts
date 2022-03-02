@@ -87,12 +87,11 @@ enum featureValuePairType {
 export class Sunburst {
   svg: d3.Selection<d3.BaseType, unknown, null, undefined>;
   sunburstStore: Writable<SunburstStoreValue>;
-  sunburstStoreValue: SunburstStoreValue;
+  sunburstStoreValue: SunburstStoreValue | null;
 
   padding: Padding;
   width: number;
   height: number;
-  level: number;
 
   maxRadius: number;
   xScale: d3.ScaleLinear<number, number, never>;
@@ -113,7 +112,13 @@ export class Sunburst {
    * The radius is determined by the number of levels to show.
    */
   get radius(): number {
-    return this.width / (2 * (this.level + 1));
+    return (
+      this.width /
+      (2 *
+        (this.sunburstStoreValue.depthMax -
+          this.sunburstStoreValue.depthLow +
+          1))
+    );
   }
 
   /**
@@ -124,22 +129,19 @@ export class Sunburst {
    * @param data Hierarchy data loaded from a JSON file
    * @param width SVG width
    * @param height SVG height
-   * @param level Number of tree levels to show
    */
   constructor({
     component,
     data,
     sunburstStore,
     width = config.layout.sunburstWidth,
-    height = config.layout.sunburstWidth,
-    level = null
+    height = config.layout.sunburstWidth
   }: {
     component: HTMLElement;
     data: object;
     sunburstStore: Writable<SunburstStoreValue>;
     width?: number;
     height?: number;
-    level?: number | null;
   }) {
     console.log('Init sunburst');
     console.log(data);
@@ -180,11 +182,10 @@ export class Sunburst {
 
     // Figure out how many levels to show at the beginning
     // If `level` is not given, we show all the levels by default
-    if (level === null) {
-      this.level = this.partition.height;
-    } else {
-      this.level = level;
-    }
+    // Initialize the store
+    this.sunburstStore = sunburstStore;
+    this.sunburstStoreValue = null;
+    this.#initStore();
 
     // Create scales
     this.maxRadius = this.width / 2;
@@ -220,11 +221,6 @@ export class Sunburst {
           this.yScale((d as ArcPartition).y1) - 1
         )
       );
-
-    // Initialize the store
-    this.sunburstStore = sunburstStore;
-    this.sunburstStoreValue = null;
-    this.#initStore();
 
     // Draw the initial view
     console.time('Draw sunburst');
@@ -490,7 +486,7 @@ export class Sunburst {
     // Figure out the height of the trie and initialize the depth
     this.sunburstStoreValue.depthMax = this.partition.height;
     this.sunburstStoreValue.depthLow = 1;
-    this.sunburstStoreValue.depthLow = this.sunburstStoreValue.depthMax;
+    this.sunburstStoreValue.depthHigh = this.sunburstStoreValue.depthMax;
 
     this.sunburstStore.set(this.sunburstStoreValue);
   }
