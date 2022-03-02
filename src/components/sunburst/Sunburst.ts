@@ -487,6 +487,18 @@ export class Sunburst {
         case SunburstAction.DepthChanged: {
           console.log('depth changed!');
           this.sunburstStoreValue.action = SunburstAction.None;
+
+          const yGap = 1 / (this.sunburstStoreValue.depthMax + 1);
+          this.#arcZoom(
+            {
+              x0: this.xScale.domain()[0],
+              x1: this.xScale.domain()[1],
+              y0: 0,
+              y1: (this.sunburstStoreValue.depthHigh + 1) * yGap
+            },
+            500
+          );
+
           this.sunburstStore.set(this.sunburstStoreValue);
           break;
         }
@@ -560,19 +572,31 @@ export class Sunburst {
         );
         return color;
       });
+
+    const yGap = 1 / (this.sunburstStoreValue.depthMax + 1);
+    this.#arcZoom(
+      {
+        x0: this.xScale.domain()[0],
+        x1: this.xScale.domain()[1],
+        y0: 0,
+        y1: (this.sunburstStoreValue.depthHigh + 1) * yGap
+      },
+      500
+    );
   }
 
   /**
-   * Zoom in or out of one arc with transitions
+   * Zoom in or out of one sector with transitions
    * @param newDomain Target domain
+   * @param duration Transition duration (ms)
    */
-  #arcZoom(newDomain: ArcDomain) {
+  #arcZoom(newDomain: ArcDomain, duration = 800) {
     // Customize an interpolator for the transition
     // We animate the domains of x and y scales
     const transition = this.svg
       .select('.arc-group')
       .transition()
-      .duration(800)
+      .duration(duration)
       .ease(d3.easeCubicInOut)
       .tween('zoom', () => {
         const xInterpolator = d3.interpolate(this.xScale.domain(), [
@@ -582,7 +606,7 @@ export class Sunburst {
 
         const yInterpolator = d3.interpolate(this.yScale.domain(), [
           newDomain.y0,
-          1
+          newDomain.y1
         ]);
 
         // At each frame, overwrite the x and y scale domains
@@ -595,7 +619,9 @@ export class Sunburst {
     // Update the view
     transition
       .selectAll('.arc')
-      .attrTween('d', d => () => this.arc(d as d3.DefaultArcObject));
+      .attrTween('d', d => () => this.arc(d as d3.DefaultArcObject))
+      // @ts-ignore
+      .style('fill-opacity', d => (d.y0 >= newDomain.y1 ? 0.2 : 1));
   }
 
   /**
@@ -611,6 +637,11 @@ export class Sunburst {
 
     // Detect if the user clicks the center
     const curXDomain = this.xScale.domain();
+    const curYDomain = this.yScale.domain();
+
+    const yGap = 1 / (this.sunburstStoreValue.depthMax + 1);
+    const curDepthGap =
+      this.sunburstStoreValue.depthHigh - this.sunburstStoreValue.depthLow;
 
     if (d.x0 == curXDomain[0] && d.x1 == curXDomain[1]) {
       // Transition to the last domain in the domain stack
@@ -621,15 +652,15 @@ export class Sunburst {
         x0: d.x0,
         x1: d.x1,
         y0: d.y0,
-        y1: 1
+        y1: d.y0 + yGap * (curDepthGap + 1)
       };
 
       // Save the current domain in the stack
       const curDomain: ArcDomain = {
         x0: curXDomain[0],
         x1: curXDomain[1],
-        y0: this.yScale.domain()[0],
-        y1: this.yScale.domain()[1]
+        y0: curYDomain[0],
+        y1: curYDomain[1]
       };
       this.arcDomainStack.push(curDomain);
     }
