@@ -58,6 +58,7 @@
             i + 1 >= handler?.sunburstStoreValue.depthLow}
           class:no-hover={i + 1 === handler?.sunburstStoreValue.depthHigh}
           on:click={() => handler?.depthBoxClicked(i + 1)}
+          style={handler?.getDepthBoxStyle(i + 1)}
         >
           {i + 1}
         </div>

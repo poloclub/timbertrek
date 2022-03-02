@@ -1,4 +1,7 @@
 import type { Writable } from 'svelte/store';
+import d3 from '../../utils/d3-import';
+// import { config } from '../../config';
+import { getContrastRatio } from '../../utils/utils';
 import {
   AppearanceStoreValue,
   SunburstStoreValue,
@@ -85,5 +88,32 @@ export class ToolbarEventHandler {
     } else {
       console.error('Unknown case in depthBoxClicked()');
     }
+  };
+
+  /**
+   * Get the CSS style string for the depth box (background color and color)
+   * @param depth Depth number (starting from 1)
+   */
+  getDepthBoxStyle = (depth: number) => {
+    const background = this.sunburstStoreValue.depthColors[depth - 1];
+    let foreground = 'inherit';
+
+    if (background === '') {
+      // background = config.colors['gray-50'];
+      return '';
+    } else {
+      // Check the color contrast for the text color
+      const whiteRGB = [252, 252, 252];
+      // const blackRGB = [66, 66, 66];
+
+      const rgb = d3.color(background).rgb();
+      const backgroundRGB = [rgb.r, rgb.g, rgb.b];
+
+      if (getContrastRatio(whiteRGB, backgroundRGB) < 0.55) {
+        foreground = 'hsla(0, 0%, 99%, 1)';
+      }
+    }
+
+    return `background-color: ${background}; color: ${foreground};`;
   };
 }

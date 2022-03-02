@@ -63,6 +63,10 @@ interface ArcDomain {
   y1: number;
 }
 
+interface ArcDomainData extends ArcDomain {
+  node: HierarchyNode;
+}
+
 /**
  * This enum defines which feature to extract. The node can include two
  * features.
@@ -106,7 +110,7 @@ export class Sunburst {
   arc: d3.Arc<any, d3.DefaultArcObject>;
   featureMap: Map<number, string[]>;
   colorScale: d3.ScaleOrdinal<string, string, never>;
-  arcDomainStack: ArcDomain[];
+  arcDomainStack: ArcDomainData[];
 
   /**
    * The radius is determined by the number of levels to show.
@@ -659,14 +663,38 @@ export class Sunburst {
       };
 
       // Save the current domain in the stack
-      const curDomain: ArcDomain = {
+      const curDomainData: ArcDomainData = {
         x0: curXDomain[0],
         x1: curXDomain[1],
         y0: curYDomain[0],
-        y1: curYDomain[1]
+        y1: curYDomain[1],
+        node: d
       };
-      this.arcDomainStack.push(curDomain);
+      this.arcDomainStack.push(curDomainData);
     }
+
+    // Update the depth box color based on the clicked arc
+    const depthColors = new Array<string>(
+      this.sunburstStoreValue.depthMax
+    ).fill('');
+
+    const ancestors = d.ancestors();
+    ancestors.forEach(a => {
+      if (a.depth > 0) {
+        const curColor = this.colorScale(
+          this.#getFeatureNameValue(
+            a.data['f'] as string,
+            FeaturePosition.First,
+            featureValuePairType.PairString
+          ) as string
+        );
+        depthColors[a.depth - 1] = curColor;
+      }
+    });
+
+    // Update the store
+    this.sunburstStoreValue.depthColors = depthColors;
+    this.sunburstStore.set(this.sunburstStoreValue);
 
     this.#arcZoom(targetDomain);
   }

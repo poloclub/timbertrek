@@ -62,8 +62,8 @@
 
     user-select: none;
 
-    transition: background-color 100ms ease-in-out, fill 100ms ease-in-out,
-      color 100ms ease-in-out;
+    transition: background-color 100ms ease-in-out, color 100ms ease-in-out,
+      fill 100ms ease-in-out, color 100ms ease-in-out;
 
     &.in-range {
       background-color: adjust-color($color: white, $lightness: -12%);

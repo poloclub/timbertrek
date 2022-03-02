@@ -125,3 +125,75 @@ export const downloadText = (
     myDlAnchorElem?.remove();
   }
 };
+
+/**
+ * Compute the luminance of a RGB color
+ * https://www.w3.org/TR/WCAG21/#dfn-contrast-ratio
+ * @param color [R, G, B in 0..255]
+ * @returns number
+ */
+export const getLuminance = (color: number[]) => {
+  const r = color[0];
+  const g = color[1];
+  const b = color[2];
+
+  // Some strange required transformations
+  const transformedRGB = [r, g, b].map(v => {
+    v /= 255;
+    return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+  });
+
+  return (
+    transformedRGB[0] * 0.2126 +
+    transformedRGB[1] * 0.7152 +
+    transformedRGB[2] * 0.0722
+  );
+};
+
+/**
+ * Compute color contrast ratio
+ * @param color1 [r, g, b] in 255 scale
+ * @param color2 [r, g, b] in 255 scale
+ * @returns Contrast ratio
+ */
+export const getContrastRatio = (color1: number[], color2: number[]) => {
+  const color1L = getLuminance(color1);
+  const color2L = getLuminance(color2);
+  const ratio =
+    color1L > color2L
+      ? (color2L + 0.05) / (color1L + 0.05)
+      : (color1L + 0.05) / (color2L + 0.05);
+  return ratio;
+};
+
+/**
+ * Check if two colors have enough contrast
+ * @param color1 [r, g, b] in 255 scale
+ * @param color2 [r, g, b] in 255 scale
+ * @param condition 'AA' or 'AAA'
+ * @param smallText If it is small text
+ * @returns If two colors have enough contrast
+ */
+export const haveContrast = (
+  color1: number[],
+  color2: number[],
+  condition = 'AAA',
+  smallText = true
+) => {
+  const ratio = getContrastRatio(color1, color2);
+
+  // Compare the ratio with different thresholds
+  if (condition === 'AA') {
+    if (smallText) {
+      return ratio <= 1 / 4.5;
+    } else {
+      return ratio <= 1 / 3;
+    }
+  } else {
+    if (smallText) {
+      return ratio <= 1 / 7;
+    } else {
+      return ratio <= 1 / 4.5;
+    }
+  }
+};
