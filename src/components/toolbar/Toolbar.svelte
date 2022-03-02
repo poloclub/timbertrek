@@ -8,7 +8,6 @@
   import iconBrush from '../../imgs/icon-brush.svg?raw';
   import iconSearch from '../../imgs/icon-search.svg?raw';
   import iconStar from '../../imgs/icon-star.svg?raw';
-  import iconDepth from '../../imgs/icon-depth.svg?raw';
 
   // Component variables
   // export let data: object | null = null;
@@ -55,6 +54,9 @@
     <div class='depth-box-container'>
       {#each [...Array(handler?.sunburstStoreValue.depthMax).keys()] as i}
         <div class='depth-box'
+          class:in-range={i + 1 <= handler?.sunburstStoreValue.depthHigh &&
+            i + 1 >= handler?.sunburstStoreValue.depthLow}
+          class:no-hover={i + 1 === handler?.sunburstStoreValue.depthHigh}
           on:click={() => handler?.depthBoxClicked(i + 1)}
         >
           {i + 1}

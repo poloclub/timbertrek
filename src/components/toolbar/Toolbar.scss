@@ -65,12 +65,17 @@
     transition: background-color 100ms ease-in-out, fill 100ms ease-in-out,
       color 100ms ease-in-out;
 
-    &:hover {
+    &.in-range {
+      background-color: adjust-color($color: white, $lightness: -12%);
+      border: 1px solid $gray-400;
+    }
+
+    &:not(.no-hover):hover {
       background-color: adjust-color($color: white, $lightness: -7%);
     }
 
     &:active {
-      background-color: adjust-color($color: white, $lightness: -11%);
+      background-color: adjust-color($color: white, $lightness: -12%);
     }
   }
 }
@@ -98,7 +103,8 @@
       color 100ms ease-in-out;
 
     &.shown {
-      background-color: adjust-color($color: white, $lightness: -10%);
+      background-color: adjust-color($color: white, $lightness: -12%);
+      border: 1px solid $gray-400;
     }
 
     &:hover {
@@ -106,7 +112,7 @@
     }
 
     &:active {
-      background-color: adjust-color($color: white, $lightness: -11%);
+      background-color: adjust-color($color: white, $lightness: -12%);
     }
   }
 }

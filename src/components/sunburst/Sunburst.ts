@@ -1,7 +1,7 @@
 import d3 from '../../utils/d3-import';
 import { config } from '../../config';
 import type { Writable } from 'svelte/store';
-import type { SunburstStoreValue } from 'src/stores';
+import { SunburstStoreValue, SunburstAction } from '../../stores';
 
 interface FeatureMap {
   [featureID: number]: string[];
@@ -481,12 +481,34 @@ export class Sunburst {
   #initStore() {
     this.sunburstStore.subscribe(value => {
       this.sunburstStoreValue = value;
+
+      // Handle actions
+      switch (this.sunburstStoreValue.action) {
+        case SunburstAction.DepthChanged: {
+          console.log('depth changed!');
+          this.sunburstStoreValue.action = SunburstAction.None;
+          this.sunburstStore.set(this.sunburstStoreValue);
+          break;
+        }
+        case SunburstAction.None: {
+          break;
+        }
+        default: {
+          console.error('Unknown case in sunburstStore action');
+        }
+      }
     });
 
     // Figure out the height of the trie and initialize the depth
     this.sunburstStoreValue.depthMax = this.partition.height;
     this.sunburstStoreValue.depthLow = 1;
-    this.sunburstStoreValue.depthHigh = this.sunburstStoreValue.depthMax;
+    this.sunburstStoreValue.depthHigh = this.sunburstStoreValue.depthMax - 3;
+    this.sunburstStoreValue.action = SunburstAction.None;
+
+    // Initialize the depth colors with empty strings
+    this.sunburstStoreValue.depthColors = new Array<string>(
+      this.sunburstStoreValue.depthMax
+    ).fill('');
 
     this.sunburstStore.set(this.sunburstStoreValue);
   }

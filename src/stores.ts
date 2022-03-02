@@ -8,7 +8,16 @@ export interface SunburstStoreValue {
   depthMax: number;
   depthLow: number;
   depthHigh: number;
-  selectedFeature: string;
+  depthColors: string[];
+  action: SunburstAction;
+}
+
+/**
+ * Actions that needed to be handled
+ */
+export enum SunburstAction {
+  DepthChanged,
+  None = ''
 }
 
 /**
@@ -28,7 +37,8 @@ export const getSunburstStore = () => {
     depthMax: 0,
     depthLow: 0,
     depthHigh: 0,
-    selectedFeature: ''
+    depthColors: [],
+    action: SunburstAction.None
   });
 
   return curStore;
