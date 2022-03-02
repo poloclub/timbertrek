@@ -485,15 +485,18 @@ export class Sunburst {
       // Handle actions
       switch (this.sunburstStoreValue.action) {
         case SunburstAction.DepthChanged: {
-          console.log('depth changed!');
+          // Zoom into different # of depths
           this.sunburstStoreValue.action = SunburstAction.None;
-
           const yGap = 1 / (this.sunburstStoreValue.depthMax + 1);
+
+          // Need to specially handle case where the user has selected a sector
+          const y0 =
+            this.arcDomainStack.length > 0 ? this.yScale.domain()[0] : 0;
           this.#arcZoom(
             {
               x0: this.xScale.domain()[0],
               x1: this.xScale.domain()[1],
-              y0: 0,
+              y0: y0,
               y1: (this.sunburstStoreValue.depthHigh + 1) * yGap
             },
             500
