@@ -15,6 +15,8 @@
   line-height: 1;
 }
 
+$depth-box-width: 24px;
+
 .depths {
   display: flex;
   flex-direction: row;
@@ -34,23 +36,42 @@
     gap: 8px;
     position: relative;
 
+    .depth-box-lines {
+      display: flex;
+      z-index: 2;
+      position: absolute;
+      top: 2px;
+      left: $depth-box-width - 1px;
+      width: calc(100% - #{$depth-box-width * 2} + 2px);
+      height: 50%;
+      pointer-events: none;
+
+      .depth-line {
+        flex: 1 0 auto;
+
+        &.in-range {
+          border-bottom: 3px solid $gray-500;
+        }
+      }
+    }
+
     &::after {
       position: absolute;
       z-index: 1;
       content: '';
       width: 100%;
-      border-bottom: 1px solid $gray-400;
+      border-bottom: 1px solid $gray-300;
       top: 50%;
       left: 0px;
     }
   }
 
   .depth-box {
-    z-index: 2;
+    z-index: 3;
     flex-shrink: 0;
 
-    width: 24px;
-    height: 24px;
+    width: $depth-box-width;
+    height: $depth-box-width;
     border-radius: 5px;
 
     border: 1px solid $gray-300;
@@ -67,7 +88,7 @@
 
     &.in-range {
       background-color: adjust-color($color: white, $lightness: -12%);
-      border: 1px solid $gray-500;
+      border: 1px solid $gray-400;
     }
 
     &:not(.no-hover):hover {

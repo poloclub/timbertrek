@@ -52,6 +52,16 @@
     </div>
 
     <div class='depth-box-container'>
+      <div class='depth-box-lines'>
+        {#each [...Array(Math.max(handler?.sunburstStoreValue.depthMax - 1, 0)).keys()] as i}
+          <div class='depth-line'
+            class:in-range={i + 2 <= handler?.sunburstStoreValue.depthHigh &&
+              i + 2 > handler?.sunburstStoreValue.depthLow}
+          >
+          </div>
+        {/each}
+      </div>
+
       {#each [...Array(handler?.sunburstStoreValue.depthMax).keys()] as i}
         <div class='depth-box'
           class:in-range={i + 1 <= handler?.sunburstStoreValue.depthHigh &&
