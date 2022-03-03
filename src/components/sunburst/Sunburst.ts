@@ -65,6 +65,7 @@ interface ArcDomain {
 
 interface ArcDomainData extends ArcDomain {
   node: HierarchyNode;
+  depthGap: number;
 }
 
 /**
@@ -111,6 +112,7 @@ export class Sunburst {
   featureMap: Map<number, string[]>;
   colorScale: d3.ScaleOrdinal<string, string, never>;
   arcDomainStack: ArcDomainData[];
+  curHeadNode: HierarchyNode;
 
   /**
    * The radius is determined by the number of levels to show.
@@ -590,6 +592,9 @@ export class Sunburst {
       },
       500
     );
+
+    // The initial head node is the root
+    this.curHeadNode = this.partition;
   }
 
   /**
@@ -641,25 +646,51 @@ export class Sunburst {
     e.preventDefault();
 
     let targetDomain: ArcDomain = { x0: 0, x1: 1, y0: 0, y1: 1 };
+    let newHead = d;
 
     // Detect if the user clicks the center
     const curXDomain = this.xScale.domain();
     const curYDomain = this.yScale.domain();
 
-    const yGap = 1 / (this.sunburstStoreValue.depthMax + 1);
+    // We keep the current depth gap for the transition
     const curDepthGap =
       this.sunburstStoreValue.depthHigh - this.sunburstStoreValue.depthLow;
 
     if (d.x0 == curXDomain[0] && d.x1 == curXDomain[1]) {
-      // Transition to the last domain in the domain stack
-      targetDomain = this.arcDomainStack.pop();
+      // Case 1: Transition to the last domain in the domain stack
+      const lastDomainData = this.arcDomainStack.pop();
+      newHead = lastDomainData.node;
+      console.log(newHead);
+      targetDomain = lastDomainData;
+
+      // Update the low and high pointer
+      this.sunburstStoreValue.depthLow =
+        newHead.depth === 0 ? 1 : newHead.depth;
+      this.sunburstStoreValue.depthHigh = Math.min(
+        this.sunburstStoreValue.depthLow + lastDomainData.depthGap,
+        this.sunburstStoreValue.depthMax
+      );
     } else {
-      // The user clicks an arc, zoom into it
+      // Case 2: Transition to the clicked arc
+      const yGap = 1 / (this.sunburstStoreValue.depthMax + 1);
+
+      // Update the low and high pointers
+      this.sunburstStoreValue.depthLow = d.depth;
+      this.sunburstStoreValue.depthHigh = Math.min(
+        d.depth + curDepthGap,
+        this.sunburstStoreValue.depthMax
+      );
+
       targetDomain = {
         x0: d.x0,
         x1: d.x1,
         y0: d.y0,
-        y1: d.y0 + yGap * (curDepthGap + 1)
+        y1:
+          d.y0 +
+          yGap *
+            (this.sunburstStoreValue.depthHigh -
+              this.sunburstStoreValue.depthLow +
+              1)
       };
 
       // Save the current domain in the stack
@@ -668,7 +699,8 @@ export class Sunburst {
         x1: curXDomain[1],
         y0: curYDomain[0],
         y1: curYDomain[1],
-        node: d
+        node: this.curHeadNode,
+        depthGap: curDepthGap
       };
       this.arcDomainStack.push(curDomainData);
     }
@@ -678,7 +710,7 @@ export class Sunburst {
       this.sunburstStoreValue.depthMax
     ).fill('');
 
-    const ancestors = d.ancestors();
+    const ancestors = newHead.ancestors();
     ancestors.forEach(a => {
       if (a.depth > 0) {
         const curColor = this.colorScale(
@@ -696,6 +728,8 @@ export class Sunburst {
     this.sunburstStoreValue.depthColors = depthColors;
     this.sunburstStore.set(this.sunburstStoreValue);
 
+    // Update the new head
+    this.curHeadNode = newHead;
     this.#arcZoom(targetDomain);
   }
 }

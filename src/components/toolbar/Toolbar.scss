@@ -67,7 +67,7 @@
 
     &.in-range {
       background-color: adjust-color($color: white, $lightness: -12%);
-      border: 1px solid $gray-400;
+      border: 1px solid $gray-500;
     }
 
     &:not(.no-hover):hover {
