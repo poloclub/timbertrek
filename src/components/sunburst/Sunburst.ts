@@ -660,7 +660,6 @@ export class Sunburst {
       // Case 1: Transition to the last domain in the domain stack
       const lastDomainData = this.arcDomainStack.pop();
       newHead = lastDomainData.node;
-      console.log(newHead);
       targetDomain = lastDomainData;
 
       // Update the low and high pointer

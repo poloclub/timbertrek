@@ -54,7 +54,7 @@ export class ToolbarEventHandler {
 
   /**
    * Handler for depth box clicking event
-   * Case 1: number < low: it only happens during zoom, move low
+   * Case 1: number < low: it only happens during zoom, do nothing
    * Case 2: number > high: move high
    * Case 3: number between low and high: move high
    * Case 4: number = low or number = high: do nothing
@@ -63,9 +63,7 @@ export class ToolbarEventHandler {
   depthBoxClicked = (depth: number) => {
     if (depth < this.sunburstStoreValue.depthLow) {
       // Case 1
-      this.sunburstStoreValue.depthLow = depth;
-      this.sunburstStoreValue.action = SunburstAction.DepthChanged;
-      this.sunburstStore.set(this.sunburstStoreValue);
+      // pass
     } else if (depth > this.sunburstStoreValue.depthHigh) {
       // Case 2
       this.sunburstStoreValue.depthHigh = depth;
@@ -114,6 +112,8 @@ export class ToolbarEventHandler {
       }
     }
 
-    return `background-color: ${background}; color: ${foreground};`;
+    return `
+    background-color: ${background}; color: ${foreground}; border: none;
+    `;
   };
 }
