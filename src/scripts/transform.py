@@ -1,6 +1,7 @@
 import numpy as np
 import re
 
+from collections import deque
 from json import load, dump
 from matplotlib import pyplot as plt
 
@@ -198,3 +199,162 @@ def get_feature_map(feature_header, feature_description_map):
             feature_map[i] = [feature_name, feature_value]
 
     return feature_map
+
+
+def build_tree_map(trie, tree_map, tree_strings=[], objective='acc'):
+    """
+    Map each tree to a unique number
+
+    Args:
+        trie (dict): The original trie
+        tree_map (dict): The dictionary that map tree id to a string
+        tree_desc (string[]): a list of tree descriptions
+        objective (string): name of the leaf node objective key
+    """
+
+    # Hit the terminal node
+    if objective in trie:
+        # Record this tree
+        new_count = tree_map['count'] + 1
+        tree_map['map'][new_count] = [tree_strings, trie[objective]]
+        tree_map['count'] = new_count
+        return
+
+    for k in trie:
+        new_tree_strings = [s for s in tree_strings]
+        new_tree_strings.append(k)
+        build_tree_map(trie[k], tree_map, new_tree_strings)
+
+    return
+
+
+def get_decision_rules(tree_strings):
+    """Generate a set of decision rules used by a tree
+
+    Args:
+        tree_strings ([string]): Tree strings parsed form the trie
+
+    Returns:
+        set: A set of decision rules
+    """
+    working_queue = deque()
+
+    # Each queue item is a list [feature_id, previous_feature_ids]
+    working_queue.append([tree_strings[0], []])
+    i = 1
+    decision_rules = set()
+
+    while len(working_queue) > 0:
+        cur_feature, pre_features = working_queue.popleft()
+
+        cur_string = tree_strings[i]
+        cur_string_split = cur_string.split()
+
+        if len(cur_string_split) == 2:
+            # Case 1: there are two values
+            cur_features = pre_features + [cur_feature]
+
+            for s in cur_string_split:
+                if s == '-1' or s == '-2':
+                    # We hit a decision node, add this decision rule chain
+                    decision_rules.add(
+                        (tuple(cur_features), '+' if s == '-2' else '-'))
+                else:
+                    working_queue.append([s, cur_features])
+
+        elif len(cur_string_split) == 4:
+            # Case 2: there are four values: the first two correpond to the cur item
+            # and the last two correpond to the next item in the queue
+            cur_features = pre_features + [cur_feature]
+            for s in cur_string_split[:2]:
+                if s == '-1' or s == '-2':
+                    decision_rules.add(tuple(cur_features))
+                else:
+                    working_queue.append([s, cur_features])
+
+            # Load the next item in the queue
+            cur_feature, pre_features = working_queue.popleft()
+            cur_features = pre_features + [cur_feature]
+            for s in cur_string_split[2:]:
+                if s == '-1' or s == '-2':
+                    decision_rules.add(tuple(cur_features))
+                else:
+                    working_queue.append([s, cur_features])
+
+        else:
+            print('Error: encounter string size either 2 or 4')
+
+        i += 1
+
+    return decision_rules
+
+
+def get_hierarchy_tree(tree_strings):
+    """Convert a tree string to a hierarchy dict
+
+    Args:
+        tree_strings ([string]): tree strings parsed from the trie
+    """
+
+    working_queue = deque()
+
+    # Each queue item is a list [feature_id, previous_feature_ids]
+    i = 1
+    tree_dict = {}
+    working_queue.append([tree_strings[0], tree_dict])
+
+    while len(working_queue) > 0:
+        cur_feature, sub_tree = working_queue.popleft()
+
+        cur_string = tree_strings[i]
+        cur_string_split = cur_string.split()
+
+        if len(cur_string_split) == 2:
+            # Case 1: there are two values
+            sub_tree['f'] = cur_feature
+            sub_tree['c'] = []
+
+            for s in cur_string_split:
+                if s == '-1' or s == '-2':
+                    # We hit a decision node, add a leaf to this brank
+                    sub_tree['c'].append({'f': '+' if s == '-2' else '-'})
+                else:
+                    new_sub_tree = {}
+                    sub_tree['c'].append(new_sub_tree)
+                    working_queue.append([s, new_sub_tree])
+
+        elif len(cur_string_split) == 4:
+            # Case 2: there are four values: the first two correpond to the cur item
+            # and the last two correpond to the next item in the queue
+            sub_tree['f'] = cur_feature
+            sub_tree['c'] = []
+
+            for s in cur_string_split[:2]:
+                if s == '-1' or s == '-2':
+                    # We hit a decision node, add a leaf to this brank
+                    sub_tree['c'].append({'f': '+' if s == '-2' else '-'})
+                else:
+                    new_sub_tree = {}
+                    sub_tree['c'].append(new_sub_tree)
+                    working_queue.append([s, new_sub_tree])
+
+            # Load the next item in the queue
+            cur_feature, sub_tree = working_queue.popleft()
+            sub_tree['f'] = cur_feature
+            sub_tree['c'] = []
+
+            for s in cur_string_split[2:]:
+                if s == '-1' or s == '-2':
+                    # We hit a decision node, add a leaf to this brank
+                    sub_tree['c'].append({'f': '+' if s == '-2' else '-'})
+                else:
+                    new_sub_tree = {}
+                    sub_tree['c'].append(new_sub_tree)
+                    working_queue.append([s, new_sub_tree])
+
+        else:
+            print('Error: encounter string size either 2 or 4')
+
+        i += 1
+
+    return tree_dict
