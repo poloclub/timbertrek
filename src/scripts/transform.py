@@ -370,3 +370,91 @@ def get_hierarchy_tree(tree_strings):
         i += 1
 
     return tree_dict
+
+
+def get_decision_rule_hierarchy_dict(trie, keep_position=True):
+    """Generate and format decision rules as a hierarchy dict from the original
+        trie.
+
+    Args:
+        trie (dict): Original trie
+        keep_position (bool, optional): Whether to keep the position of each
+            feature (left or right). Defaults to True.
+
+    Returns:
+        dict: Hierarchy dict
+    """
+
+    trie_copy = transform_trie(trie)
+
+    # Step 1: build a dictionary to map tree ID to its string description
+    tree_map = {'count': 0, 'map': {}}
+    build_tree_map(trie_copy, tree_map)
+
+    # Step 2: build a temporary dictionary to map string to tree ID
+    string_to_id_map = {}
+    for k in tree_map['map']:
+        string_to_id_map[tuple(tree_map['map'][k][0])] = k
+
+    decision_rule_hierarchy = {'f': 'root', 'c': []}
+
+    for i in tree_map['map']:
+        cur_string = tree_map['map'][i][0]
+        all_rules = get_decision_rules(cur_string)
+
+        # Iterate the set and build the hierarchy dict
+        for rule in all_rules:
+            cur_dict = decision_rule_hierarchy
+
+            for f in rule[0]:
+                cur_feature = (f if keep_position else
+                               re.sub(r'(\d*)[tf]', r'\1', f))
+
+                is_exist = False
+                for item in cur_dict['c']:
+                    if item['f'] == cur_feature:
+                        cur_dict = item
+                        is_exist = True
+                        break
+
+                if not is_exist:
+                    new_item = {'f': cur_feature, 'c': []}
+                    cur_dict['c'].append(new_item)
+                    cur_dict = new_item
+                    is_exist = True
+
+            # Hit the end of the rule, add this tree to the children list
+            # If keep_position = False, need to avoid adding duplicate trees
+            existing_trees = set()
+            for c in cur_dict['c']:
+                if c['f'] == '_':
+                    existing_trees.add(c['t'])
+
+            if i not in existing_trees:
+                cur_dict['c'].append({
+                    'f': '_',
+                    't': i
+                })
+
+    return decision_rule_hierarchy, tree_map
+
+
+def get_all_tree_ids(node):
+    """Get all tree ids used in a hierarchy dict
+
+    Args:
+        node (dict): Hierarchy dict
+
+    Returns:
+        [int]: All tree IDs
+    """
+
+    if node['f'] == '_':
+        return [node['t']]
+
+    cur_tree_ids = []
+
+    for c in node['c']:
+        cur_tree_ids.extend(get_all_tree_ids(c))
+
+    return cur_tree_ids
