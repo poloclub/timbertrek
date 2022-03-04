@@ -252,9 +252,10 @@ def get_decision_rules(tree_strings):
 
         if len(cur_string_split) == 2:
             # Case 1: there are two values
-            cur_features = pre_features + [cur_feature]
-
-            for s in cur_string_split:
+            for j, s in enumerate(cur_string_split):
+                formated_cur_feature = cur_feature
+                formated_cur_feature += 't' if j == 0 else 'f'
+                cur_features = pre_features + [formated_cur_feature]
                 if s == '-1' or s == '-2':
                     # We hit a decision node, add this decision rule chain
                     decision_rules.add(
@@ -263,21 +264,32 @@ def get_decision_rules(tree_strings):
                     working_queue.append([s, cur_features])
 
         elif len(cur_string_split) == 4:
-            # Case 2: there are four values: the first two correpond to the cur item
-            # and the last two correpond to the next item in the queue
-            cur_features = pre_features + [cur_feature]
-            for s in cur_string_split[:2]:
+            # Case 2: there are four values: the first two correspond to the cur item
+            # and the last two correspond to the next item in the queue
+            for j, s in enumerate(cur_string_split[:2]):
+
+                formated_cur_feature = cur_feature
+                formated_cur_feature += 't' if j == 0 else 'f'
+                cur_features = pre_features + [formated_cur_feature]
+
                 if s == '-1' or s == '-2':
-                    decision_rules.add(tuple(cur_features))
+                    decision_rules.add(
+                        (tuple(cur_features), '+' if s == '-2' else '-'))
                 else:
                     working_queue.append([s, cur_features])
 
             # Load the next item in the queue
             cur_feature, pre_features = working_queue.popleft()
-            cur_features = pre_features + [cur_feature]
-            for s in cur_string_split[2:]:
+
+            for j, s in enumerate(cur_string_split[2:]):
+
+                formated_cur_feature = cur_feature
+                formated_cur_feature += 't' if j == 0 else 'f'
+                cur_features = pre_features + [formated_cur_feature]
+
                 if s == '-1' or s == '-2':
-                    decision_rules.add(tuple(cur_features))
+                    decision_rules.add(
+                        (tuple(cur_features), '+' if s == '-2' else '-'))
                 else:
                     working_queue.append([s, cur_features])
 
@@ -316,7 +328,7 @@ def get_hierarchy_tree(tree_strings):
 
             for s in cur_string_split:
                 if s == '-1' or s == '-2':
-                    # We hit a decision node, add a leaf to this brank
+                    # We hit a decision node, add a leaf to this branch
                     sub_tree['c'].append({'f': '+' if s == '-2' else '-'})
                 else:
                     new_sub_tree = {}
@@ -324,14 +336,14 @@ def get_hierarchy_tree(tree_strings):
                     working_queue.append([s, new_sub_tree])
 
         elif len(cur_string_split) == 4:
-            # Case 2: there are four values: the first two correpond to the cur item
-            # and the last two correpond to the next item in the queue
+            # Case 2: there are four values: the first two correspond to the cur item
+            # and the last two correspond to the next item in the queue
             sub_tree['f'] = cur_feature
             sub_tree['c'] = []
 
             for s in cur_string_split[:2]:
                 if s == '-1' or s == '-2':
-                    # We hit a decision node, add a leaf to this brank
+                    # We hit a decision node, add a leaf to this branch
                     sub_tree['c'].append({'f': '+' if s == '-2' else '-'})
                 else:
                     new_sub_tree = {}
@@ -345,7 +357,7 @@ def get_hierarchy_tree(tree_strings):
 
             for s in cur_string_split[2:]:
                 if s == '-1' or s == '-2':
-                    # We hit a decision node, add a leaf to this brank
+                    # We hit a decision node, add a leaf to this branch
                     sub_tree['c'].append({'f': '+' if s == '-2' else '-'})
                 else:
                     new_sub_tree = {}
