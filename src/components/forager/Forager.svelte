@@ -13,7 +13,7 @@
 
   const initData = async () => {
     // Init the model
-    data = await d3.json('/data/compas_0.01_0.05.json');
+    data = await d3.json('/data/compas_rules_0.01_0.05.json');
   };
 
   initData();

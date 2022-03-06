@@ -7,7 +7,7 @@ interface FeatureMap {
   [featureID: number]: string[];
 }
 
-interface HierarchyData {
+interface TreeNode {
   /**
    * Feature name
    */
@@ -16,25 +16,48 @@ interface HierarchyData {
   /**
    * Array of children
    */
-  c: HierarchyData[];
+  c: [TreeNode, number];
+}
+
+interface TreeMap {
+  /**
+   * Number of trees
+   */
+  count: number;
 
   /**
-   * Array that specifies the split positions
-   * (-1: negative, 0: split, 1: positive)
-   * Only leaf node has this property
+   * A map from tree ID to the tree's hierarchy dict
    */
-  d: number[] | undefined;
+  [treeID: number]: TreeNode[];
+}
 
-  /**
-   * Metric score of this tree
-   * Only leaf node has this property
-   */
-  s: number | undefined;
+interface HierarchyJSON {
+  trie: RuleNode;
 
   /**
    * Map feature ID to [feature name, feature value]
    */
   featureMap: FeatureMap;
+
+  treeMap: TreeMap;
+}
+
+interface RuleNode {
+  /**
+   * Feature name
+   */
+  f: string;
+
+  /**
+   * Array of children
+   */
+  c: RuleNode[];
+
+  /**
+   * Tree ID
+   * Only leaf node has this property
+   */
+  t?: number;
 }
 
 // Define the arc path generator
@@ -102,7 +125,7 @@ export class Sunburst {
   xScale: d3.ScaleLinear<number, number, never>;
   yScale: d3.ScaleLinear<number, number, never>;
 
-  data: HierarchyData;
+  data: RuleNode;
   partition: d3.HierarchyRectangularNode<unknown>;
 
   featureCount: Map<string, number>;
@@ -144,7 +167,7 @@ export class Sunburst {
     height = config.layout.sunburstWidth
   }: {
     component: HTMLElement;
-    data: object;
+    data: HierarchyJSON;
     sunburstStore: Writable<SunburstStoreValue>;
     width?: number;
     height?: number;
@@ -173,11 +196,11 @@ export class Sunburst {
     this.height = height - this.padding.top - this.padding.bottom;
 
     // Transform the data
-    this.data = data as HierarchyData;
+    this.data = data['trie'];
 
     // Get the feature map
     this.featureMap = new Map<number, string[]>();
-    for (const [k, v] of Object.entries(this.data.featureMap)) {
+    for (const [k, v] of Object.entries(data.featureMap)) {
       this.featureMap.set(parseInt(k), v as string[]);
     }
 
@@ -216,7 +239,7 @@ export class Sunburst {
           ((this.xScale((d as ArcPartition).x1) -
             this.xScale((d as ArcPartition).x0)) /
             2,
-          0.002)
+          0.00001)
         )
       )
       .padRadius(this.radius * 1.5)
