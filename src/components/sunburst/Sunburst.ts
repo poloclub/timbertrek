@@ -196,7 +196,7 @@ export class Sunburst {
     this.height = height - this.padding.top - this.padding.bottom;
 
     // Transform the data
-    this.data = data['trie'];
+    this.data = data.trie;
 
     // Get the feature map
     this.featureMap = new Map<number, string[]>();
@@ -299,7 +299,6 @@ export class Sunburst {
           stringID = +rawFeatureString.replace(/.*\s(.*)/, '$1');
           break;
         case FeaturePosition.Both:
-          // TODO: Need to specially handle this case
           stringID = +rawFeatureString.replace(/(.*)\s.*/, '$1');
           break;
         default:
@@ -561,11 +560,6 @@ export class Sunburst {
    * Draw the initial view.
    */
   #initView() {
-    // Save a copy of initial state of each node for animation
-    this.partition.each(d => {
-      (d as HierarchyNode).current = d;
-    });
-
     const content = this.svg
       .append('g')
       .attr('class', 'content-group')
@@ -586,7 +580,7 @@ export class Sunburst {
       .attr('class', d => `arc feature-${d.data['f']}`)
       .classed('leaf', d => d.data['f'] === '_')
       // @ts-ignore
-      .attr('d', d => this.arc(d.current))
+      .attr('d', d => this.arc(d))
       .on('click', (e, d) => this.#arcClicked(e as MouseEvent, d))
       .style('fill', d => {
         // Let CSS handle the color for leaf nodes
@@ -603,6 +597,11 @@ export class Sunburst {
           ) as string
         );
         return color;
+      })
+      .style('display', d => {
+        if (this.xScale(d.x1) - this.xScale(d.x0) < 0.002) {
+          return 'none';
+        }
       });
 
     const yGap = 1 / (this.sunburstStoreValue.depthMax + 1);
