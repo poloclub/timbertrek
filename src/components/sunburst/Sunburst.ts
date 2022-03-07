@@ -2,6 +2,7 @@ import d3 from '../../utils/d3-import';
 import { config } from '../../config';
 import type { Writable } from 'svelte/store';
 import { getContrastRatio } from '../../utils/utils';
+import { getSFTextWidth } from '../../utils/text-width';
 import { SunburstStoreValue, SunburstAction } from '../../stores';
 
 interface FeatureMap {
@@ -280,6 +281,8 @@ export class Sunburst {
         angles.reverse();
       }
 
+      // Path arc: rx, ry, radius, start angle, end angle, direction (true if
+      // anti-clockwise, false if clockwise)
       const curPath = d3.path();
       curPath.arc(0, 0, radius, angles[0], angles[1], needToInvert);
       return curPath.toString();
@@ -661,6 +664,21 @@ export class Sunburst {
     this.curHeadNode = this.partition;
   }
 
+  /**
+   * Approximate if the text fits in the given arc
+   */
+  #doesTextFitArc(d: HierarchyNode) {
+    const text = this.#getFeatureInfo(d.data['f'] as string).nameValue;
+    const textWidth = getSFTextWidth(text, 16 * 0.9);
+
+    // Compute the arc length
+    const angle = this.xScale(d.x1) - this.xScale(d.x0);
+    const radius = Math.max(0, (this.yScale(d.y0) + this.yScale(d.y1)) / 2);
+    const arcLength = angle * radius;
+
+    return textWidth <= arcLength;
+  }
+
   #drawText() {
     const arcGroup = this.svg.select('g.arc-group');
 
@@ -684,6 +702,7 @@ export class Sunburst {
 
     // Choose the text color based on the background color
     texts.style('fill', d => {
+      console.log(this.#doesTextFitArc(d));
       const background = d3.color(
         this.colorScale(
           this.#getFeatureNameValue(

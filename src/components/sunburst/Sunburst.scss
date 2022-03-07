@@ -27,6 +27,9 @@
     dominant-baseline: middle;
     font-size: 0.9rem;
 
+    user-select: none;
+    cursor: default;
+
     animation-name: fade-in;
     animation-duration: 200ms;
     animation-timing-function: cubic-bezier(0.645, 0.045, 0.355, 1);
