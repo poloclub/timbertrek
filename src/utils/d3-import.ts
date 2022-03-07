@@ -42,6 +42,8 @@ import {
   arc
 } from 'd3-shape';
 
+import { path } from 'd3-path';
+
 import { hierarchy, partition } from 'd3-hierarchy';
 
 import { brush } from 'd3-brush';
@@ -99,5 +101,6 @@ export default {
   timeFormat,
   hierarchy,
   partition,
-  arc
+  arc,
+  path
 };

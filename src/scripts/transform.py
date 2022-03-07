@@ -192,7 +192,7 @@ def get_feature_map(feature_header, feature_description_map):
             feature_value = 'is ' + feature_value
             feature_map[i] = [feature_name, feature_value]
         elif feature_type == 'count':
-            feature_value = re.sub(r'([>=<])(.*)', r'\1\2', feature_value)
+            feature_value = re.sub(r'([>=<])(.*)', r'\1 \2', feature_value)
             feature_map[i] = [feature_name, feature_value]
         elif feature_type == 'yes':
             feature_value = ''

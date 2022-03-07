@@ -11,6 +11,34 @@
   align-items: center;
 }
 
-.sunburst :global(.arc.leaf) {
-  fill: $gray-300;
+.sunburst {
+  :global(.arc.leaf) {
+    fill: $gray-300;
+  }
+
+  :global(.text-arc) {
+    // visibility: hidden;
+    stroke: $red-100;
+    fill: none;
+  }
+
+  :global(text.feature-name) {
+    text-anchor: middle;
+    dominant-baseline: middle;
+    font-size: 0.9rem;
+
+    animation-name: fade-in;
+    animation-duration: 200ms;
+    animation-timing-function: cubic-bezier(0.645, 0.045, 0.355, 1);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }

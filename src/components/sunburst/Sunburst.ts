@@ -1,6 +1,7 @@
 import d3 from '../../utils/d3-import';
 import { config } from '../../config';
 import type { Writable } from 'svelte/store';
+import { getContrastRatio } from '../../utils/utils';
 import { SunburstStoreValue, SunburstAction } from '../../stores';
 
 interface FeatureMap {
@@ -109,6 +110,8 @@ enum featureValuePairType {
   PairString
 }
 
+const HALF_PI = Math.PI / 2;
+
 /**
  * Sunburst class that represents a sunburst chart
  */
@@ -132,6 +135,7 @@ export class Sunburst {
   featureValueCount: Map<string, Map<string, number>>;
 
   arc: d3.Arc<any, d3.DefaultArcObject>;
+  textArc: (node: HierarchyNode) => string;
   featureMap: Map<number, string[]>;
   colorScale: d3.ScaleOrdinal<string, string, never>;
   arcDomainStack: ArcDomainData[];
@@ -229,7 +233,20 @@ export class Sunburst {
     // Push the initial domain
     this.arcDomainStack = [];
 
-    // Set up the arc generator
+    // Set up the arc generators (background and text)
+    this.#initArcGenerator();
+
+    // Draw the initial view
+    console.time('Draw sunburst');
+    this.#initView();
+    console.timeEnd('Draw sunburst');
+  }
+
+  /**
+   * Initialize the arc generators.
+   */
+  #initArcGenerator() {
+    // Initialize the background arc path generator
     this.arc = d3
       .arc()
       .startAngle(d => this.xScale((d as ArcPartition).x0))
@@ -251,10 +268,22 @@ export class Sunburst {
         )
       );
 
-    // Draw the initial view
-    console.time('Draw sunburst');
-    this.#initView();
-    console.timeEnd('Draw sunburst');
+    // Initialize the text arc path generator
+    this.textArc = (d: HierarchyNode) => {
+      const angles = [this.xScale(d.x0) - HALF_PI, this.xScale(d.x1) - HALF_PI];
+      const radius = Math.max(0, (this.yScale(d.y0) + this.yScale(d.y1)) / 2);
+      const midAngle = (angles[0] + angles[1]) / 2;
+
+      // Flip the text arc when the angle is from 0 to PI
+      const needToInvert = midAngle > 0 && midAngle < Math.PI;
+      if (needToInvert) {
+        angles.reverse();
+      }
+
+      const curPath = d3.path();
+      curPath.arc(0, 0, radius, angles[0], angles[1], needToInvert);
+      return curPath.toString();
+    };
   }
 
   /**
@@ -272,7 +301,7 @@ export class Sunburst {
     if (!isNaN(parsedInt)) {
       featureInfo.name = this.featureMap.get(parsedInt)[0];
       featureInfo.value = this.featureMap.get(parsedInt)[1];
-      featureInfo.nameValue = `${featureInfo.name}:${featureInfo.value}`;
+      featureInfo.nameValue = `${featureInfo.name} ${featureInfo.value}`;
     }
     return featureInfo;
   }
@@ -573,12 +602,17 @@ export class Sunburst {
     // Draw the arcs
     const arcGroup = content.append('g').attr('class', 'arc-group');
 
-    arcGroup
-      .selectAll('path.arc')
+    const arcGroups = arcGroup
+      .selectAll('g.arc')
       .data(this.partition.descendants().slice(1) as HierarchyNode[])
-      .join('path')
-      .attr('class', d => `arc feature-${d.data['f']}`)
-      .classed('leaf', d => d.data['f'] === '_')
+      .join('g')
+      .attr('class', d => `arc-${d.depth}`)
+      .classed('leaf', d => d.data['f'] === '_');
+
+    // Draw the background paths
+    arcGroups
+      .append('path')
+      .attr('class', 'arc')
       // @ts-ignore
       .attr('d', d => this.arc(d))
       .on('click', (e, d) => this.#arcClicked(e as MouseEvent, d))
@@ -587,7 +621,6 @@ export class Sunburst {
         if (d.data['f'] === '_') {
           return 'null';
         }
-
         // Determine the color
         const color = this.colorScale(
           this.#getFeatureNameValue(
@@ -604,6 +637,12 @@ export class Sunburst {
         }
       });
 
+    // TODO: Temporarily add titles, need to replace with tooltips
+    arcGroups
+      .append('title')
+      .text(d => this.#getFeatureInfo(d.data['f'] as string).nameValue);
+
+    // Zoom into the third level at the beginning
     const yGap = 1 / (this.sunburstStoreValue.depthMax + 1);
     this.#arcZoom(
       {
@@ -615,8 +654,69 @@ export class Sunburst {
       500
     );
 
+    // Draw texts on the most inner ring
+    // this.#drawText();
+
     // The initial head node is the root
     this.curHeadNode = this.partition;
+  }
+
+  #drawText() {
+    const arcGroup = this.svg.select('g.arc-group');
+
+    // We only draw text on the most inner ring
+    const innerArcs = arcGroup.selectAll(
+      `g.arc-${this.sunburstStoreValue.depthLow}`
+    ) as d3.Selection<
+      d3.BaseType | SVGGElement,
+      HierarchyNode,
+      SVGGElement,
+      unknown
+    >;
+
+    innerArcs
+      .append('path')
+      .attr('class', 'text-arc')
+      .attr('id', (d, i) => `text-arc-${i}`)
+      .attr('d', d => this.textArc(d));
+
+    const texts = innerArcs.append('text').attr('class', 'feature-name');
+
+    // Choose the text color based on the background color
+    texts.style('fill', d => {
+      const background = d3.color(
+        this.colorScale(
+          this.#getFeatureNameValue(
+            d.data['f'] as string,
+            FeaturePosition.First,
+            featureValuePairType.PairString
+          ) as string
+        )
+      );
+
+      // Check contract ratio if we use white color
+      let foreground = 'currentcolor';
+      const whiteRGB = [252, 252, 252];
+      const rgb = d3.color(background).rgb();
+      const backgroundRGB = [rgb.r, rgb.g, rgb.b];
+
+      if (getContrastRatio(whiteRGB, backgroundRGB) < 0.55) {
+        foreground = 'hsla(0, 0%, 99%, 1)';
+      }
+
+      return foreground;
+    });
+
+    texts
+      .append('textPath')
+      .attr('startOffset', '50%')
+      .attr('xlink:href', (d, i) => `#text-arc-${i}`)
+      .text(d => this.#getFeatureInfo(d.data['f'] as string).nameValue);
+  }
+
+  #removeText() {
+    this.svg.selectAll('.text-arc').remove();
+    this.svg.selectAll('text.feature-name').remove();
   }
 
   /**
@@ -625,6 +725,9 @@ export class Sunburst {
    * @param duration Transition duration (ms)
    */
   #arcZoom(newDomain: ArcDomain, duration = 800) {
+    // Clean up the text
+    this.#removeText();
+
     // Customize an interpolator for the transition
     // We animate the domains of x and y scales
     const transition = this.svg
@@ -648,6 +751,9 @@ export class Sunburst {
           this.xScale.domain(xInterpolator(t));
           this.yScale.domain(yInterpolator(t));
         };
+      })
+      .on('end', () => {
+        this.#drawText();
       });
 
     // Update the view
