@@ -106,9 +106,17 @@ enum FeaturePosition {
 /**
  * Type of feature string encodings
  */
-enum featureValuePairType {
+enum FeatureValuePairType {
   PairArray,
   PairString
+}
+
+/**
+ * Different layouts for drawing the text on an arc
+ */
+enum TextArcMode {
+  SectorArc,
+  MidLine
 }
 
 const HALF_PI = Math.PI / 2;
@@ -136,7 +144,6 @@ export class Sunburst {
   featureValueCount: Map<string, Map<string, number>>;
 
   arc: d3.Arc<any, d3.DefaultArcObject>;
-  textArc: (node: HierarchyNode) => string;
   featureMap: Map<number, string[]>;
   colorScale: d3.ScaleOrdinal<string, string, never>;
   arcDomainStack: ArcDomainData[];
@@ -234,19 +241,6 @@ export class Sunburst {
     // Push the initial domain
     this.arcDomainStack = [];
 
-    // Set up the arc generators (background and text)
-    this.#initArcGenerator();
-
-    // Draw the initial view
-    console.time('Draw sunburst');
-    this.#initView();
-    console.timeEnd('Draw sunburst');
-  }
-
-  /**
-   * Initialize the arc generators.
-   */
-  #initArcGenerator() {
     // Initialize the background arc path generator
     this.arc = d3
       .arc()
@@ -269,24 +263,10 @@ export class Sunburst {
         )
       );
 
-    // Initialize the text arc path generator
-    this.textArc = (d: HierarchyNode) => {
-      const angles = [this.xScale(d.x0) - HALF_PI, this.xScale(d.x1) - HALF_PI];
-      const radius = Math.max(0, (this.yScale(d.y0) + this.yScale(d.y1)) / 2);
-      const midAngle = (angles[0] + angles[1]) / 2;
-
-      // Flip the text arc when the angle is from 0 to PI
-      const needToInvert = midAngle > 0 && midAngle < Math.PI;
-      if (needToInvert) {
-        angles.reverse();
-      }
-
-      // Path arc: rx, ry, radius, start angle, end angle, direction (true if
-      // anti-clockwise, false if clockwise)
-      const curPath = d3.path();
-      curPath.arc(0, 0, radius, angles[0], angles[1], needToInvert);
-      return curPath.toString();
-    };
+    // Draw the initial view
+    console.time('Draw sunburst');
+    this.#initView();
+    console.timeEnd('Draw sunburst');
   }
 
   /**
@@ -298,13 +278,17 @@ export class Sunburst {
     const featureInfo = {
       name: '',
       value: '',
-      nameValue: ''
+      nameValue: '',
+      short: '',
+      shortValue: ''
     };
     const parsedInt = parseInt(f);
     if (!isNaN(parsedInt)) {
       featureInfo.name = this.featureMap.get(parsedInt)[0];
       featureInfo.value = this.featureMap.get(parsedInt)[1];
+      featureInfo.short = this.featureMap.get(parsedInt)[2];
       featureInfo.nameValue = `${featureInfo.name} ${featureInfo.value}`;
+      featureInfo.shortValue = `${featureInfo.short} ${featureInfo.value}`;
     }
     return featureInfo;
   }
@@ -319,7 +303,7 @@ export class Sunburst {
   #getFeatureNameValue(
     rawFeatureString: string,
     order: FeaturePosition = FeaturePosition.First,
-    returnValue: featureValuePairType = featureValuePairType.PairArray
+    returnValue: FeatureValuePairType = FeatureValuePairType.PairArray
   ) {
     let stringID = -1;
     if (rawFeatureString.includes(' ')) {
@@ -341,12 +325,12 @@ export class Sunburst {
     }
 
     switch (returnValue) {
-      case featureValuePairType.PairArray:
+      case FeatureValuePairType.PairArray:
         if (isNaN(stringID)) {
           return ['', ''];
         }
         return this.featureMap.get(stringID);
-      case featureValuePairType.PairString: {
+      case FeatureValuePairType.PairString: {
         if (isNaN(stringID)) {
           return '';
         }
@@ -424,7 +408,7 @@ export class Sunburst {
           this.#getFeatureNameValue(
             a.data.f,
             FeaturePosition.First,
-            featureValuePairType.PairString
+            FeatureValuePairType.PairString
           ) as string
         )
       ).l;
@@ -434,7 +418,7 @@ export class Sunburst {
           this.#getFeatureNameValue(
             b.data.f,
             FeaturePosition.First,
-            featureValuePairType.PairString
+            FeatureValuePairType.PairString
           ) as string
         )
       ).l;
@@ -629,7 +613,7 @@ export class Sunburst {
           this.#getFeatureNameValue(
             d.data['f'] as string,
             FeaturePosition.First,
-            featureValuePairType.PairString
+            FeatureValuePairType.PairString
           ) as string
         );
         return color;
@@ -664,11 +648,70 @@ export class Sunburst {
     this.curHeadNode = this.partition;
   }
 
+  // Initialize the text arc path generator
+  #textArc = (d: HierarchyNode, textArcMode: TextArcMode) => {
+    switch (textArcMode) {
+      case TextArcMode.SectorArc: {
+        const angles = [
+          this.xScale(d.x0) - HALF_PI,
+          this.xScale(d.x1) - HALF_PI
+        ];
+        const radius = Math.max(0, (this.yScale(d.y0) + this.yScale(d.y1)) / 2);
+        const midAngle = (angles[0] + angles[1]) / 2;
+
+        // Flip the text arc when the angle is from 0 to PI
+        const needToInvert = midAngle > 0 && midAngle < Math.PI;
+        if (needToInvert) {
+          angles.reverse();
+        }
+
+        // Path arc: rx, ry, radius, start angle, end angle, direction (true if
+        // anti-clockwise, false if clockwise)
+        const curPath = d3.path();
+        curPath.arc(0, 0, radius, angles[0], angles[1], needToInvert);
+        return curPath.toString();
+      }
+
+      case TextArcMode.MidLine: {
+        // To draw a straight line, we need to convert the polar coordinate to
+        // Cartesian
+        const angles = [
+          this.xScale(d.x0) - HALF_PI,
+          this.xScale(d.x1) - HALF_PI
+        ];
+        const midAngle = (angles[0] + angles[1]) / 2;
+
+        const startRadius = this.yScale(d.y0);
+        const endRadius = this.yScale(d.y1);
+
+        const xStart = startRadius * Math.cos(midAngle);
+        const yStart = startRadius * Math.sin(midAngle);
+
+        const xEnd = endRadius * Math.cos(midAngle);
+        const yEnd = endRadius * Math.sin(midAngle);
+
+        // Different drawing order on the left/right half circles
+        const curPath = d3.path();
+        if (midAngle >= Math.PI / 2 && midAngle <= (Math.PI * 3) / 2) {
+          curPath.moveTo(xEnd, yEnd);
+          curPath.lineTo(xStart, yStart);
+        } else {
+          curPath.moveTo(xStart, yStart);
+          curPath.lineTo(xEnd, yEnd);
+        }
+        return curPath.toString();
+      }
+    }
+  };
+
   /**
    * Approximate if the text fits in the given arc
    */
-  #doesTextFitArc(d: HierarchyNode) {
-    const text = this.#getFeatureInfo(d.data['f'] as string).nameValue;
+  #doesTextFitArc(d: HierarchyNode, text: string | null = null) {
+    if (text == null) {
+      text = this.#getFeatureInfo(d.data['f'] as string).nameValue;
+    }
+
     const textWidth = getSFTextWidth(text, 16 * 0.9);
 
     // Compute the arc length
@@ -679,11 +722,15 @@ export class Sunburst {
     return textWidth <= arcLength;
   }
 
+  /**
+   * Draw feature names on the inner circles and the most inner ring
+   */
   #drawText() {
+    // Case 1: Draw text on the arc sectors
     const arcGroup = this.svg.select('g.arc-group');
 
     // We only draw text on the most inner ring
-    const innerArcs = arcGroup.selectAll(
+    let innerArcs = arcGroup.selectAll(
       `g.arc-${this.sunburstStoreValue.depthLow}`
     ) as d3.Selection<
       d3.BaseType | SVGGElement,
@@ -692,23 +739,33 @@ export class Sunburst {
       unknown
     >;
 
+    // We only draw text on the visible rings
+    innerArcs = innerArcs.filter(
+      d => d.x0 >= this.xScale.domain()[0] && d.x1 <= this.xScale.domain()[1]
+    );
+
     innerArcs
       .append('path')
       .attr('class', 'text-arc')
       .attr('id', (d, i) => `text-arc-${i}`)
-      .attr('d', d => this.textArc(d));
+      .attr('d', d => this.#textArc(d, TextArcMode.SectorArc));
+
+    innerArcs
+      .append('path')
+      .attr('class', 'text-line')
+      .attr('id', (d, i) => `text-line-${i}`)
+      .attr('d', d => this.#textArc(d, TextArcMode.MidLine));
 
     const texts = innerArcs.append('text').attr('class', 'feature-name');
 
     // Choose the text color based on the background color
     texts.style('fill', d => {
-      console.log(this.#doesTextFitArc(d));
       const background = d3.color(
         this.colorScale(
           this.#getFeatureNameValue(
             d.data['f'] as string,
             FeaturePosition.First,
-            featureValuePairType.PairString
+            FeatureValuePairType.PairString
           ) as string
         )
       );
@@ -726,15 +783,45 @@ export class Sunburst {
       return foreground;
     });
 
+    const drawnFeatureNames = new Set<string>();
+    const sectorRadius =
+      this.yScale(texts.datum().y1) - this.yScale(texts.datum().y0);
+
     texts
       .append('textPath')
       .attr('startOffset', '50%')
-      .attr('xlink:href', (d, i) => `#text-arc-${i}`)
-      .text(d => this.#getFeatureInfo(d.data['f'] as string).nameValue);
+      .attr('xlink:href', (d, i) => {
+        const featureInfo = this.#getFeatureInfo(d.data['f'] as string);
+        let text = featureInfo.nameValue;
+
+        // If the feature is drawn once, we just draw the condition
+        if (drawnFeatureNames.has(featureInfo.name)) {
+          text = featureInfo.value;
+        }
+
+        if (this.#doesTextFitArc(d, text)) {
+          return `#text-arc-${i}`;
+        } else {
+          return `#text-line-${i}`;
+        }
+      })
+      .text(d => {
+        const featureInfo = this.#getFeatureInfo(d.data['f'] as string);
+        let text = featureInfo.nameValue;
+
+        // If the feature is drawn once, we just draw the condition
+        if (drawnFeatureNames.has(featureInfo.name)) {
+          text = featureInfo.value;
+        }
+
+        drawnFeatureNames.add(featureInfo.name);
+        return text;
+      });
   }
 
   #removeText() {
     this.svg.selectAll('.text-arc').remove();
+    this.svg.selectAll('.text-line').remove();
     this.svg.selectAll('text.feature-name').remove();
   }
 
@@ -863,7 +950,7 @@ export class Sunburst {
           this.#getFeatureNameValue(
             a.data['f'] as string,
             FeaturePosition.First,
-            featureValuePairType.PairString
+            FeatureValuePairType.PairString
           ) as string
         );
         depthColors[a.depth - 1] = curColor;

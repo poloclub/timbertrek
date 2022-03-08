@@ -186,17 +186,18 @@ def get_feature_map(feature_header, feature_description_map):
 
         # Translate the feature name into a more readable format
         feature_type = feature_description_map[feature_name]['type']
+        feature_short = feature_description_map[feature_name]['short']
         feature_name = feature_description_map[feature_name]['info']
 
         if feature_type == 'is':
             feature_value = 'is ' + feature_value
-            feature_map[i] = [feature_name, feature_value]
+            feature_map[i] = [feature_name, feature_value, feature_short]
         elif feature_type == 'count':
             feature_value = re.sub(r'([>=<])(.*)', r'\1 \2', feature_value)
-            feature_map[i] = [feature_name, feature_value]
+            feature_map[i] = [feature_name, feature_value, feature_short]
         elif feature_type == 'yes':
             feature_value = ''
-            feature_map[i] = [feature_name, feature_value]
+            feature_map[i] = [feature_name, feature_value, feature_short]
 
     return feature_map
 
