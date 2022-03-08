@@ -199,11 +199,16 @@ export function drawText(this: Sunburst) {
 
       /**
        * Determine the text layout.
-       * (1) first time & we have enough space => arc path
-       * (2) first time & not enough space => line
-       * (3) others => line
+       * (1) firs time & we have enough space for full line => line
+       * (2) first time & we have enough space for arc => arc path
+       * (3) first time & not enough space => line
+       * (4) others => line
        */
-      if (
+      const textWidth = getLatoTextWidth(text, 16 * curFontSize);
+      if (textWidth < sectorRadius) {
+        textLayoutMap.set(i, TextArcMode.MidLine);
+        return `#text-line-${i}`;
+      } else if (
         !featureNameExists &&
         this.doesTextFitArc(d, 16 * curFontSize, text, 10)
       ) {
