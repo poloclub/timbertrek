@@ -136,6 +136,7 @@ export class Sunburst {
   maxRadius: number;
   xScale: d3.ScaleLinear<number, number, never>;
   yScale: d3.ScaleLinear<number, number, never>;
+  textFontScale: d3.ScaleLinear<number, number, never>;
 
   data: RuleNode;
   partition: d3.HierarchyRectangularNode<unknown>;
@@ -237,6 +238,11 @@ export class Sunburst {
       .clamp(true);
 
     this.yScale = d3.scaleLinear().domain([0, 1]).range([0, this.maxRadius]);
+
+    this.textFontScale = d3
+      .scaleLinear()
+      .domain([1, this.sunburstStoreValue.depthMax - 1])
+      .range([0.93, 0.7]);
 
     // Push the initial domain
     this.arcDomainStack = [];
@@ -707,12 +713,12 @@ export class Sunburst {
   /**
    * Approximate if the text fits in the given arc
    */
-  #doesTextFitArc(d: HierarchyNode, text: string | null = null) {
+  #doesTextFitArc(d: HierarchyNode, fontSize = 16, text: string | null = null) {
     if (text == null) {
       text = this.#getFeatureInfo(d.data['f'] as string).nameValue;
     }
 
-    const textWidth = getLatoTextWidth(text, 16 * 0.9);
+    const textWidth = getLatoTextWidth(text, fontSize);
 
     // Compute the arc length
     const angle = this.xScale(d.x1) - this.xScale(d.x0);
@@ -793,16 +799,22 @@ export class Sunburst {
 
     // Compute the sector radius adjusted by a padding constant
     const sectorRadius =
-      this.yScale(texts.datum().y1) - this.yScale(texts.datum().y0) - 12;
+      this.yScale(texts.datum().y1) - this.yScale(texts.datum().y0) - 15;
     const maxTextHeight = 18.5;
+
+    // Adaptively choose the font size (linear to depth gap)
+    const curFontSize = this.textFontScale(
+      this.sunburstStoreValue.depthHigh - this.sunburstStoreValue.depthLow
+    );
 
     // Add text path
     const textPaths = texts
+      .style('font-size', `${curFontSize}rem`)
       .append('textPath')
       .attr('startOffset', '50%')
       .attr('xlink:href', (d, i) => {
         const featureInfo = this.#getFeatureInfo(d.data['f'] as string);
-        let text = featureInfo.nameValue.toLowerCase();
+        let text = featureInfo.nameValue;
         let featureNameExists = false;
 
         // If the feature is drawn once, we just draw the condition
@@ -818,7 +830,10 @@ export class Sunburst {
          * (2) first time & not enough space => line
          * (3) others => line
          */
-        if (!featureNameExists && this.#doesTextFitArc(d, text)) {
+        if (
+          !featureNameExists &&
+          this.#doesTextFitArc(d, 16 * curFontSize, text)
+        ) {
           textLayoutMap.set(i, TextArcMode.SectorArc);
           return `#text-arc-${i}`;
         } else {
@@ -831,7 +846,7 @@ export class Sunburst {
     drawnFeatureNames.clear();
     textPaths.text((d, i) => {
       const featureInfo = this.#getFeatureInfo(d.data['f'] as string);
-      let text = featureInfo.nameValue.toLowerCase();
+      let text = featureInfo.nameValue;
       let onlyShowValue = false;
 
       // If the feature is drawn once, we just draw the condition
@@ -858,21 +873,21 @@ export class Sunburst {
         }
 
         // Width check (first check)
-        let textWidth = getLatoTextWidth(text, 16 * 0.9);
+        let textWidth = getLatoTextWidth(text, 16 * curFontSize);
         if (textWidth > sectorRadius) {
           // If the width is larger than the sector radius, then we try to use
           // its short name
           if (!onlyShowValue) {
-            text = featureInfo.shortValue.toLowerCase();
+            text = featureInfo.shortValue;
 
             // Check if the new width is okay, if not, replace the last portion
             // of the string with ...
-            textWidth = getLatoTextWidth(text, 16 * 0.9);
+            textWidth = getLatoTextWidth(text, 16 * curFontSize);
             while (textWidth > sectorRadius) {
               text = text.replace('...', '');
               text = text.slice(0, text.length - 1);
               text = `${text}...`;
-              textWidth = getLatoTextWidth(text, 16 * 0.9);
+              textWidth = getLatoTextWidth(text, 16 * curFontSize);
             }
           }
         }
