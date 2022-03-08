@@ -1,123 +1,20 @@
 import d3 from '../../utils/d3-import';
 import { config } from '../../config';
 import type { Writable } from 'svelte/store';
-import { getContrastRatio } from '../../utils/utils';
-import { getLatoTextWidth } from '../../utils/text-width';
 import { SunburstStoreValue, SunburstAction } from '../../stores';
-
-interface FeatureMap {
-  [featureID: number]: string[];
-}
-
-interface TreeNode {
-  /**
-   * Feature name
-   */
-  f: string;
-
-  /**
-   * Array of children
-   */
-  c: [TreeNode, number];
-}
-
-interface TreeMap {
-  /**
-   * Number of trees
-   */
-  count: number;
-
-  /**
-   * A map from tree ID to the tree's hierarchy dict
-   */
-  [treeID: number]: TreeNode[];
-}
-
-interface HierarchyJSON {
-  trie: RuleNode;
-
-  /**
-   * Map feature ID to [feature name, feature value]
-   */
-  featureMap: FeatureMap;
-
-  treeMap: TreeMap;
-}
-
-interface RuleNode {
-  /**
-   * Feature name
-   */
-  f: string;
-
-  /**
-   * Array of children
-   */
-  c: RuleNode[];
-
-  /**
-   * Tree ID
-   * Only leaf node has this property
-   */
-  t?: number;
-}
-
-// Define the arc path generator
-interface ArcPartition extends d3.DefaultArcObject {
-  x0: number;
-  x1: number;
-  y0: number;
-  y1: number;
-}
-
-interface HierarchyNode extends d3.HierarchyRectangularNode<unknown> {
-  current?: d3.HierarchyRectangularNode<unknown>;
-}
-
-interface Padding {
-  top: number;
-  bottom: number;
-  left: number;
-  right: number;
-}
-
-interface ArcDomain {
-  x0: number;
-  x1: number;
-  y0: number;
-  y1: number;
-}
-
-interface ArcDomainData extends ArcDomain {
-  node: HierarchyNode;
-  depthGap: number;
-}
-
-/**
- * This enum defines which feature to extract. The node can include two
- * features.
- */
-enum FeaturePosition {
-  First,
-  Second,
-  Both
-}
-
-/**
- * Type of feature string encodings
- */
-enum FeatureValuePairType {
-  PairArray,
-  PairString
-}
-
-/**
- * Different layouts for drawing the text on an arc
- */
-enum TextArcMode {
-  SectorArc,
-  MidLine
-}
+import { textArc, doesTextFitArc, removeText, drawText } from './SunburstText';
+import {
+  ArcDomain,
+  ArcDomainData,
+  ArcPartition,
+  FeatureInfo,
+  FeaturePosition,
+  FeatureValuePairType,
+  HierarchyJSON,
+  HierarchyNode,
+  Padding,
+  RuleNode
+} from './SunburstTypes';
 
 const HALF_PI = Math.PI / 2;
 
@@ -149,6 +46,12 @@ export class Sunburst {
   colorScale: d3.ScaleOrdinal<string, string, never>;
   arcDomainStack: ArcDomainData[];
   curHeadNode: HierarchyNode;
+
+  // Methods implemented in another file
+  textArc = textArc;
+  doesTextFitArc = doesTextFitArc;
+  removeText = removeText;
+  drawText = drawText;
 
   /**
    * The radius is determined by the number of levels to show.
@@ -280,7 +183,7 @@ export class Sunburst {
    * @param f Feature's `f` field, it can be a number, '_', or 'root'
    * @returns featureInfo
    */
-  #getFeatureInfo(f: string) {
+  protected getFeatureInfo(f: string): FeatureInfo {
     const featureInfo = {
       name: '',
       value: '',
@@ -306,7 +209,7 @@ export class Sunburst {
    * @param returnValue Return [name, value] array or 'name:value' string
    * @returns Feature name and value
    */
-  #getFeatureNameValue(
+  protected getFeatureNameValue(
     rawFeatureString: string,
     order: FeaturePosition = FeaturePosition.First,
     returnValue: FeatureValuePairType = FeatureValuePairType.PairArray
@@ -362,7 +265,7 @@ export class Sunburst {
      * Step 2: Figure out the feature order (based on first split frequency)
      */
     root.children.forEach(d => {
-      const [featureName, featureValue] = this.#getFeatureNameValue(d.data.f);
+      const [featureName, featureValue] = this.getFeatureNameValue(d.data.f);
 
       // Check if this feature name is created
       if (this.featureCount.has(featureName)) {
@@ -404,14 +307,14 @@ export class Sunburst {
      * already sorted the lightness mapping in #getColorScale()
      */
     root = root.sort((a, b) => {
-      const aName = this.#getFeatureInfo(a.data.f).name;
-      const bName = this.#getFeatureInfo(b.data.f).name;
+      const aName = this.getFeatureInfo(a.data.f).name;
+      const bName = this.getFeatureInfo(b.data.f).name;
       const aFeatureCount = this.featureCount.get(aName);
       const bFeatureCount = this.featureCount.get(bName);
 
       const aLightness = d3.lch(
         this.colorScale(
-          this.#getFeatureNameValue(
+          this.getFeatureNameValue(
             a.data.f,
             FeaturePosition.First,
             FeatureValuePairType.PairString
@@ -421,7 +324,7 @@ export class Sunburst {
 
       const bLightness = d3.lch(
         this.colorScale(
-          this.#getFeatureNameValue(
+          this.getFeatureNameValue(
             b.data.f,
             FeaturePosition.First,
             FeatureValuePairType.PairString
@@ -616,7 +519,7 @@ export class Sunburst {
         }
         // Determine the color
         const color = this.colorScale(
-          this.#getFeatureNameValue(
+          this.getFeatureNameValue(
             d.data['f'] as string,
             FeaturePosition.First,
             FeatureValuePairType.PairString
@@ -633,7 +536,7 @@ export class Sunburst {
     // TODO: Temporarily add titles, need to replace with tooltips
     arcGroups
       .append('title')
-      .text(d => this.#getFeatureInfo(d.data['f'] as string).nameValue);
+      .text(d => this.getFeatureInfo(d.data['f'] as string).nameValue);
 
     // Zoom into the third level at the beginning
     const yGap = 1 / (this.sunburstStoreValue.depthMax + 1);
@@ -654,268 +557,6 @@ export class Sunburst {
     this.curHeadNode = this.partition;
   }
 
-  // Initialize the text arc path generator
-  #textArc = (d: HierarchyNode, textArcMode: TextArcMode) => {
-    switch (textArcMode) {
-      case TextArcMode.SectorArc: {
-        const angles = [
-          this.xScale(d.x0) - HALF_PI,
-          this.xScale(d.x1) - HALF_PI
-        ];
-        const radius = Math.max(0, (this.yScale(d.y0) + this.yScale(d.y1)) / 2);
-        const midAngle = (angles[0] + angles[1]) / 2;
-
-        // Flip the text arc when the angle is from 0 to PI
-        const needToInvert = midAngle > 0 && midAngle < Math.PI;
-        if (needToInvert) {
-          angles.reverse();
-        }
-
-        // Path arc: rx, ry, radius, start angle, end angle, direction (true if
-        // anti-clockwise, false if clockwise)
-        const curPath = d3.path();
-        curPath.arc(0, 0, radius, angles[0], angles[1], needToInvert);
-        return curPath.toString();
-      }
-
-      case TextArcMode.MidLine: {
-        // To draw a straight line, we need to convert the polar coordinate to
-        // Cartesian
-        const angles = [
-          this.xScale(d.x0) - HALF_PI,
-          this.xScale(d.x1) - HALF_PI
-        ];
-        const midAngle = (angles[0] + angles[1]) / 2;
-
-        const startRadius = this.yScale(d.y0);
-        const endRadius = this.yScale(d.y1);
-
-        const xStart = startRadius * Math.cos(midAngle);
-        const yStart = startRadius * Math.sin(midAngle);
-
-        const xEnd = endRadius * Math.cos(midAngle);
-        const yEnd = endRadius * Math.sin(midAngle);
-
-        // Different drawing order on the left/right half circles
-        const curPath = d3.path();
-        if (midAngle >= Math.PI / 2 && midAngle <= (Math.PI * 3) / 2) {
-          curPath.moveTo(xEnd, yEnd);
-          curPath.lineTo(xStart, yStart);
-        } else {
-          curPath.moveTo(xStart, yStart);
-          curPath.lineTo(xEnd, yEnd);
-        }
-        return curPath.toString();
-      }
-    }
-  };
-
-  /**
-   * Approximate if the text fits in the given arc
-   */
-  #doesTextFitArc(
-    d: HierarchyNode,
-    fontSize = 16,
-    text: string | null = null,
-    padding = 0
-  ) {
-    if (text == null) {
-      text = this.#getFeatureInfo(d.data['f'] as string).nameValue;
-    }
-
-    const textWidth = getLatoTextWidth(text, fontSize);
-
-    // Compute the arc length
-    const angle = this.xScale(d.x1) - this.xScale(d.x0);
-    const radius = Math.max(0, (this.yScale(d.y0) + this.yScale(d.y1)) / 2);
-    const arcLength = angle * radius;
-
-    return textWidth <= arcLength - padding;
-  }
-
-  /**
-   * Draw feature names on the inner circles and the most inner ring
-   */
-  #drawText() {
-    // Case 1: Draw text on the arc sectors
-    const arcGroup = this.svg.select('g.arc-group');
-
-    // We only draw text on the most inner ring (not circle)
-    // Check of the user has clicked a sector
-    let innerArcs = arcGroup.selectAll(
-      `g.arc-${
-        this.xScale.domain()[0] === 0 && this.xScale.domain()[1] === 1
-          ? this.sunburstStoreValue.depthLow
-          : this.sunburstStoreValue.depthLow + 1
-      }`
-    ) as d3.Selection<
-      d3.BaseType | SVGGElement,
-      HierarchyNode,
-      SVGGElement,
-      unknown
-    >;
-
-    // We only draw text on the visible rings
-    innerArcs = innerArcs.filter(
-      d =>
-        d.x0 >= this.xScale.domain()[0] &&
-        d.x1 <= this.xScale.domain()[1] &&
-        d.data['f'] !== '_'
-    );
-
-    innerArcs
-      .append('path')
-      .attr('class', 'text-arc')
-      .attr('id', (d, i) => `text-arc-${i}`)
-      .attr('d', d => this.#textArc(d, TextArcMode.SectorArc));
-
-    innerArcs
-      .append('path')
-      .attr('class', 'text-line')
-      .attr('id', (d, i) => `text-line-${i}`)
-      .attr('d', d => this.#textArc(d, TextArcMode.MidLine));
-
-    const texts = innerArcs.append('text').attr('class', 'feature-name');
-
-    // Choose the text color based on the background color
-    texts.style('fill', d => {
-      const background = d3.color(
-        this.colorScale(
-          this.#getFeatureNameValue(
-            d.data['f'] as string,
-            FeaturePosition.First,
-            FeatureValuePairType.PairString
-          ) as string
-        )
-      );
-
-      // Check contract ratio if we use white color
-      let foreground = 'currentcolor';
-      const whiteRGB = [252, 252, 252];
-      const blackRGB = [74, 74, 74];
-      const rgb = d3.color(background).rgb();
-      const backgroundRGB = [rgb.r, rgb.g, rgb.b];
-
-      if (
-        getContrastRatio(whiteRGB, backgroundRGB) <
-        getContrastRatio(blackRGB, backgroundRGB)
-      ) {
-        // if (getContrastRatio(whiteRGB, backgroundRGB) < 0.4) {
-        foreground = 'hsla(0, 0%, 99%, 1)';
-      }
-
-      return foreground;
-    });
-
-    const drawnFeatureNames = new Set<string>();
-    const textLayoutMap = new Map<number, TextArcMode>();
-
-    // Compute the sector radius adjusted by a padding constant
-    const sectorRadius =
-      this.yScale(texts.datum().y1) - this.yScale(texts.datum().y0) - 15;
-    const maxTextHeight = 18.5;
-
-    // Adaptively choose the font size (linear to depth gap)
-    const curFontSize = this.textFontScale(
-      this.sunburstStoreValue.depthHigh - this.sunburstStoreValue.depthLow
-    );
-
-    // Add text path
-    const textPaths = texts
-      .style('font-size', `${curFontSize}rem`)
-      .append('textPath')
-      .attr('startOffset', '50%')
-      .attr('xlink:href', (d, i) => {
-        const featureInfo = this.#getFeatureInfo(d.data['f'] as string);
-        let text = featureInfo.nameValue;
-        let featureNameExists = false;
-
-        // If the feature is drawn once, we just draw the condition
-        if (drawnFeatureNames.has(featureInfo.name)) {
-          text = featureInfo.value;
-          featureNameExists = true;
-        }
-        drawnFeatureNames.add(featureInfo.name);
-
-        /**
-         * Determine the text layout.
-         * (1) first time & we have enough space => arc path
-         * (2) first time & not enough space => line
-         * (3) others => line
-         */
-        if (
-          !featureNameExists &&
-          this.#doesTextFitArc(d, 16 * curFontSize, text, 10)
-        ) {
-          textLayoutMap.set(i, TextArcMode.SectorArc);
-          return `#text-arc-${i}`;
-        } else {
-          textLayoutMap.set(i, TextArcMode.MidLine);
-          return `#text-line-${i}`;
-        }
-      });
-
-    // Add text
-    drawnFeatureNames.clear();
-    textPaths.text((d, i) => {
-      const featureInfo = this.#getFeatureInfo(d.data['f'] as string);
-      let text = featureInfo.nameValue;
-      let onlyShowValue = false;
-
-      // If the feature is drawn once, we just draw the condition
-      if (drawnFeatureNames.has(featureInfo.name)) {
-        text = featureInfo.value;
-        onlyShowValue = true;
-      }
-
-      /**
-       * Shorten the text if necessary (we only consider the middle line case)
-       * If text height > sector outer arc length: show nothing
-       * If text width > sector width: shorten the text
-       * To shorten the text:
-       *   (1) Use short name + condition
-       *   (2) Replace the end portion with ...
-       */
-      if (textLayoutMap.get(i) === TextArcMode.MidLine) {
-        // Height check
-        const innerArcLength =
-          this.yScale(d.y1) * (this.xScale(d.x1) - this.xScale(d.x0));
-        if (innerArcLength < maxTextHeight) {
-          return '';
-        }
-
-        // Width check (first check)
-        let textWidth = getLatoTextWidth(text, 16 * curFontSize);
-        if (textWidth > sectorRadius) {
-          // If the width is larger than the sector radius, then we try to use
-          // its short name
-          if (!onlyShowValue) {
-            text = featureInfo.shortValue;
-
-            // Check if the new width is okay, if not, replace the last portion
-            // of the string with ...
-            textWidth = getLatoTextWidth(text, 16 * curFontSize);
-            while (textWidth > sectorRadius) {
-              text = text.replace('...', '');
-              text = text.slice(0, text.length - 1);
-              text = `${text}...`;
-              textWidth = getLatoTextWidth(text, 16 * curFontSize);
-            }
-          }
-        }
-      }
-
-      drawnFeatureNames.add(featureInfo.name);
-      return text;
-    });
-  }
-
-  #removeText() {
-    this.svg.selectAll('.text-arc').remove();
-    this.svg.selectAll('.text-line').remove();
-    this.svg.selectAll('text.feature-name').remove();
-  }
-
   /**
    * Zoom in or out of one sector with transitions
    * @param newDomain Target domain
@@ -923,7 +564,7 @@ export class Sunburst {
    */
   #arcZoom(newDomain: ArcDomain, duration = 800) {
     // Clean up the text
-    this.#removeText();
+    this.removeText();
 
     // Customize an interpolator for the transition
     // We animate the domains of x and y scales
@@ -950,7 +591,7 @@ export class Sunburst {
         };
       })
       .on('end', () => {
-        this.#drawText();
+        this.drawText();
       });
 
     // Update the view
@@ -1038,7 +679,7 @@ export class Sunburst {
     ancestors.forEach(a => {
       if (a.depth > 0) {
         const curColor = this.colorScale(
-          this.#getFeatureNameValue(
+          this.getFeatureNameValue(
             a.data['f'] as string,
             FeaturePosition.First,
             FeatureValuePairType.PairString
