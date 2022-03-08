@@ -41,7 +41,7 @@
         Forager
       </div>
       <div class='logo-tag'>
-        Identify accurate decision trees that align with human knowledge
+        Identifying accurate decision trees that align with human knowledge
       </div>
     </div>
   </div>

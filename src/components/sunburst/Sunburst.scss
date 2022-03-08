@@ -17,13 +17,13 @@
   }
 
   :global(.text-arc) {
-    // visibility: hidden;
+    visibility: hidden;
     stroke: $red-800;
     fill: none;
   }
 
   :global(.text-line) {
-    // visibility: hidden;
+    visibility: hidden;
     stroke: $teal-800;
     fill: none;
   }
@@ -33,6 +33,8 @@
     dominant-baseline: middle;
     font-size: 0.9rem;
     font-family: 'Lato';
+    line-height: 1;
+    color: $gray-900;
 
     user-select: none;
     cursor: default;

@@ -773,10 +773,15 @@ export class Sunburst {
       // Check contract ratio if we use white color
       let foreground = 'currentcolor';
       const whiteRGB = [252, 252, 252];
+      const blackRGB = [74, 74, 74];
       const rgb = d3.color(background).rgb();
       const backgroundRGB = [rgb.r, rgb.g, rgb.b];
 
-      if (getContrastRatio(whiteRGB, backgroundRGB) < 0.55) {
+      if (
+        getContrastRatio(whiteRGB, backgroundRGB) <
+        getContrastRatio(blackRGB, backgroundRGB)
+      ) {
+        // if (getContrastRatio(whiteRGB, backgroundRGB) < 0.4) {
         foreground = 'hsla(0, 0%, 99%, 1)';
       }
 
@@ -784,39 +789,97 @@ export class Sunburst {
     });
 
     const drawnFeatureNames = new Set<string>();
-    const sectorRadius =
-      this.yScale(texts.datum().y1) - this.yScale(texts.datum().y0);
+    const textLayoutMap = new Map<number, TextArcMode>();
 
-    texts
+    // Compute the sector radius adjusted by a padding constant
+    const sectorRadius =
+      this.yScale(texts.datum().y1) - this.yScale(texts.datum().y0) - 12;
+    const maxTextHeight = 18.5;
+
+    // Add text path
+    const textPaths = texts
       .append('textPath')
       .attr('startOffset', '50%')
       .attr('xlink:href', (d, i) => {
         const featureInfo = this.#getFeatureInfo(d.data['f'] as string);
-        let text = featureInfo.nameValue;
+        let text = featureInfo.nameValue.toLowerCase();
+        let featureNameExists = false;
 
         // If the feature is drawn once, we just draw the condition
         if (drawnFeatureNames.has(featureInfo.name)) {
           text = featureInfo.value;
+          featureNameExists = true;
         }
+        drawnFeatureNames.add(featureInfo.name);
 
-        if (this.#doesTextFitArc(d, text)) {
+        /**
+         * Determine the text layout.
+         * (1) first time & we have enough space => arc path
+         * (2) first time & not enough space => line
+         * (3) others => line
+         */
+        if (!featureNameExists && this.#doesTextFitArc(d, text)) {
+          textLayoutMap.set(i, TextArcMode.SectorArc);
           return `#text-arc-${i}`;
         } else {
+          textLayoutMap.set(i, TextArcMode.MidLine);
           return `#text-line-${i}`;
         }
-      })
-      .text(d => {
-        const featureInfo = this.#getFeatureInfo(d.data['f'] as string);
-        let text = featureInfo.nameValue;
+      });
 
-        // If the feature is drawn once, we just draw the condition
-        if (drawnFeatureNames.has(featureInfo.name)) {
-          text = featureInfo.value;
+    // Add text
+    drawnFeatureNames.clear();
+    textPaths.text((d, i) => {
+      const featureInfo = this.#getFeatureInfo(d.data['f'] as string);
+      let text = featureInfo.nameValue.toLowerCase();
+      let onlyShowValue = false;
+
+      // If the feature is drawn once, we just draw the condition
+      if (drawnFeatureNames.has(featureInfo.name)) {
+        text = featureInfo.value;
+        onlyShowValue = true;
+      }
+      drawnFeatureNames.add(featureInfo.name);
+
+      /**
+       * Shorten the text if necessary (we only consider the middle line case)
+       * If text height > sector outer arc length: show nothing
+       * If text width > sector width: shorten the text
+       * To shorten the text:
+       *   (1) Use short name + condition
+       *   (2) Replace the end portion with ...
+       */
+      if (textLayoutMap.get(i) === TextArcMode.MidLine) {
+        // Height check
+        const innerArcLength =
+          this.yScale(d.y1) * (this.xScale(d.x1) - this.xScale(d.x0));
+        if (innerArcLength < maxTextHeight) {
+          return '';
         }
 
-        drawnFeatureNames.add(featureInfo.name);
-        return text;
-      });
+        // Width check (first check)
+        let textWidth = getLatoTextWidth(text, 16 * 0.9);
+        if (textWidth > sectorRadius) {
+          // If the width is larger than the sector radius, then we try to use
+          // its short name
+          if (!onlyShowValue) {
+            text = featureInfo.shortValue.toLowerCase();
+
+            // Check if the new width is okay, if not, replace the last portion
+            // of the string with ...
+            textWidth = getLatoTextWidth(text, 16 * 0.9);
+            while (textWidth > sectorRadius) {
+              text = text.replace('...', '');
+              text = text.slice(0, text.length - 1);
+              text = `${text}...`;
+              textWidth = getLatoTextWidth(text, 16 * 0.9);
+            }
+          }
+        }
+      }
+
+      return text;
+    });
   }
 
   #removeText() {

@@ -102,12 +102,15 @@ export class ToolbarEventHandler {
     } else {
       // Check the color contrast for the text color
       const whiteRGB = [252, 252, 252];
-      // const blackRGB = [66, 66, 66];
+      const blackRGB = [74, 74, 74];
 
       const rgb = d3.color(background).rgb();
       const backgroundRGB = [rgb.r, rgb.g, rgb.b];
 
-      if (getContrastRatio(whiteRGB, backgroundRGB) < 0.55) {
+      if (
+        getContrastRatio(whiteRGB, backgroundRGB) <
+        getContrastRatio(blackRGB, backgroundRGB)
+      ) {
         foreground = 'hsla(0, 0%, 99%, 1)';
       }
     }
