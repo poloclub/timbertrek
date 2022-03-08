@@ -625,7 +625,7 @@ export class Sunburst {
         return color;
       })
       .style('display', d => {
-        if (this.xScale(d.x1) - this.xScale(d.x0) < 0.002) {
+        if (d.data['f'] === '_') {
           return 'none';
         }
       });
@@ -713,7 +713,12 @@ export class Sunburst {
   /**
    * Approximate if the text fits in the given arc
    */
-  #doesTextFitArc(d: HierarchyNode, fontSize = 16, text: string | null = null) {
+  #doesTextFitArc(
+    d: HierarchyNode,
+    fontSize = 16,
+    text: string | null = null,
+    padding = 0
+  ) {
     if (text == null) {
       text = this.#getFeatureInfo(d.data['f'] as string).nameValue;
     }
@@ -725,7 +730,7 @@ export class Sunburst {
     const radius = Math.max(0, (this.yScale(d.y0) + this.yScale(d.y1)) / 2);
     const arcLength = angle * radius;
 
-    return textWidth <= arcLength;
+    return textWidth <= arcLength - padding;
   }
 
   /**
@@ -735,9 +740,14 @@ export class Sunburst {
     // Case 1: Draw text on the arc sectors
     const arcGroup = this.svg.select('g.arc-group');
 
-    // We only draw text on the most inner ring
+    // We only draw text on the most inner ring (not circle)
+    // Check of the user has clicked a sector
     let innerArcs = arcGroup.selectAll(
-      `g.arc-${this.sunburstStoreValue.depthLow}`
+      `g.arc-${
+        this.xScale.domain()[0] === 0 && this.xScale.domain()[1] === 1
+          ? this.sunburstStoreValue.depthLow
+          : this.sunburstStoreValue.depthLow + 1
+      }`
     ) as d3.Selection<
       d3.BaseType | SVGGElement,
       HierarchyNode,
@@ -747,7 +757,10 @@ export class Sunburst {
 
     // We only draw text on the visible rings
     innerArcs = innerArcs.filter(
-      d => d.x0 >= this.xScale.domain()[0] && d.x1 <= this.xScale.domain()[1]
+      d =>
+        d.x0 >= this.xScale.domain()[0] &&
+        d.x1 <= this.xScale.domain()[1] &&
+        d.data['f'] !== '_'
     );
 
     innerArcs
@@ -832,7 +845,7 @@ export class Sunburst {
          */
         if (
           !featureNameExists &&
-          this.#doesTextFitArc(d, 16 * curFontSize, text)
+          this.#doesTextFitArc(d, 16 * curFontSize, text, 10)
         ) {
           textLayoutMap.set(i, TextArcMode.SectorArc);
           return `#text-arc-${i}`;
@@ -854,7 +867,6 @@ export class Sunburst {
         text = featureInfo.value;
         onlyShowValue = true;
       }
-      drawnFeatureNames.add(featureInfo.name);
 
       /**
        * Shorten the text if necessary (we only consider the middle line case)
@@ -893,6 +905,7 @@ export class Sunburst {
         }
       }
 
+      drawnFeatureNames.add(featureInfo.name);
       return text;
     });
   }

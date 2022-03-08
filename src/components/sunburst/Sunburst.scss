@@ -30,17 +30,21 @@
 
   :global(text.feature-name) {
     text-anchor: middle;
-    dominant-baseline: middle;
     font-family: 'Lato';
     line-height: 1;
     color: $gray-900;
 
     user-select: none;
     cursor: default;
+    pointer-events: none;
 
     animation-name: fade-in;
     animation-duration: 200ms;
     animation-timing-function: cubic-bezier(0.645, 0.045, 0.355, 1);
+
+    :global(textPath) {
+      dominant-baseline: middle;
+    }
   }
 }
 
