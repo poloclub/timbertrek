@@ -2,7 +2,7 @@ import d3 from '../../utils/d3-import';
 import { config } from '../../config';
 import type { Writable } from 'svelte/store';
 import { getContrastRatio } from '../../utils/utils';
-import { getSFTextWidth } from '../../utils/text-width';
+import { getLatoTextWidth } from '../../utils/text-width';
 import { SunburstStoreValue, SunburstAction } from '../../stores';
 
 interface FeatureMap {
@@ -712,7 +712,7 @@ export class Sunburst {
       text = this.#getFeatureInfo(d.data['f'] as string).nameValue;
     }
 
-    const textWidth = getSFTextWidth(text, 16 * 0.9);
+    const textWidth = getLatoTextWidth(text, 16 * 0.9);
 
     // Compute the arc length
     const angle = this.xScale(d.x1) - this.xScale(d.x0);
