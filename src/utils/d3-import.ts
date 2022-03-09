@@ -39,12 +39,14 @@ import {
   curveBasis,
   curveMonotoneX,
   curveMonotoneY,
-  arc
+  arc,
+  linkHorizontal,
+  linkVertical
 } from 'd3-shape';
 
 import { path } from 'd3-path';
 
-import { hierarchy, partition } from 'd3-hierarchy';
+import { hierarchy, partition, tree } from 'd3-hierarchy';
 
 import { brush } from 'd3-brush';
 
@@ -101,6 +103,9 @@ export default {
   timeFormat,
   hierarchy,
   partition,
+  tree,
   arc,
+  linkHorizontal,
+  linkVertical,
   path
 };

@@ -37,3 +37,14 @@
     background-color: $gray-600;
   }
 }
+
+.tree-svg {
+  stroke-linecap: round;
+  stroke-linejoin: round;
+
+  :global(path.link) {
+    fill: none;
+    stroke: $gray-700;
+    stroke-width: 1px;
+  }
+}
