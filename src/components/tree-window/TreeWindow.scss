@@ -2,8 +2,8 @@
 
 .tree-window {
   position: absolute;
-  width: 200px;
-  height: 200px;
+  // width: 200px;
+  // height: 200px;
   left: 100px;
   top: 100px;
 
@@ -11,9 +11,13 @@
   border-radius: $border-radius;
   box-shadow: $shadow-border-light;
 
-  display: flex;
+  display: none;
   flex-direction: column;
   align-items: center;
+
+  &.show {
+    display: flex;
+  }
 }
 
 .tree-header {

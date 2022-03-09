@@ -12,6 +12,12 @@ export interface SunburstStoreValue {
   action: SunburstAction;
 }
 
+export interface TreeWindowStoreValue {
+  featureMap: Map<number, string[]>;
+  treeID: number;
+  show: boolean;
+}
+
 /**
  * Actions that needed to be handled
  */
@@ -39,6 +45,16 @@ export const getSunburstStore = () => {
     depthHigh: 0,
     depthColors: [],
     action: SunburstAction.None
+  });
+
+  return curStore;
+};
+
+export const getTreeWindowStore = () => {
+  const curStore: Writable<TreeWindowStoreValue> = writable({
+    featureMap: new Map<number, string[]>(),
+    treeID: 0,
+    show: false
   });
 
   return curStore;
