@@ -3,6 +3,7 @@
   import { getAppearanceStore, getSunburstStore } from '../../stores';
   import Toolbar from '../toolbar/Toolbar.svelte';
   import Sunburst from '../sunburst/Sunburst.svelte';
+  import TreeWindow from '../tree-window/TreeWindow.svelte';
   import AppearancePanel from '../appearance-panel/AppearancePanel.svelte';
   import d3 from '../../utils/d3-import';
 
@@ -31,42 +32,48 @@
   @import './Forager.scss';
 </style>
 
+<div class='forager-page' bind:this={component}>
 
-<div class='forager' bind:this={component}>
+  <div class='forager'>
 
-  <div class='header'>
+    <div class='header'>
 
-    <div class='logo'>
-      <div class='logo-icon'>
-        Forager
-      </div>
-      <div class='logo-tag'>
-        Identifying accurate decision trees that align with human knowledge
+      <div class='logo'>
+        <div class='logo-icon'>
+          Forager
+        </div>
+        <div class='logo-tag'>
+          Identifying accurate decision trees that align with human knowledge
+        </div>
       </div>
     </div>
-  </div>
 
-  <div class='content'>
+    <div class='content'>
 
-    <div class='toolbar'>
-      <Toolbar
+      <div class='toolbar'>
+        <Toolbar
+          appearanceStore={appearanceStore}
+          sunburstStore={sunburstStore}
+        />
+      </div>
+
+      <div class='sunburst'>
+        <Sunburst
+          data={data}
+          sunburstStore={sunburstStore}
+        />
+      </div>
+
+    </div>
+
+    <div class='sidebar'>
+      <AppearancePanel
         appearanceStore={appearanceStore}
-        sunburstStore={sunburstStore}
       />
     </div>
-
-    <div class='sunburst'>
-      <Sunburst
-        data={data}
-        sunburstStore={sunburstStore}
-      />
-    </div>
-
   </div>
 
-  <div class='sidebar'>
-    <AppearancePanel
-      appearanceStore={appearanceStore}
-    />
-  </div>
+  <TreeWindow
+    data={data}
+  />
 </div>

@@ -1,5 +1,23 @@
 @import '../../define';
 
+.forager-page {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  // $rect-width: 1px;
+  // $rect-gap: 24px;
+  // background-image: linear-gradient(
+  //     $gray-200 $rect-width,
+  //     transparent $rect-width
+  //   ),
+  //   linear-gradient(to right, $gray-200 $rect-width, white $rect-width);
+  // background-size: $rect-gap $rect-gap;
+}
+
 .forager {
   border: 1px solid $gray-light-border;
   background: $gray-light-background;
@@ -8,6 +26,8 @@
     0px 0px 10px hsla(0, 0%, 0%, 0.05);
 
   position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
 .header {

@@ -1,5 +1,20 @@
 @import '../../define';
 
+.article-page {
+  width: 100vw;
+  height: 100vh;
+
+  // $rect-width: 1px;
+  // $rect-gap: 30px;
+  // $rect-color: hsla(0, 0%, 50%, 0.12);
+  // background-image: linear-gradient(
+  //     $rect-color $rect-width,
+  //     transparent $rect-width
+  //   ),
+  //   linear-gradient(to right, $rect-color $rect-width, white $rect-width);
+  // background-size: $rect-gap $rect-gap;
+}
+
 .main-app {
   display: flex;
   justify-content: center;
@@ -9,4 +24,6 @@
   width: 100vw;
   box-sizing: border-box;
   overflow-x: hidden;
+
+  position: relative;
 }

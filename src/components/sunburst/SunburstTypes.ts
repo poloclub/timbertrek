@@ -11,7 +11,7 @@ export interface TreeNode {
   /**
    * Array of children
    */
-  c: [TreeNode, number];
+  c: TreeNode[];
 }
 
 export interface TreeMap {
@@ -21,9 +21,9 @@ export interface TreeMap {
   count: number;
 
   /**
-   * A map from tree ID to the tree's hierarchy dict
+   * A map from tree ID to the tree's hierarchy dict and accuracy
    */
-  [treeID: number]: TreeNode[];
+  map: { [treeID: number]: [TreeNode, number] };
 }
 
 export interface HierarchyJSON {

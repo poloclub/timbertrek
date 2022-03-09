@@ -14,8 +14,8 @@
   @import './Article.scss';
 </style>
 
-<div class='main-app' bind:this={component}>
-
-  <Forager />
-
+<div class='article-page'>
+  <div class='main-app' bind:this={component}>
+    <Forager />
+  </div>
 </div>
