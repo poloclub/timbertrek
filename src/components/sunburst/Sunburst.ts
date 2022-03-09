@@ -17,6 +17,7 @@ import {
 } from './SunburstTypes';
 
 const HALF_PI = Math.PI / 2;
+const ZOOM_DURATION = 800;
 
 /**
  * Sunburst class that represents a sunburst chart
@@ -47,10 +48,25 @@ export class Sunburst {
   arcDomainStack: ArcDomainData[];
   curHeadNode: HierarchyNode;
 
-  // Methods implemented in another file
+  // ===== Methods implemented in another file ====
+  /**
+   * Initialize text arc
+   */
   textArc = textArc;
+
+  /**
+   * Approximate if the text fits in the given arc
+   */
   doesTextFitArc = doesTextFitArc;
+
+  /**
+   * Remove all text
+   */
   removeText = removeText;
+
+  /**
+   * Draw feature names on the inner circles and the most inner ring
+   */
   drawText = drawText;
 
   /**
@@ -495,6 +511,9 @@ export class Sunburst {
         })`
       );
 
+    // Create middle circle group
+    content.append('g').attr('class', 'mid-circle-group');
+
     // Draw the arcs
     const arcGroup = content.append('g').attr('class', 'arc-group');
 
@@ -538,6 +557,9 @@ export class Sunburst {
       .append('title')
       .text(d => this.getFeatureInfo(d.data['f'] as string).nameValue);
 
+    // The initial head node is the root
+    this.curHeadNode = this.partition;
+
     // Zoom into the third level at the beginning
     const yGap = 1 / (this.sunburstStoreValue.depthMax + 1);
     this.#arcZoom(
@@ -549,12 +571,6 @@ export class Sunburst {
       },
       500
     );
-
-    // Draw texts on the most inner ring
-    // this.#drawText();
-
-    // The initial head node is the root
-    this.curHeadNode = this.partition;
   }
 
   /**
@@ -562,9 +578,10 @@ export class Sunburst {
    * @param newDomain Target domain
    * @param duration Transition duration (ms)
    */
-  #arcZoom(newDomain: ArcDomain, duration = 800) {
+  #arcZoom(newDomain: ArcDomain, duration = ZOOM_DURATION) {
     // Clean up the text
     this.removeText();
+    this.#drawMidCircles(newDomain);
 
     // Customize an interpolator for the transition
     // We animate the domains of x and y scales
@@ -600,6 +617,88 @@ export class Sunburst {
       .attrTween('d', d => () => this.arc(d as d3.DefaultArcObject))
       // @ts-ignore
       .style('fill-opacity', d => (d.y0 >= newDomain.y1 ? 0.2 : 1));
+  }
+
+  /**
+   * Draw the circles for selected sectors (ancestors)
+   * @param newDomain Target domain
+   */
+  #drawMidCircles(newDomain: ArcDomain) {
+    // Check if the user is jumping depths; if so we need to animate the enter
+    let skipDepth = false;
+    if (this.arcDomainStack.length > 0) {
+      skipDepth =
+        this.curHeadNode.depth -
+          this.arcDomainStack[this.arcDomainStack.length - 1].node.depth !==
+        1;
+    }
+
+    const midCircleGroup = this.svg
+      .select('g.content-group')
+      .selectAll('g.mid-circle-group')
+      .data([0])
+      .join('g')
+      .attr('class', 'mid-circle-group')
+      .raise();
+
+    // The data is the head node's ancestors
+    const ancestors = this.curHeadNode.ancestors().filter(d => d.depth !== 0);
+
+    /**
+     * Very edgy case! Cannot use this.yscale() here because its domain is being
+     * interpolated in the sector zooming function
+     */
+    const newYScale = d3
+      .scaleLinear()
+      .domain([newDomain.y0, newDomain.y1])
+      .range([0, this.maxRadius]);
+
+    const centerRadius =
+      newYScale(this.curHeadNode.y1) - newYScale(this.curHeadNode.y0);
+
+    const depths = ancestors.map(d => d.depth);
+
+    const radiusScale = d3
+      .scaleLinear()
+      .domain([d3.min(depths) - 1, d3.max(depths)])
+      .range([0, centerRadius]);
+
+    const circles = midCircleGroup
+      .selectAll('g.mid-circle')
+      .data(ancestors, d => (d as HierarchyNode).value)
+      .join(
+        enter =>
+          enter
+            .append('g')
+            .attr('class', 'mid-circle')
+            .append('circle')
+            .attr('r', 0)
+            .style('fill', d =>
+              this.colorScale(
+                this.getFeatureNameValue(
+                  d.data['f'] as string,
+                  FeaturePosition.First,
+                  FeatureValuePairType.PairString
+                ) as string
+              )
+            )
+            .call(enter =>
+              enter
+                .transition()
+                .duration(skipDepth ? 0 : 0)
+                .delay(skipDepth ? ZOOM_DURATION - 100 : ZOOM_DURATION + 100)
+                .attr('r', d => radiusScale(d.depth))
+            ),
+        update =>
+          update
+            .select('circle')
+            .transition('zoom')
+            .duration(ZOOM_DURATION)
+            .ease(d3.easeCubicInOut)
+            .attr('r', d => {
+              return radiusScale(d.depth);
+            })
+      );
   }
 
   /**

@@ -15,7 +15,13 @@ import { getContrastRatio } from '../../utils/utils';
 
 const HALF_PI = Math.PI / 2;
 
-// Initialize the text arc path generator
+/**
+ * Initialize text arc
+ * @param this Sunburst
+ * @param d Hierarchy node
+ * @param textArcMode Text layout
+ * @returns arc generator
+ */
 export function textArc(
   this: Sunburst,
   d: HierarchyNode,
@@ -171,6 +177,10 @@ export function drawText(this: Sunburst) {
   const textLayoutMap = new Map<number, TextArcMode>();
 
   // Compute the sector radius adjusted by a padding constant
+  if (texts.size() === 0) {
+    return;
+  }
+
   const sectorRadius =
     this.yScale(texts.datum().y1) - this.yScale(texts.datum().y0) - 15;
   const maxTextHeight = 18.5;
@@ -275,6 +285,9 @@ export function drawText(this: Sunburst) {
   });
 }
 
+/**
+ * Remove all text
+ */
 export function removeText(this: Sunburst) {
   this.svg.selectAll('.text-arc').remove();
   this.svg.selectAll('.text-line').remove();
