@@ -1,51 +1,65 @@
 module.exports = {
-  parser: "@typescript-eslint/parser",
+  parser: '@typescript-eslint/parser',
   extends: [
-    "eslint:recommended",
-    "plugin:@typescript-eslint/recommended",
-    "plugin:@typescript-eslint/recommended-requiring-type-checking",
-    "prettier"
+    'eslint:recommended',
+    'plugin:@typescript-eslint/recommended',
+    'plugin:@typescript-eslint/recommended-requiring-type-checking',
+    'prettier'
   ],
   parserOptions: {
-    ecmaVersion: 2020,
-    sourceType: "module",
+    ecmaVersion: 'esnext',
+    sourceType: 'module',
     tsconfigRootDir: __dirname,
-    project: ["./tsconfig.json"],
-    extraFileExtensions: [".svelte", ".cjs"],
+    project: ['./tsconfig.json'],
+    extraFileExtensions: ['.svelte', '.cjs']
   },
   env: {
     es6: true,
-    browser: true,
+    browser: true
   },
   overrides: [
     {
-      files: ["*.svelte"],
-      processor: "svelte3/svelte3",
-    },
+      files: ['*.svelte'],
+      parser: 'svelte-eslint-parser',
+      extends: [
+        'eslint:recommended',
+        'plugin:@typescript-eslint/recommended',
+        'plugin:@typescript-eslint/recommended-requiring-type-checking',
+        'prettier'
+      ],
+      parserOptions: {
+        ecmaVersion: 'esnext',
+        sourceType: 'module',
+        tsconfigRootDir: __dirname,
+        project: ['./tsconfig.json'],
+        extraFileExtensions: ['.svelte', '.cjs']
+      }
+    }
   ],
   settings: {
-    "svelte3/typescript": () => require("typescript"),
-    "svelte3/ignore-styles": () => true,
+    'svelte3/typescript': () => require('typescript'),
+    'svelte3/ignore-styles': () => true
   },
-  plugins: ["svelte3", "@typescript-eslint", "prettier"],
-  ignorePatterns: ["node_modules"],
+  plugins: ['@typescript-eslint', 'prettier'],
+  ignorePatterns: ['node_modules'],
   rules: {
-    indent: ["error", 2, { SwitchCase: 1 }],
-    "linebreak-style": ["error", "unix"],
-    quotes: ["error", "single"],
-    "prefer-const": ["error"],
-    semi: ["error", "always"],
-    "max-len": [
-      "warn",
+    indent: ['error', 2, { SwitchCase: 1 }],
+    'linebreak-style': ['error', 'unix'],
+    quotes: ['error', 'single'],
+    'prefer-const': ['error'],
+    semi: ['error', 'always'],
+    'max-len': [
+      'warn',
       {
-        code: 80,
-      },
+        code: 80
+      }
     ],
-    "prettier/prettier": 2,
-    "@typescript-eslint/no-floating-promises": "off",
-    "@typescript-eslint/no-unsafe-return": "off",
-    "@typescript-eslint/ban-ts-comment": "off",
-    "@typescript-eslint/restrict-template-expressions": "off",
-    "@typescript-eslint/no-non-null-assertion": "off"
-  },
+    'prettier/prettier': 2,
+    '@typescript-eslint/no-floating-promises': 'off',
+    '@typescript-eslint/no-unsafe-return': 'off',
+    '@typescript-eslint/ban-ts-comment': 'off',
+    '@typescript-eslint/restrict-template-expressions': 'off',
+    '@typescript-eslint/no-non-null-assertion': 'off',
+    'no-self-assign': 'off'
+  }
 };

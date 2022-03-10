@@ -1,4 +1,4 @@
-<script lang='ts'>
+<script lang="ts">
   import { onMount } from 'svelte';
   import { TreeWindow } from './TreeWindow';
   import type { Writable } from 'svelte/store';
@@ -6,15 +6,15 @@
   import type { HierarchyJSON, TreeNode } from '../sunburst/SunburstTypes';
 
   // Component variables
-  export let data: HierarchyJSON = null;
-  export let featureMap: Map<number, string[]> = null;
-  export let treeWindowStore: Writable<TreeWindowStoreValue> = null;
+  export let data: HierarchyJSON | null = null;
+  export let featureMap: Map<number, string[]> | null = null;
+  export let treeWindowStore: Writable<TreeWindowStoreValue> | null = null;
 
-  let component: HTMLElement = null;
+  let component: HTMLElement | null = null;
   let mounted = false;
 
   // View variables
-  let treeWindow: TreeWindow = null;
+  let treeWindow: TreeWindow | null = null;
 
   onMount(() => {
     mounted = true;
@@ -25,7 +25,7 @@
   };
 
   const initView = () => {
-    if (component && data) {
+    if (component && data && featureMap && treeWindowStore) {
       const treeMap = data.treeMap;
 
       // Convert treeMap into a real Map
@@ -34,22 +34,33 @@
         treeMapMap.set(+k, treeMap.map[+k] as [TreeNode, number]);
       });
 
-      treeWindow = new TreeWindow({ component, treeMapMap, featureMap,
-        treeWindowStore, treeWindowUpdated });
+      treeWindow = new TreeWindow({
+        component,
+        treeMapMap,
+        featureMap,
+        treeWindowStore,
+        treeWindowUpdated
+      });
     }
   };
 
-  $: data && featureMap && treeWindowStore && mounted && component && initView();
+  $: data &&
+    featureMap &&
+    treeWindowStore &&
+    mounted &&
+    component &&
+    initView();
 </script>
 
-<style lang='scss'>
+<style lang="scss">
   @import './TreeWindow.scss';
 </style>
 
-<div class='tree-window'
+<div
+  class="tree-window"
   bind:this={component}
   class:show={treeWindow?.treeWindowStoreValue.show}
 >
-  <div class='tree-header'>Tree {treeWindow?.treeWindowStoreValue.treeID}</div>
-  <svg class='tree-svg'></svg>
+  <div class="tree-header">Tree {treeWindow?.treeWindowStoreValue.treeID}</div>
+  <svg class="tree-svg" />
 </div>
