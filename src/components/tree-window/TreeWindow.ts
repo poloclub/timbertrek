@@ -1,13 +1,18 @@
 import d3 from '../../utils/d3-import';
 import type { Writable } from 'svelte/store';
 import type { TreeNode, TreeMap, Padding } from '../sunburst/SunburstTypes';
-import type { TreeWindowStoreValue } from 'src/stores';
+import {
+  TreeWindowStoreValue,
+  getTreeWindowStoreDefaultValue
+} from 'src/stores';
 
 /**
  * Class for a tree window object.
  */
 export class TreeWindow {
   tree: TreeNode;
+  treeMap: Map<number, [TreeNode, number]>;
+  curTreeID: number;
 
   treeWindowStore: Writable<TreeWindowStoreValue>;
   treeWindowStoreValue: TreeWindowStoreValue;
@@ -29,7 +34,7 @@ export class TreeWindow {
    */
   constructor({
     component,
-    tree,
+    treeMapMap,
     featureMap,
     treeWindowStore,
     treeWindowUpdated,
@@ -37,19 +42,22 @@ export class TreeWindow {
     height = 200
   }: {
     component: HTMLElement;
-    tree: TreeNode;
+    treeMapMap: Map<number, [TreeNode, number]>;
     featureMap: Map<number, string[]>;
     treeWindowStore: Writable<TreeWindowStoreValue>;
     treeWindowUpdated: () => void;
     width?: number;
     height?: number;
   }) {
-    this.tree = tree;
+    this.treeMap = treeMapMap;
+    this.curTreeID = 332;
+    this.tree = this.treeMap.get(this.curTreeID)![0];
     this.treeWindowUpdated = treeWindowUpdated;
-    console.log(tree);
+    console.log(this.tree, this.treeMap);
 
     // Initialize the store
     this.treeWindowStore = treeWindowStore;
+    this.treeWindowStoreValue = getTreeWindowStoreDefaultValue();
     this.#initStore(featureMap);
 
     // Initialize the svg
@@ -82,12 +90,34 @@ export class TreeWindow {
   #initStore(featureMap: Map<number, string[]>) {
     this.treeWindowStore.subscribe(value => {
       this.treeWindowStoreValue = value;
+
+      if (this.svg !== undefined) {
+        if (this.treeWindowStoreValue.treeID !== this.curTreeID) {
+          const newTreeTuple = this.treeMap.get(
+            this.treeWindowStoreValue.treeID
+          );
+
+          if (newTreeTuple) {
+            this.curTreeID = this.treeWindowStoreValue.treeID;
+            this.tree = newTreeTuple[0];
+            console.log(this.curTreeID, this.tree);
+            this.#redraw();
+          }
+        }
+      }
+
       this.treeWindowUpdated();
     });
 
     // Set up the initial store value
     this.treeWindowStoreValue.featureMap = featureMap;
     this.treeWindowStore.set(this.treeWindowStoreValue);
+  }
+
+  #redraw() {
+    console.log('redraw!');
+    this.svg.selectAll('g.content').remove();
+    this.#initView();
   }
 
   /**
@@ -140,7 +170,11 @@ export class TreeWindow {
       .append('circle')
       .attr('r', nodeR)
       .style('fill', d => {
-        return this.treeWindowStoreValue.getFeatureColor(d.data.f);
+        if (this.treeWindowStoreValue.getFeatureColor) {
+          return this.treeWindowStoreValue.getFeatureColor(d.data.f);
+        } else {
+          return 'var(--md-gray-500)';
+        }
       });
 
     // Draw decisions as a rectangle with a symbol

@@ -83,8 +83,8 @@ export class Sunburst {
     return (
       this.width /
       (2 *
-        (this.sunburstStoreValue.depthMax -
-          this.sunburstStoreValue.depthLow +
+        (this.sunburstStoreValue?.depthMax -
+          this.sunburstStoreValue?.depthLow +
           1))
     );
   }
@@ -549,9 +549,10 @@ export class Sunburst {
       .classed('leaf', d => d.data['f'] === '_');
 
     // Draw the background paths
-    arcGroups
+    const arcs = arcGroups
       .append('path')
       .attr('class', 'arc')
+      .classed('leaf', d => d.data['f'] === '_')
       // @ts-ignore
       .attr('d', d => this.arc(d))
       .on('click', (e, d) => this.#arcClicked(e as MouseEvent, d))
@@ -564,9 +565,18 @@ export class Sunburst {
         return this.getFeatureColor(d.data['f'] as string);
       })
       .style('display', d => {
-        if (d.data['f'] === '_') {
+        if (d.data['f'] === ';') {
           return 'none';
         }
+      });
+
+    // Add hover event for leaf arcs
+    arcs
+      .filter(d => d.data['f'] === '_')
+      .on('mouseenter', (e, d) => {
+        const treeID = d.data['t'] as string;
+        this.treeWindowStoreValue.treeID = +treeID;
+        this.treeWindowStore.set(this.treeWindowStoreValue);
       });
 
     // TODO: Temporarily add titles, need to replace with tooltips

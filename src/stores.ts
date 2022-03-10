@@ -16,7 +16,7 @@ export interface TreeWindowStoreValue {
   featureMap: Map<number, string[]>;
   treeID: number;
   show: boolean;
-  getFeatureColor: (f: string) => string | null;
+  getFeatureColor: null | ((f: string) => string);
 }
 
 /**
@@ -27,37 +27,43 @@ export enum SunburstAction {
   None = ''
 }
 
-/**
- * Factory function for AppearanceStore
- * @returns AppearanceStore
- */
-export const getAppearanceStore = () => {
-  const curStore: Writable<AppearanceStoreValue> = writable({
+export const getAppearanceStoreDefaultValue = () => {
+  return {
     shown: false
-  });
-
-  return curStore;
+  };
 };
 
-export const getSunburstStore = () => {
-  const curStore: Writable<SunburstStoreValue> = writable({
+export const getSunburstStoreDefaultValue = () => {
+  return {
     depthMax: 0,
     depthLow: 0,
     depthHigh: 0,
     depthColors: [],
     action: SunburstAction.None
-  });
-
-  return curStore;
+  };
 };
 
-export const getTreeWindowStore = () => {
-  const curStore: Writable<TreeWindowStoreValue> = writable({
+export const getTreeWindowStoreDefaultValue = () => {
+  return {
     featureMap: new Map<number, string[]>(),
     treeID: 0,
     show: false,
     getFeatureColor: null
-  });
+  };
+};
 
-  return curStore;
+/**
+ * Factory function for AppearanceStore
+ * @returns AppearanceStore
+ */
+export const getAppearanceStore = () => {
+  return writable(getAppearanceStoreDefaultValue());
+};
+
+export const getSunburstStore = () => {
+  return writable(getSunburstStoreDefaultValue());
+};
+
+export const getTreeWindowStore = () => {
+  return writable(getTreeWindowStoreDefaultValue());
 };

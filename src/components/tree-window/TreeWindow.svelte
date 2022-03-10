@@ -3,7 +3,7 @@
   import { TreeWindow } from './TreeWindow';
   import type { Writable } from 'svelte/store';
   import type { TreeWindowStoreValue } from '../../stores';
-  import type { HierarchyJSON } from '../sunburst/SunburstTypes';
+  import type { HierarchyJSON, TreeNode } from '../sunburst/SunburstTypes';
 
   // Component variables
   export let data: HierarchyJSON = null;
@@ -26,11 +26,15 @@
 
   const initView = () => {
     if (component && data) {
-      const treeID = 332;
       const treeMap = data.treeMap;
-      const tree = treeMap.map[treeID][0];
 
-      treeWindow = new TreeWindow({ component, tree, featureMap,
+      // Convert treeMap into a real Map
+      const treeMapMap = new Map<number, [TreeNode, number]>();
+      Object.keys(treeMap.map).forEach(k => {
+        treeMapMap.set(+k, treeMap.map[+k] as [TreeNode, number]);
+      });
+
+      treeWindow = new TreeWindow({ component, treeMapMap, featureMap,
         treeWindowStore, treeWindowUpdated });
     }
   };
