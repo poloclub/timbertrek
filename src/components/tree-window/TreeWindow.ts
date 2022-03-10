@@ -94,46 +94,24 @@ export class TreeWindow {
    * Draw a vertical tree on the SVG.
    */
   #initView() {
-    const content = this.svg.append('g').attr('class', 'content');
+    const content = this.svg
+      .append('g')
+      .attr('class', 'content')
+      .attr(
+        'transform',
+        `translate(${this.padding.left}, ${this.padding.top})`
+      );
 
     const root = d3.hierarchy(this.tree, d => d.c);
-    const nodeR = 5;
-    const treeNodes = d3.tree().size([this.width, this.height])(root);
-
-    // Find the most left/right/top/bottom points
-    // const corners = {
-    //   x0: Infinity,
-    //   x1: -Infinity,
-    //   y0: Infinity,
-    //   y1: -Infinity
-    // };
-
-    // treeNodes.each(d => {
-    //   if (d.x > corners.x1) corners.x1 = d.x;
-    //   if (d.x < corners.x0) corners.x0 = d.x;
-    //   if (d.y > corners.y1) corners.y1 = d.y;
-    //   if (d.y < corners.y0) corners.y0 = d.y;
-    // });
-
-    // content.attr(
-    //   'transform',
-    //   `translate(${
-    //     this.padding.left -
-    //     corners.x0 +
-    //     (this.width - (corners.x1 - corners.x0)) / 2
-    //   }, ${this.padding.top})`
-    // );
-
-    content.attr(
-      'transform',
-      `translate(${this.padding.left}, ${this.padding.top})`
-    );
+    const nodeR = 7;
+    const rectR = nodeR * 1;
+    d3.tree().size([this.width, this.height])(root);
 
     // Draw the links
     const linkGroup = content.append('g').attr('class', 'link-group');
     linkGroup
       .selectAll('path.link')
-      .data(treeNodes.links())
+      .data(root.links())
       .join('path')
       .attr('class', 'link')
       .attr('d', d => {
@@ -147,14 +125,40 @@ export class TreeWindow {
 
     // Draw the nodes
     const nodeGroup = content.append('g').attr('class', 'node-group');
-    nodeGroup
+    const nodes = nodeGroup
       .selectAll('g')
-      .data(treeNodes.descendants())
+      .data(root.descendants())
       .join('g')
       .attr('class', 'node')
-      .attr('transform', d => `translate(${d.x}, ${d.y})`)
+      // @ts-ignore
+      .attr('transform', d => `translate(${d.x}, ${d.y})`);
+
+    // Draw decision points as a circle
+    const decisionSet = new Set(['-', '+']);
+    nodes
+      .filter(d => !decisionSet.has(d.data.f))
       .append('circle')
-      .attr('r', nodeR);
+      .attr('r', nodeR)
+      .style('fill', d => {
+        return this.treeWindowStoreValue.getFeatureColor(d.data.f);
+      });
+
+    // Draw decisions as a rectangle with a symbol
+    nodes
+      .filter(d => decisionSet.has(d.data.f))
+      .append('rect')
+      .attr('x', -rectR)
+      .attr('y', -rectR)
+      .attr('rx', 2)
+      .attr('ry', 2)
+      .attr('width', 2 * rectR)
+      .attr('height', 2 * rectR);
+
+    nodes
+      .filter(d => decisionSet.has(d.data.f))
+      .append('text')
+      .attr('dy', 0.5)
+      .text(d => d.data.f);
 
     this.treeWindowStoreValue.show = true;
     this.treeWindowStoreValue.treeID = 332;

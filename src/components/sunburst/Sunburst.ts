@@ -1,7 +1,11 @@
 import d3 from '../../utils/d3-import';
 import { config } from '../../config';
 import type { Writable } from 'svelte/store';
-import { SunburstStoreValue, SunburstAction } from '../../stores';
+import {
+  SunburstStoreValue,
+  SunburstAction,
+  TreeWindowStoreValue
+} from '../../stores';
 import { textArc, doesTextFitArc, removeText, drawText } from './SunburstText';
 import {
   ArcDomain,
@@ -26,6 +30,9 @@ export class Sunburst {
   svg: d3.Selection<d3.BaseType, unknown, null, undefined>;
   sunburstStore: Writable<SunburstStoreValue>;
   sunburstStoreValue: SunburstStoreValue | null;
+
+  treeWindowStore: Writable<TreeWindowStoreValue>;
+  treeWindowStoreValue: TreeWindowStoreValue | null;
 
   padding: Padding;
   width: number;
@@ -95,12 +102,14 @@ export class Sunburst {
     component,
     data,
     sunburstStore,
+    treeWindowStore,
     width = config.layout.sunburstWidth,
     height = config.layout.sunburstWidth
   }: {
     component: HTMLElement;
     data: HierarchyJSON;
     sunburstStore: Writable<SunburstStoreValue>;
+    treeWindowStore: Writable<TreeWindowStoreValue>;
     width?: number;
     height?: number;
   }) {
@@ -146,7 +155,11 @@ export class Sunburst {
     // Initialize the store
     this.sunburstStore = sunburstStore;
     this.sunburstStoreValue = null;
-    this.#initStore();
+    this.#initSunburstStore();
+
+    this.treeWindowStore = treeWindowStore;
+    this.treeWindowStoreValue = null;
+    this.#initTreeWindowStore();
 
     // Create scales
     this.maxRadius = this.width / 2;
@@ -328,25 +341,8 @@ export class Sunburst {
       const aFeatureCount = this.featureCount.get(aName);
       const bFeatureCount = this.featureCount.get(bName);
 
-      const aLightness = d3.lch(
-        this.colorScale(
-          this.getFeatureNameValue(
-            a.data.f,
-            FeaturePosition.First,
-            FeatureValuePairType.PairString
-          ) as string
-        )
-      ).l;
-
-      const bLightness = d3.lch(
-        this.colorScale(
-          this.getFeatureNameValue(
-            b.data.f,
-            FeaturePosition.First,
-            FeatureValuePairType.PairString
-          ) as string
-        )
-      ).l;
+      const aLightness = d3.lch(this.getFeatureColor(a.data.f)).l;
+      const bLightness = d3.lch(this.getFeatureColor(b.data.f)).l;
 
       return bFeatureCount - aFeatureCount || aLightness - bLightness;
     });
@@ -359,6 +355,21 @@ export class Sunburst {
 
     return partition;
   }
+
+  /**
+   * Get the color of the feature value pair
+   * @param f Feature value pair string
+   * @returns Color in string
+   */
+  getFeatureColor = (f: string) => {
+    return this.colorScale(
+      this.getFeatureNameValue(
+        f,
+        FeaturePosition.First,
+        FeatureValuePairType.PairString
+      ) as string
+    );
+  };
 
   /**
    * Construct the color scale for different features.
@@ -447,7 +458,7 @@ export class Sunburst {
   /**
    * Initialize the sunburst store
    */
-  #initStore() {
+  #initSunburstStore() {
     this.sunburstStore.subscribe(value => {
       this.sunburstStoreValue = value;
 
@@ -498,6 +509,19 @@ export class Sunburst {
   }
 
   /**
+   * Initialize the tree window store
+   */
+  #initTreeWindowStore() {
+    this.treeWindowStore.subscribe(value => {
+      this.treeWindowStoreValue = value;
+    });
+
+    // Pass the color scale to tree window store
+    this.treeWindowStoreValue.getFeatureColor = this.getFeatureColor;
+    this.treeWindowStore.set(this.treeWindowStoreValue);
+  }
+
+  /**
    * Draw the initial view.
    */
   #initView() {
@@ -537,14 +561,7 @@ export class Sunburst {
           return 'null';
         }
         // Determine the color
-        const color = this.colorScale(
-          this.getFeatureNameValue(
-            d.data['f'] as string,
-            FeaturePosition.First,
-            FeatureValuePairType.PairString
-          ) as string
-        );
-        return color;
+        return this.getFeatureColor(d.data['f'] as string);
       })
       .style('display', d => {
         if (d.data['f'] === '_') {
@@ -673,15 +690,7 @@ export class Sunburst {
             .attr('class', 'mid-circle')
             .append('circle')
             .attr('r', 0)
-            .style('fill', d =>
-              this.colorScale(
-                this.getFeatureNameValue(
-                  d.data['f'] as string,
-                  FeaturePosition.First,
-                  FeatureValuePairType.PairString
-                ) as string
-              )
-            )
+            .style('fill', d => this.getFeatureColor(d.data['f'] as string))
             .call(enter =>
               enter
                 .transition()
@@ -777,13 +786,7 @@ export class Sunburst {
     const ancestors = newHead.ancestors();
     ancestors.forEach(a => {
       if (a.depth > 0) {
-        const curColor = this.colorScale(
-          this.getFeatureNameValue(
-            a.data['f'] as string,
-            FeaturePosition.First,
-            FeatureValuePairType.PairString
-          ) as string
-        );
+        const curColor = this.getFeatureColor(a.data['f'] as string);
         depthColors[a.depth - 1] = curColor;
       }
     });

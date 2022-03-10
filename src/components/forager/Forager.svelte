@@ -30,7 +30,7 @@
   // Construct stores
   const appearanceStore = getAppearanceStore();
   const sunburstStore = getSunburstStore();
-  const treeStore = getTreeWindowStore();
+  const treeWindowStore = getTreeWindowStore();
 
   onMount(() => {
     console.log('mounted!');
@@ -70,6 +70,7 @@
         <Sunburst
           data={data}
           sunburstStore={sunburstStore}
+          treeWindowStore={treeWindowStore}
         />
       </div>
 
@@ -85,6 +86,6 @@
   <TreeWindow
     data={data}
     featureMap={featureMap}
-    treeWindowStore={treeStore}
+    treeWindowStore={treeWindowStore}
   />
 </div>

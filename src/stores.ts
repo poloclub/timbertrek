@@ -16,6 +16,7 @@ export interface TreeWindowStoreValue {
   featureMap: Map<number, string[]>;
   treeID: number;
   show: boolean;
+  getFeatureColor: (f: string) => string | null;
 }
 
 /**
@@ -54,7 +55,8 @@ export const getTreeWindowStore = () => {
   const curStore: Writable<TreeWindowStoreValue> = writable({
     featureMap: new Map<number, string[]>(),
     treeID: 0,
-    show: false
+    show: false,
+    getFeatureColor: null
   });
 
   return curStore;

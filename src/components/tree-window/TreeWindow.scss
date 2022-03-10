@@ -47,4 +47,16 @@
     stroke: $gray-700;
     stroke-width: 1px;
   }
+
+  :global(.node rect) {
+    fill: $gray-light-background;
+    stroke: $gray-700;
+    stroke-width: 1px;
+  }
+
+  :global(.node text) {
+    fill: $gray-700;
+    dominant-baseline: middle;
+    text-anchor: middle;
+  }
 }

@@ -3,12 +3,13 @@
   import { onMount } from 'svelte';
   import { config } from '../../config';
   import type { Writable } from 'svelte/store';
-  import type { SunburstStoreValue } from '../../stores';
+  import type { SunburstStoreValue, TreeWindowStoreValue } from '../../stores';
   import type { HierarchyJSON } from './SunburstTypes';
 
   // Component variables
   export let data: HierarchyJSON | null = null;
   export let sunburstStore: Writable<SunburstStoreValue> | null = null;
+  export let treeWindowStore: Writable<TreeWindowStoreValue> | null = null;
 
   let component: HTMLElement | null = null;
   let mounted = false;
@@ -24,7 +25,8 @@
 
   const initView = () => {
     if (component && data) {
-      sunburst = new Sunburst({ component, data, sunburstStore, width, height });
+      sunburst = new Sunburst({ component, data, sunburstStore, treeWindowStore,
+        width, height });
     }
 
     console.log(sunburst);
