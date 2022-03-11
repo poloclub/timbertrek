@@ -651,6 +651,9 @@ export class Sunburst {
           this.xScale.domain(xInterpolator(t));
           this.yScale.domain(yInterpolator(t));
         };
+      })
+      .on('end', () => {
+        this.drawText();
       });
 
     // Update the view
@@ -745,6 +748,11 @@ export class Sunburst {
   #arcClicked(e: MouseEvent, d: HierarchyNode) {
     e.stopPropagation();
     e.preventDefault();
+
+    // No interaction if users clicks a leaf node
+    if (d.data.f === '_') {
+      return;
+    }
 
     let targetDomain: ArcDomain = { x0: 0, x1: 1, y0: 0, y1: 1 };
     let newHead = d;

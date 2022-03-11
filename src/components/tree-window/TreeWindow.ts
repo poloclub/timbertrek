@@ -8,7 +8,7 @@ import { getTreeWindowStoreDefaultValue } from '../../stores';
  * Class for a tree window object.
  */
 export class TreeWindow {
-  tree: TreeNode;
+  // tree: TreeNode;
   treeMap: Map<number, [TreeNode, number]>;
   curTreeID: number;
 
@@ -21,6 +21,16 @@ export class TreeWindow {
   padding: Padding;
   width: number;
   height: number;
+
+  get tree(): TreeNode | null {
+    const mapValue = this.treeMap.get(this.curTreeID);
+    if (mapValue !== undefined) {
+      return mapValue[0];
+    } else {
+      console.warn(`No such tree on the record ${this.curTreeID}`);
+      return null;
+    }
+  }
 
   /**
    * Initialize a TreeWindow object
@@ -49,7 +59,6 @@ export class TreeWindow {
   }) {
     this.treeMap = treeMapMap;
     this.curTreeID = 332;
-    this.tree = this.treeMap.get(this.curTreeID)![0];
     this.treeWindowUpdated = treeWindowUpdated;
     console.log(this.tree, this.treeMap);
 
@@ -79,7 +88,10 @@ export class TreeWindow {
     this.height = height - this.padding.top - this.padding.bottom;
 
     // Draw the tree
-    this.#initView();
+    this.#drawCurTree();
+
+    this.treeWindowStoreValue.show = true;
+    this.treeWindowStore.set(this.treeWindowStoreValue);
   }
 
   /**
@@ -97,8 +109,6 @@ export class TreeWindow {
 
           if (newTreeTuple) {
             this.curTreeID = this.treeWindowStoreValue.treeID;
-            this.tree = newTreeTuple[0];
-            console.log(this.curTreeID, this.tree);
             this.#redraw();
           }
         }
@@ -115,13 +125,18 @@ export class TreeWindow {
   #redraw() {
     console.log('redraw!');
     this.svg.selectAll('g.content').remove();
-    this.#initView();
+    this.#drawCurTree();
   }
 
   /**
-   * Draw a vertical tree on the SVG.
+   * Draw the tree with this.curTreeID
    */
-  #initView() {
+  #drawCurTree() {
+    if (this.tree === null) {
+      console.warn('Trying to draw a tree that does not exist');
+      return;
+    }
+
     const content = this.svg
       .append('g')
       .attr('class', 'content')
@@ -191,9 +206,5 @@ export class TreeWindow {
       .append('text')
       .attr('dy', 0.5)
       .text(d => d.data.f);
-
-    this.treeWindowStoreValue.show = true;
-    this.treeWindowStoreValue.treeID = 332;
-    this.treeWindowStore.set(this.treeWindowStoreValue);
   }
 }
