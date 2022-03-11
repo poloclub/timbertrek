@@ -187,14 +187,21 @@ export class Sunburst {
       .arc()
       .startAngle(d => this.xScale((d as ArcPartition).x0))
       .endAngle(d => this.xScale((d as ArcPartition).x1))
-      .padAngle(d =>
-        Math.min(
-          ((this.xScale((d as ArcPartition).x1) -
-            this.xScale((d as ArcPartition).x0)) /
-            2,
-          0.00001)
-        )
-      )
+      .padAngle(d => {
+        const dn = d as unknown as HierarchyNode;
+        const sectorWidth =
+          this.xScale((d as ArcPartition).x1) -
+          this.xScale((d as ArcPartition).x0);
+        if (dn.data.f === '_') {
+          if (sectorWidth < 0.001) {
+            return 0;
+          } else {
+            return Math.min(sectorWidth / 2, 0.015);
+          }
+        } else {
+          return 0;
+        }
+      })
       .padRadius(this.radius * 1.5)
       .innerRadius(d => Math.max(0, this.yScale((d as ArcPartition).y0)))
       .outerRadius(d =>

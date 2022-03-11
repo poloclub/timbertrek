@@ -123,7 +123,6 @@ export class TreeWindow {
   }
 
   #redraw() {
-    console.log('redraw!');
     this.svg.selectAll('g.content').remove();
     this.#drawCurTree();
   }
