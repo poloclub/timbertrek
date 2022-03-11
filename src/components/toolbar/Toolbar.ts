@@ -2,11 +2,12 @@ import type { Writable } from 'svelte/store';
 import d3 from '../../utils/d3-import';
 // import { config } from '../../config';
 import { getContrastRatio } from '../../utils/utils';
+import type { AppearanceStoreValue, SunburstStoreValue } from '../../stores';
 import {
-  AppearanceStoreValue,
-  SunburstStoreValue,
-  SunburstAction
+  getAppearanceStoreDefaultValue,
+  getSunburstStoreDefaultValue
 } from '../../stores';
+import { SunburstAction } from '../../stores';
 
 /**
  * Class to handle events in the toolbar
@@ -31,6 +32,7 @@ export class ToolbarEventHandler {
 
     // Appearance button store bonding
     this.appearanceStore = appearanceStore;
+    this.appearanceStoreValue = getAppearanceStoreDefaultValue();
     this.appearanceStore.subscribe(value => {
       this.appearanceStoreValue = value;
       this.handlerUpdated();
@@ -38,6 +40,7 @@ export class ToolbarEventHandler {
 
     // Sunburst store bonding
     this.sunburstStore = sunburstStore;
+    this.sunburstStoreValue = getSunburstStoreDefaultValue();
     this.sunburstStore.subscribe(value => {
       this.sunburstStoreValue = value;
       this.handlerUpdated();
@@ -96,7 +99,7 @@ export class ToolbarEventHandler {
     const background = this.sunburstStoreValue.depthColors[depth - 1];
     let foreground = 'inherit';
 
-    if (background === '') {
+    if (background === null || background === '') {
       // background = config.colors['gray-50'];
       return '';
     } else {
@@ -104,7 +107,7 @@ export class ToolbarEventHandler {
       const whiteRGB = [252, 252, 252];
       const blackRGB = [74, 74, 74];
 
-      const rgb = d3.color(background).rgb();
+      const rgb = d3.color(background)!.rgb();
       const backgroundRGB = [rgb.r, rgb.g, rgb.b];
 
       if (

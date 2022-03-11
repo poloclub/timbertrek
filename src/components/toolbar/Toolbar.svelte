@@ -1,6 +1,6 @@
-<script lang='ts'>
+<script lang="ts">
   import { onMount } from 'svelte';
-  import { preProcessSVG } from '../../utils/utils';
+  // import { preProcessSVG } from '../../utils/utils';
   import { ToolbarEventHandler } from './Toolbar';
   import type { Writable } from 'svelte/store';
   import type { AppearanceStoreValue, SunburstStoreValue } from 'src/stores';
@@ -11,8 +11,8 @@
 
   // Component variables
   // export let data: object | null = null;
-  export let appearanceStore: Writable<AppearanceStoreValue> = null;
-  export let sunburstStore: Writable<SunburstStoreValue> = null;
+  export let appearanceStore: Writable<AppearanceStoreValue> | null = null;
+  export let sunburstStore: Writable<SunburstStoreValue> | null = null;
 
   let component: HTMLElement | null = null;
   let mounted = false;
@@ -21,7 +21,7 @@
   // const processedIconDepth = iconDepth.replaceAll('black', 'currentcolor');
 
   // Create the event handler object
-  let handler: ToolbarEventHandler = null;
+  let handler: ToolbarEventHandler | null = null;
 
   onMount(() => {
     mounted = true;
@@ -32,38 +32,40 @@
   };
 
   const initView = () => {
-    handler = new ToolbarEventHandler(handlerUpdated, appearanceStore,
-      sunburstStore
-    );
+    if (appearanceStore && sunburstStore) {
+      handler = new ToolbarEventHandler(
+        handlerUpdated,
+        appearanceStore,
+        sunburstStore
+      );
+    }
   };
 
-  $: appearanceStore && initView();
+  $: appearanceStore && sunburstStore && initView();
 </script>
 
-<style lang='scss'>
+<style lang="scss">
   @import './Toolbar.scss';
 </style>
 
-<div class='toolbar' bind:this={component}>
+<div class="toolbar" bind:this={component}>
+  <div class="depths">
+    <div class="depth-label">Show Depth</div>
 
-  <div class='depths'>
-    <div class='depth-label'>
-      Show Depth
-    </div>
-
-    <div class='depth-box-container'>
-      <div class='depth-box-lines'>
+    <div class="depth-box-container">
+      <div class="depth-box-lines">
         {#each [...Array(Math.max(handler?.sunburstStoreValue.depthMax - 1, 0)).keys()] as i}
-          <div class='depth-line'
+          <div
+            class="depth-line"
             class:in-range={i + 2 <= handler?.sunburstStoreValue.depthHigh &&
               i + 2 > handler?.sunburstStoreValue.depthLow}
-          >
-          </div>
+          />
         {/each}
       </div>
 
       {#each [...Array(handler?.sunburstStoreValue.depthMax).keys()] as i}
-        <div class='depth-box'
+        <div
+          class="depth-box"
           class:in-range={i + 1 <= handler?.sunburstStoreValue.depthHigh &&
             i + 1 >= handler?.sunburstStoreValue.depthLow}
           class:no-hover={i + 1 === handler?.sunburstStoreValue.depthHigh}
@@ -76,38 +78,32 @@
     </div>
   </div>
 
-  <div class='tools'>
-
-    <div class='tool-button'
-      on:click={() => {handler?.appearanceClicked();}}
+  <div class="tools">
+    <div
+      class="tool-button"
+      on:click={() => {
+        handler?.appearanceClicked();
+      }}
       class:shown={handler?.appearanceStoreValue.shown}
     >
-      <span class='svg-icon icon-brush'>
+      <span class="svg-icon icon-brush">
         {@html iconBrush}
       </span>
-      <span class='tool-name'>
-        Appearance
-      </span>
+      <span class="tool-name"> Appearance </span>
     </div>
 
-    <div class='tool-button'>
-      <span class='svg-icon icon-brush'>
+    <div class="tool-button">
+      <span class="svg-icon icon-brush">
         {@html iconStar}
       </span>
-      <span class='tool-name'>
-        Favorites
-      </span>
+      <span class="tool-name"> Favorites </span>
     </div>
 
-    <div class='tool-button'>
-      <span class='svg-icon icon-brush'>
+    <div class="tool-button">
+      <span class="svg-icon icon-brush">
         {@html iconSearch}
       </span>
-      <span class='tool-name'>
-        Search
-      </span>
+      <span class="tool-name"> Search </span>
     </div>
-
   </div>
-
 </div>

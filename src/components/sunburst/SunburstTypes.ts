@@ -65,6 +65,7 @@ export interface ArcPartition extends d3.DefaultArcObject {
 
 export interface HierarchyNode extends d3.HierarchyRectangularNode<unknown> {
   current?: d3.HierarchyRectangularNode<unknown>;
+  data: RuleNode;
 }
 
 export interface Padding {

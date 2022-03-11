@@ -1,4 +1,4 @@
-<script lang='ts'>
+<script lang="ts">
   import { Sunburst } from './Sunburst';
   import { onMount } from 'svelte';
   import { config } from '../../config';
@@ -24,21 +24,32 @@
   });
 
   const initView = () => {
-    if (component && data) {
-      sunburst = new Sunburst({ component, data, sunburstStore, treeWindowStore,
-        width, height });
+    if (component && data && sunburstStore && treeWindowStore) {
+      sunburst = new Sunburst({
+        component,
+        data,
+        sunburstStore,
+        treeWindowStore,
+        width,
+        height
+      });
     }
 
     console.log(sunburst);
   };
 
-  $: data && sunburstStore && mounted && component && initView();
+  $: data &&
+    sunburstStore &&
+    treeWindowStore &&
+    mounted &&
+    component &&
+    initView();
 </script>
 
-<style lang='scss'>
+<style lang="scss">
   @import './Sunburst.scss';
 </style>
 
-<div class='sunburst' bind:this={component}>
-  <svg class='sunburst-svg'></svg>
+<div class="sunburst" bind:this={component}>
+  <svg class="sunburst-svg" />
 </div>

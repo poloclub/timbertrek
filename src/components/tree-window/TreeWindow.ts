@@ -1,8 +1,8 @@
 import d3 from '../../utils/d3-import';
 import type { Writable } from 'svelte/store';
 import type { TreeNode, TreeMap, Padding } from '../sunburst/SunburstTypes';
-import type { TreeWindowStoreValue } from 'src/stores';
-import { getTreeWindowStoreDefaultValue } from 'src/stores';
+import type { TreeWindowStoreValue } from '../../stores';
+import { getTreeWindowStoreDefaultValue } from '../../stores';
 
 /**
  * Class for a tree window object.

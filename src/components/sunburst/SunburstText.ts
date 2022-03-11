@@ -6,9 +6,9 @@ import type { Sunburst } from './Sunburst';
 import {
   TextArcMode,
   FeaturePosition,
-  FeatureValuePairType,
-  HierarchyNode
+  FeatureValuePairType
 } from './SunburstTypes';
+import type { HierarchyNode } from './SunburstTypes';
 import d3 from '../../utils/d3-import';
 import { getLatoTextWidth } from '../../utils/text-width';
 import { getContrastRatio } from '../../utils/utils';
@@ -86,7 +86,7 @@ export function doesTextFitArc(
   padding = 0
 ) {
   if (text == null) {
-    text = this.getFeatureInfo(d.data['f'] as string).nameValue;
+    text = this.getFeatureInfo(d.data.f).nameValue;
   }
 
   const textWidth = getLatoTextWidth(text, fontSize);
@@ -148,26 +148,27 @@ export function drawText(this: Sunburst) {
     const background = d3.color(
       this.colorScale(
         this.getFeatureNameValue(
-          d.data['f'] as string,
+          d.data.f,
           FeaturePosition.First,
           FeatureValuePairType.PairString
         ) as string
       )
     );
 
-    // Check contract ratio if we use white color
     let foreground = 'currentcolor';
-    const whiteRGB = [252, 252, 252];
-    const blackRGB = [74, 74, 74];
-    const rgb = d3.color(background).rgb();
-    const backgroundRGB = [rgb.r, rgb.g, rgb.b];
+    if (background !== null) {
+      // Check contract ratio if we use white color
+      const whiteRGB = [252, 252, 252];
+      const blackRGB = [74, 74, 74];
+      const rgb = d3.color(background).rgb();
+      const backgroundRGB = [rgb.r, rgb.g, rgb.b];
 
-    if (
-      getContrastRatio(whiteRGB, backgroundRGB) <
-      getContrastRatio(blackRGB, backgroundRGB)
-    ) {
-      // if (getContrastRatio(whiteRGB, backgroundRGB) < 0.4) {
-      foreground = 'hsla(0, 0%, 99%, 1)';
+      if (
+        getContrastRatio(whiteRGB, backgroundRGB) <
+        getContrastRatio(blackRGB, backgroundRGB)
+      ) {
+        foreground = 'hsla(0, 0%, 99%, 1)';
+      }
     }
 
     return foreground;
@@ -196,7 +197,7 @@ export function drawText(this: Sunburst) {
     .append('textPath')
     .attr('startOffset', '50%')
     .attr('xlink:href', (d, i) => {
-      const featureInfo = this.getFeatureInfo(d.data['f'] as string);
+      const featureInfo = this.getFeatureInfo(d.data.f);
       let text = featureInfo.nameValue;
       let featureNameExists = false;
 
@@ -233,7 +234,7 @@ export function drawText(this: Sunburst) {
   // Add text
   drawnFeatureNames.clear();
   textPaths.text((d, i) => {
-    const featureInfo = this.getFeatureInfo(d.data['f'] as string);
+    const featureInfo = this.getFeatureInfo(d.data.f);
     let text = featureInfo.nameValue;
     let onlyShowValue = false;
 

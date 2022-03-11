@@ -1,26 +1,25 @@
 import d3 from '../../utils/d3-import';
 import { config } from '../../config';
 import type { Writable } from 'svelte/store';
+import { SunburstAction } from '../../stores';
+import type { SunburstStoreValue, TreeWindowStoreValue } from '../../stores';
 import {
-  SunburstStoreValue,
-  SunburstAction,
-  TreeWindowStoreValue
+  getSunburstStoreDefaultValue,
+  getTreeWindowStoreDefaultValue
 } from '../../stores';
 import { textArc, doesTextFitArc, removeText, drawText } from './SunburstText';
-import {
+import { FeaturePosition, FeatureValuePairType } from './SunburstTypes';
+import type {
   ArcDomain,
   ArcDomainData,
   ArcPartition,
   FeatureInfo,
-  FeaturePosition,
-  FeatureValuePairType,
   HierarchyJSON,
   HierarchyNode,
   Padding,
   RuleNode
 } from './SunburstTypes';
 
-const HALF_PI = Math.PI / 2;
 const ZOOM_DURATION = 800;
 
 /**
@@ -29,10 +28,10 @@ const ZOOM_DURATION = 800;
 export class Sunburst {
   svg: d3.Selection<d3.BaseType, unknown, null, undefined>;
   sunburstStore: Writable<SunburstStoreValue>;
-  sunburstStoreValue: SunburstStoreValue | null;
+  sunburstStoreValue: SunburstStoreValue;
 
   treeWindowStore: Writable<TreeWindowStoreValue>;
-  treeWindowStoreValue: TreeWindowStoreValue | null;
+  treeWindowStoreValue: TreeWindowStoreValue;
 
   padding: Padding;
   width: number;
@@ -49,7 +48,7 @@ export class Sunburst {
   featureCount: Map<string, number>;
   featureValueCount: Map<string, Map<string, number>>;
 
-  arc: d3.Arc<any, d3.DefaultArcObject>;
+  arc: d3.Arc<unknown, d3.DefaultArcObject>;
   featureMap: Map<number, string[]>;
   colorScale: d3.ScaleOrdinal<string, string, never>;
   arcDomainStack: ArcDomainData[];
@@ -83,8 +82,8 @@ export class Sunburst {
     return (
       this.width /
       (2 *
-        (this.sunburstStoreValue?.depthMax -
-          this.sunburstStoreValue?.depthLow +
+        (this.sunburstStoreValue.depthMax -
+          this.sunburstStoreValue.depthLow +
           1))
     );
   }
@@ -148,17 +147,21 @@ export class Sunburst {
     // Partition the data
     this.featureCount = new Map<string, number>();
     this.featureValueCount = new Map<string, Map<string, number>>();
+    this.colorScale = d3.scaleOrdinal();
     this.partition = this.#partitionData();
+
+    // The initial head node is the root
+    this.curHeadNode = this.partition as HierarchyNode;
 
     // Figure out how many levels to show at the beginning
     // If `level` is not given, we show all the levels by default
     // Initialize the store
     this.sunburstStore = sunburstStore;
-    this.sunburstStoreValue = null;
+    this.sunburstStoreValue = getSunburstStoreDefaultValue();
     this.#initSunburstStore();
 
     this.treeWindowStore = treeWindowStore;
-    this.treeWindowStoreValue = null;
+    this.treeWindowStoreValue = getTreeWindowStoreDefaultValue();
     this.#initTreeWindowStore();
 
     // Create scales
@@ -222,11 +225,14 @@ export class Sunburst {
     };
     const parsedInt = parseInt(f);
     if (!isNaN(parsedInt)) {
-      featureInfo.name = this.featureMap.get(parsedInt)[0];
-      featureInfo.value = this.featureMap.get(parsedInt)[1];
-      featureInfo.short = this.featureMap.get(parsedInt)[2];
-      featureInfo.nameValue = `${featureInfo.name} ${featureInfo.value}`;
-      featureInfo.shortValue = `${featureInfo.short} ${featureInfo.value}`;
+      const featureMapValue = this.featureMap.get(parsedInt);
+      if (featureMapValue !== undefined) {
+        featureInfo.name = featureMapValue[0];
+        featureInfo.value = featureMapValue[1];
+        featureInfo.short = featureMapValue[2];
+        featureInfo.nameValue = `${featureInfo.name} ${featureInfo.value}`;
+        featureInfo.shortValue = `${featureInfo.short} ${featureInfo.value}`;
+      }
     }
     return featureInfo;
   }
@@ -273,7 +279,12 @@ export class Sunburst {
           return '';
         }
         const tempArray = this.featureMap.get(stringID);
-        return `${tempArray[0]}:${tempArray[1]}`;
+        if (tempArray !== undefined) {
+          return `${tempArray[0]}:${tempArray[1]}`;
+        } else {
+          console.error(`Encounter unrecorded key ${stringID}`);
+          return '';
+        }
       }
     }
   }
@@ -293,32 +304,34 @@ export class Sunburst {
     /**
      * Step 2: Figure out the feature order (based on first split frequency)
      */
-    root.children.forEach(d => {
-      const [featureName, featureValue] = this.getFeatureNameValue(d.data.f);
+    root.children!.forEach(d => {
+      const [featureName, featureValue] = this.getFeatureNameValue(
+        d.data.f
+      ) as string[];
 
       // Check if this feature name is created
       if (this.featureCount.has(featureName)) {
         this.featureCount.set(
           featureName,
-          this.featureCount.get(featureName) + d.value
+          this.featureCount.get(featureName)! + d.value!
         );
 
         // Check if this value is created
-        if (this.featureValueCount.get(featureName).has(featureValue)) {
+        if (this.featureValueCount.get(featureName)!.has(featureValue)) {
           this.featureValueCount
-            .get(featureName)
+            .get(featureName)!
             .set(
               featureValue,
-              this.featureValueCount.get(featureName).get(featureValue) +
-                d.value
+              this.featureValueCount.get(featureName)!.get(featureValue)! +
+                d.value!
             );
         } else {
-          this.featureValueCount.get(featureName).set(featureValue, d.value);
+          this.featureValueCount.get(featureName)!.set(featureValue, d.value!);
         }
       } else {
-        this.featureCount.set(featureName, d.value);
+        this.featureCount.set(featureName, d.value!);
         const tempMap = new Map<string, number>();
-        tempMap.set(featureValue, d.value);
+        tempMap.set(featureValue, d.value!);
         this.featureValueCount.set(featureName, tempMap);
       }
     });
@@ -344,7 +357,12 @@ export class Sunburst {
       const aLightness = d3.lch(this.getFeatureColor(a.data.f)).l;
       const bLightness = d3.lch(this.getFeatureColor(b.data.f)).l;
 
-      return bFeatureCount - aFeatureCount || aLightness - bLightness;
+      if (aFeatureCount !== undefined && bFeatureCount !== undefined) {
+        return bFeatureCount - aFeatureCount || aLightness - bLightness;
+      } else {
+        console.warn(`Encountered unrecorded keys ${aName} ${bName}`);
+        return 0;
+      }
     });
 
     /**
@@ -399,7 +417,7 @@ export class Sunburst {
     // them in the first split
     const sortedFeatureNames = Array.from(this.featureCount.keys())
       .filter(a => a !== '')
-      .sort((a, b) => this.featureCount.get(b) - this.featureCount.get(a));
+      .sort((a, b) => this.featureCount.get(b)! - this.featureCount.get(a)!);
 
     sortedFeatureNames.forEach((featureName, i) => {
       if (i > 8) {
@@ -410,11 +428,11 @@ export class Sunburst {
 
       // Get the number of values using this feature
       const sortedFeatureValues = Array.from(
-        this.featureValueCount.get(featureName).keys()
+        this.featureValueCount.get(featureName)!.keys()
       ).sort(
         (a, b) =>
-          this.featureValueCount.get(featureName).get(b) -
-          this.featureValueCount.get(featureName).get(a)
+          this.featureValueCount.get(featureName)!.get(b)! -
+          this.featureValueCount.get(featureName)!.get(a)!
       );
 
       // Create different lightness based on the number of values
@@ -546,35 +564,38 @@ export class Sunburst {
       .data(this.partition.descendants().slice(1) as HierarchyNode[])
       .join('g')
       .attr('class', d => `arc-${d.depth}`)
-      .classed('leaf', d => d.data['f'] === '_');
+      .classed('leaf', d => d.data.f === '_');
 
     // Draw the background paths
     const arcs = arcGroups
       .append('path')
       .attr('class', 'arc')
-      .classed('leaf', d => d.data['f'] === '_')
+      // @ts-ignore
+      .classed('leaf', d => d.data.f === '_')
       // @ts-ignore
       .attr('d', d => this.arc(d))
       .on('click', (e, d) => this.#arcClicked(e as MouseEvent, d))
       .style('fill', d => {
         // Let CSS handle the color for leaf nodes
-        if (d.data['f'] === '_') {
+        if (d.data.f === '_') {
           return 'null';
         }
         // Determine the color
-        return this.getFeatureColor(d.data['f'] as string);
+        return this.getFeatureColor(d.data.f);
       })
       .style('display', d => {
-        if (d.data['f'] === ';') {
+        if (d.data.f === ';') {
           return 'none';
+        } else {
+          return 'initial';
         }
       });
 
     // Add hover event for leaf arcs
     arcs
-      .filter(d => d.data['f'] === '_')
+      .filter(d => d.data.f === '_')
       .on('mouseenter', (e, d) => {
-        const treeID = d.data['t'] as string;
+        const treeID = d.data.t!;
         this.treeWindowStoreValue.treeID = +treeID;
         this.treeWindowStore.set(this.treeWindowStoreValue);
       });
@@ -582,10 +603,7 @@ export class Sunburst {
     // TODO: Temporarily add titles, need to replace with tooltips
     arcGroups
       .append('title')
-      .text(d => this.getFeatureInfo(d.data['f'] as string).nameValue);
-
-    // The initial head node is the root
-    this.curHeadNode = this.partition;
+      .text(d => this.getFeatureInfo(d.data.f).nameValue);
 
     // Zoom into the third level at the beginning
     const yGap = 1 / (this.sunburstStoreValue.depthMax + 1);
@@ -633,12 +651,10 @@ export class Sunburst {
           this.xScale.domain(xInterpolator(t));
           this.yScale.domain(yInterpolator(t));
         };
-      })
-      .on('end', () => {
-        this.drawText();
       });
 
     // Update the view
+    // @ts-ignore
     transition
       .selectAll('.arc')
       .attrTween('d', d => () => this.arc(d as d3.DefaultArcObject))
@@ -687,12 +703,13 @@ export class Sunburst {
 
     const radiusScale = d3
       .scaleLinear()
-      .domain([d3.min(depths) - 1, d3.max(depths)])
+      .domain([d3.min(depths)! - 1, d3.max(depths)!])
       .range([0, centerRadius]);
 
     const circles = midCircleGroup
       .selectAll('g.mid-circle')
-      .data(ancestors, d => (d as HierarchyNode).value)
+      // Use the node count as key
+      .data(ancestors, d => (d as HierarchyNode).value!)
       .join(
         enter =>
           enter
@@ -700,7 +717,7 @@ export class Sunburst {
             .attr('class', 'mid-circle')
             .append('circle')
             .attr('r', 0)
-            .style('fill', d => this.getFeatureColor(d.data['f'] as string))
+            .style('fill', d => this.getFeatureColor(d.data.f))
             .call(enter =>
               enter
                 .transition()
@@ -743,16 +760,21 @@ export class Sunburst {
     if (d.x0 == curXDomain[0] && d.x1 == curXDomain[1]) {
       // Case 1: Transition to the last domain in the domain stack
       const lastDomainData = this.arcDomainStack.pop();
-      newHead = lastDomainData.node;
-      targetDomain = lastDomainData;
 
-      // Update the low and high pointer
-      this.sunburstStoreValue.depthLow =
-        newHead.depth === 0 ? 1 : newHead.depth;
-      this.sunburstStoreValue.depthHigh = Math.min(
-        this.sunburstStoreValue.depthLow + lastDomainData.depthGap,
-        this.sunburstStoreValue.depthMax
-      );
+      if (lastDomainData !== undefined) {
+        newHead = lastDomainData.node;
+        targetDomain = lastDomainData;
+
+        // Update the low and high pointer
+        this.sunburstStoreValue.depthLow =
+          newHead.depth === 0 ? 1 : newHead.depth;
+        this.sunburstStoreValue.depthHigh = Math.min(
+          this.sunburstStoreValue.depthLow + lastDomainData.depthGap,
+          this.sunburstStoreValue.depthMax
+        );
+      } else {
+        console.error('No more arc domain from the stack to pop!');
+      }
     } else {
       // Case 2: Transition to the clicked arc
       const yGap = 1 / (this.sunburstStoreValue.depthMax + 1);
@@ -796,7 +818,7 @@ export class Sunburst {
     const ancestors = newHead.ancestors();
     ancestors.forEach(a => {
       if (a.depth > 0) {
-        const curColor = this.getFeatureColor(a.data['f'] as string);
+        const curColor = this.getFeatureColor(a.data.f);
         depthColors[a.depth - 1] = curColor;
       }
     });

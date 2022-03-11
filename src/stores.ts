@@ -1,4 +1,4 @@
-import { writable, Writable } from 'svelte/store';
+import { writable } from 'svelte/store';
 
 export interface AppearanceStoreValue {
   shown: boolean;

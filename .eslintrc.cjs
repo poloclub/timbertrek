@@ -7,7 +7,7 @@ module.exports = {
     'prettier'
   ],
   parserOptions: {
-    ecmaVersion: 'esnext',
+    ecmaVersion: 'latest',
     sourceType: 'module',
     tsconfigRootDir: __dirname,
     project: ['./tsconfig.json'],
@@ -20,27 +20,14 @@ module.exports = {
   overrides: [
     {
       files: ['*.svelte'],
-      parser: 'svelte-eslint-parser',
-      extends: [
-        'eslint:recommended',
-        'plugin:@typescript-eslint/recommended',
-        'plugin:@typescript-eslint/recommended-requiring-type-checking',
-        'prettier'
-      ],
-      parserOptions: {
-        ecmaVersion: 'esnext',
-        sourceType: 'module',
-        tsconfigRootDir: __dirname,
-        project: ['./tsconfig.json'],
-        extraFileExtensions: ['.svelte', '.cjs']
-      }
+      processor: 'svelte3/svelte3'
     }
   ],
   settings: {
     'svelte3/typescript': () => require('typescript'),
     'svelte3/ignore-styles': () => true
   },
-  plugins: ['@typescript-eslint', 'prettier'],
+  plugins: ['svelte3', '@typescript-eslint', 'prettier'],
   ignorePatterns: ['node_modules'],
   rules: {
     indent: ['error', 2, { SwitchCase: 1 }],
