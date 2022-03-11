@@ -55,6 +55,11 @@
       stroke: $gray-light-background;
       stroke-width: 1px;
     }
+
+    :global(path.mid-circle-text-arc) {
+      fill: none;
+      stroke: $pink-200;
+    }
   }
 }
 

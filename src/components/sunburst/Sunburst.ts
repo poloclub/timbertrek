@@ -7,7 +7,13 @@ import {
   getSunburstStoreDefaultValue,
   getTreeWindowStoreDefaultValue
 } from '../../stores';
-import { textArc, doesTextFitArc, removeText, drawText } from './SunburstText';
+import {
+  textArc,
+  doesTextFitArc,
+  removeText,
+  drawText,
+  drawCenterText
+} from './SunburstText';
 import { FeaturePosition, FeatureValuePairType } from './SunburstTypes';
 import type {
   ArcDomain,
@@ -74,6 +80,11 @@ export class Sunburst {
    * Draw feature names on the inner circles and the most inner ring
    */
   drawText = drawText;
+
+  /**
+   * Draw texts on the center circles
+   */
+  drawCenterText = drawCenterText;
 
   /**
    * The radius is determined by the number of levels to show.
@@ -661,6 +672,7 @@ export class Sunburst {
       })
       .on('end', () => {
         this.drawText();
+        this.drawCenterText();
       });
 
     // Update the view
@@ -716,15 +728,18 @@ export class Sunburst {
       .domain([d3.min(depths)! - 1, d3.max(depths)!])
       .range([0, centerRadius]);
 
+    const smallestR = radiusScale(1);
+
     const circles = midCircleGroup
       .selectAll('g.mid-circle')
       // Use the node count as key
       .data(ancestors, d => (d as HierarchyNode).value!)
       .join(
-        enter =>
-          enter
-            .append('g')
-            .attr('class', 'mid-circle')
+        enter => {
+          const newEnter = enter.append('g').attr('class', 'mid-circle');
+
+          // Draw the circle
+          newEnter
             .append('circle')
             .attr('r', 0)
             .style('fill', d => this.getFeatureColor(d.data.f))
@@ -734,16 +749,47 @@ export class Sunburst {
                 .duration(skipDepth ? 0 : 0)
                 .delay(skipDepth ? ZOOM_DURATION - 100 : ZOOM_DURATION + 100)
                 .attr('r', d => radiusScale(d.depth))
-            ),
-        update =>
-          update
+            );
+
+          // Draw text arcs on each circle
+          newEnter
+            .append('path')
+            .attr('class', 'mid-circle-text-arc')
+            .attr('id', d => `mid-circle-text-arc-${d.depth}`)
+            .attr('d', d => {
+              const angles = [Math.PI * 0.5, Math.PI * 2.5];
+              const radius = smallestR * (d.depth - 0.5);
+              const curPath = d3.path();
+              curPath.arc(0, 0, radius, angles[0], angles[1], false);
+              return curPath.toString();
+            });
+
+          return newEnter;
+        },
+        update => {
+          const newUpdate = update;
+
+          // Update the circle radius
+          newUpdate
             .select('circle')
             .transition('zoom')
             .duration(ZOOM_DURATION)
             .ease(d3.easeCubicInOut)
             .attr('r', d => {
               return radiusScale(d.depth);
-            })
+            });
+
+          // Update the circle text path arc
+          newUpdate.select('path').attr('d', d => {
+            const angles = [Math.PI * 0.5, Math.PI * 2.5];
+            const radius = smallestR * (d.depth - 0.5);
+            const curPath = d3.path();
+            curPath.arc(0, 0, radius, angles[0], angles[1], false);
+            return curPath.toString();
+          });
+
+          return newUpdate;
+        }
       );
   }
 

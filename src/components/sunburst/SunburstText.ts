@@ -99,6 +99,58 @@ export function doesTextFitArc(
   return textWidth <= arcLength - padding;
 }
 
+const getTextColor = (
+  getFeatureColor: (f: string) => string,
+  d: HierarchyNode
+): string => {
+  const background = d3.color(getFeatureColor(d.data.f));
+
+  let foreground = 'currentcolor';
+  if (background !== null) {
+    // Check contract ratio if we use white color
+    const whiteRGB = [252, 252, 252];
+    const blackRGB = [74, 74, 74];
+    const rgb = d3.color(background).rgb();
+    const backgroundRGB = [rgb.r, rgb.g, rgb.b];
+
+    if (
+      getContrastRatio(whiteRGB, backgroundRGB) <
+      getContrastRatio(blackRGB, backgroundRGB)
+    ) {
+      foreground = 'hsla(0, 0%, 99%, 1)';
+    }
+  }
+
+  return foreground;
+};
+
+/**
+ * Draw text on center circles
+ * @param this Sunburst object
+ */
+export function drawCenterText(this: Sunburst) {
+  const midGroup = this.svg.select('g.mid-circle-group');
+  const circleGroups = midGroup.selectAll('g.mid-circle');
+
+  if (circleGroups.size() === 0) {
+    return;
+  }
+
+  // Step 1: Compute the max radius that the text can use
+  const ringData = this.svg
+    .select(`g.arc-${this.sunburstStoreValue.depthLow}`)
+    .datum() as HierarchyNode;
+  const ringRadius = this.yScale(ringData.y1) - this.yScale(ringData.y0);
+  const smallestR = ringRadius / circleGroups.size();
+
+  /**
+   * Step 2: Decide which text to use
+   * long name + value > short name + value
+   */
+
+  console.log(smallestR);
+}
+
 /**
  * Draw feature names on the inner circles and the most inner ring
  */
@@ -144,35 +196,7 @@ export function drawText(this: Sunburst) {
   const texts = innerArcs.append('text').attr('class', 'feature-name');
 
   // Choose the text color based on the background color
-  texts.style('fill', d => {
-    const background = d3.color(
-      this.colorScale(
-        this.getFeatureNameValue(
-          d.data.f,
-          FeaturePosition.First,
-          FeatureValuePairType.PairString
-        ) as string
-      )
-    );
-
-    let foreground = 'currentcolor';
-    if (background !== null) {
-      // Check contract ratio if we use white color
-      const whiteRGB = [252, 252, 252];
-      const blackRGB = [74, 74, 74];
-      const rgb = d3.color(background).rgb();
-      const backgroundRGB = [rgb.r, rgb.g, rgb.b];
-
-      if (
-        getContrastRatio(whiteRGB, backgroundRGB) <
-        getContrastRatio(blackRGB, backgroundRGB)
-      ) {
-        foreground = 'hsla(0, 0%, 99%, 1)';
-      }
-    }
-
-    return foreground;
-  });
+  texts.style('fill', d => getTextColor(this.getFeatureColor, d));
 
   const drawnFeatureNames = new Set<string>();
   const textLayoutMap = new Map<number, TextArcMode>();
