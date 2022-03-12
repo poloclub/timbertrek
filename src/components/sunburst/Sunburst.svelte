@@ -34,8 +34,6 @@
         height
       });
     }
-
-    console.log(sunburst);
   };
 
   $: data &&

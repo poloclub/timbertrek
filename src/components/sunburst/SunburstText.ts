@@ -130,7 +130,12 @@ const getTextColor = (
  */
 export function drawCenterText(this: Sunburst) {
   const midGroup = this.svg.select('g.mid-circle-group');
-  const circleGroups = midGroup.selectAll('g.mid-circle');
+  const circleGroups = midGroup.selectAll('g.mid-circle') as d3.Selection<
+    d3.BaseType | SVGGElement,
+    HierarchyNode,
+    SVGGElement,
+    unknown
+  >;
 
   if (circleGroups.size() === 0) {
     return;
@@ -142,13 +147,78 @@ export function drawCenterText(this: Sunburst) {
     .datum() as HierarchyNode;
   const ringRadius = this.yScale(ringData.y1) - this.yScale(ringData.y0);
   const smallestR = ringRadius / circleGroups.size();
+  const availableAngleRange = Math.PI * 1.2;
 
   /**
-   * Step 2: Decide which text to use
-   * long name + value > short name + value
+   * Step 2: Decide which text to use and draw the text
+   *    long name + value, if not => short name + value
+   * We draw the text in the center of the circle for the most inner circle, and
+   * draw texts on the upper ring for other circles.
    */
 
-  console.log(smallestR);
+  const texts = circleGroups
+    .append('text')
+    .attr('class', 'feature-name')
+    // Choose the text color based on the background color
+    .style('fill', d => getTextColor(this.getFeatureColor, d));
+
+  // Adaptively choose the font size (linear to depth gap)
+  const curFontSize = this.textFontScale(
+    this.sunburstStoreValue.depthHigh - this.sunburstStoreValue.depthLow
+  );
+
+  /**
+   * Shorten the text if necessary
+   * 1. Try long name + condition
+   * 2. Try short name + condition
+   *
+   * To shorten the text:
+   *   (1) Use short name + condition
+   *   (2) Replace the end portion with ...
+   * @param d HierarchyNode
+   * @param arcLength Max available width
+   * @returns Text
+   */
+  const getFitText = (d: HierarchyNode, arcLength: number) => {
+    const featureInfo = this.getFeatureInfo(d.data.f);
+    let text = featureInfo.nameValue;
+
+    // Width check (first check)
+    let textWidth = getLatoTextWidth(text, 16 * curFontSize);
+    if (textWidth > arcLength) {
+      // If the width is larger than the sector radius, then we try to use
+      // its short name
+      text = featureInfo.shortValue;
+
+      // Check if the new width is okay, if not, replace the last portion
+      // of the string with ...
+      textWidth = getLatoTextWidth(text, 16 * curFontSize);
+      while (textWidth > arcLength) {
+        text = text.replace('...', '');
+        text = text.slice(0, text.length - 1);
+        text = `${text}...`;
+        textWidth = getLatoTextWidth(text, 16 * curFontSize);
+      }
+    }
+    return text;
+  };
+
+  // If it is the center circle, draw the text in the middle
+  texts
+    .filter(d => d.depth === 1)
+    .style('font-size', `${curFontSize}rem`)
+    .text(d => getFitText(d, smallestR * 2 - 10));
+
+  // If it is not the center circle, draw the text along an arc path
+  texts
+    .filter(d => d.depth !== 1)
+    .style('font-size', `${curFontSize}rem`)
+    .append('textPath')
+    .attr('startOffset', '50%')
+    .attr('xlink:href', d => `#mid-circle-text-arc-${d.depth}`)
+    .text(d =>
+      getFitText(d, smallestR * (d.depth - 0.5) * availableAngleRange)
+    );
 }
 
 /**
