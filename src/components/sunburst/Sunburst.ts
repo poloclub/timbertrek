@@ -18,7 +18,9 @@ import {
 import {
   arcClicked,
   arcMouseenterHandler,
-  arcMouseleaveHandler
+  arcMouseleaveHandler,
+  leafArcMouseenterHandler,
+  leafArcMouseleaveHandler
 } from './SunburstEvent';
 import { FeaturePosition, FeatureValuePairType } from './SunburstTypes';
 import type {
@@ -120,6 +122,10 @@ export class Sunburst {
    * @param d Node data
    */
   arcMouseleaveHandler = arcMouseleaveHandler;
+
+  leafArcMouseenterHandler = leafArcMouseenterHandler;
+
+  leafArcMouseleaveHandler = leafArcMouseleaveHandler;
 
   /**
    * The radius is determined by the number of levels to show.
@@ -660,13 +666,13 @@ export class Sunburst {
     // Add hover event for leaf arcs
     arcs
       .filter(d => d.data.f === '_')
-      .on('mouseenter', (e, d) => {
-        const treeID = d.data.t!;
-        this.treeWindowStoreValue.treeID = +treeID;
-        this.treeWindowStore.set(this.treeWindowStoreValue);
-      });
+      .on('mouseenter', (e, d) =>
+        this.leafArcMouseenterHandler(e as MouseEvent, d)
+      )
+      .on('mouseleave', (e, d) =>
+        this.leafArcMouseleaveHandler(e as MouseEvent, d)
+      );
 
-    // TODO: Temporarily add titles, need to replace with tooltips
     arcGroups
       .append('title')
       .text(d => this.getFeatureInfo(d.data.f).nameValue);

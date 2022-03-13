@@ -38,6 +38,12 @@
   // }
 }
 
+@keyframes dash {
+  to {
+    stroke-dashoffset: -1000;
+  }
+}
+
 .tree-svg {
   stroke-linecap: round;
   stroke-linejoin: round;
@@ -46,6 +52,13 @@
     fill: none;
     stroke: $gray-700;
     stroke-width: 1px;
+  }
+
+  :global(path.link.highlighted) {
+    stroke-width: 2px;
+    stroke: $gray-600;
+    stroke-dasharray: 5px 5px;
+    animation: dash 60s infinite linear;
   }
 
   :global(.node rect) {

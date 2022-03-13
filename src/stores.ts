@@ -15,6 +15,7 @@ export interface SunburstStoreValue {
 export interface TreeWindowStoreValue {
   featureMap: Map<number, string[]>;
   treeID: number;
+  ancestorFs: string[];
   show: boolean;
   getFeatureColor: null | ((f: string) => string);
 }
@@ -27,13 +28,13 @@ export enum SunburstAction {
   None = ''
 }
 
-export const getAppearanceStoreDefaultValue = () => {
+export const getAppearanceStoreDefaultValue = (): AppearanceStoreValue => {
   return {
     shown: false
   };
 };
 
-export const getSunburstStoreDefaultValue = () => {
+export const getSunburstStoreDefaultValue = (): SunburstStoreValue => {
   return {
     depthMax: 0,
     depthLow: 0,
@@ -43,10 +44,11 @@ export const getSunburstStoreDefaultValue = () => {
   };
 };
 
-export const getTreeWindowStoreDefaultValue = () => {
+export const getTreeWindowStoreDefaultValue = (): TreeWindowStoreValue => {
   return {
     featureMap: new Map<number, string[]>(),
     treeID: 0,
+    ancestorFs: [],
     show: false,
     getFeatureColor: null
   };

@@ -8,9 +8,9 @@ import { getTreeWindowStoreDefaultValue } from '../../stores';
  * Class for a tree window object.
  */
 export class TreeWindow {
-  // tree: TreeNode;
   treeMap: Map<number, [TreeNode, number]>;
   curTreeID: number;
+  curAncestorFs: string[];
 
   treeWindowStore: Writable<TreeWindowStoreValue>;
   treeWindowStoreValue: TreeWindowStoreValue;
@@ -59,6 +59,7 @@ export class TreeWindow {
   }) {
     this.treeMap = treeMapMap;
     this.curTreeID = 332;
+    this.curAncestorFs = ['11', '1', '0', '_'];
     this.treeWindowUpdated = treeWindowUpdated;
 
     // Initialize the store
@@ -100,6 +101,7 @@ export class TreeWindow {
     this.treeWindowStore.subscribe(value => {
       this.treeWindowStoreValue = value;
 
+      // Show the tree window with the selected tree
       if (this.svg !== undefined) {
         if (this.treeWindowStoreValue.treeID !== this.curTreeID) {
           const newTreeTuple = this.treeMap.get(
@@ -108,6 +110,7 @@ export class TreeWindow {
 
           if (newTreeTuple) {
             this.curTreeID = this.treeWindowStoreValue.treeID;
+            this.curAncestorFs = [...this.treeWindowStoreValue.ancestorFs];
             this.#redraw();
           }
         }
@@ -155,6 +158,15 @@ export class TreeWindow {
       .data(root.links())
       .join('path')
       .attr('class', 'link')
+      .attr('id', d => {
+        if (d.target.data.f === '+') {
+          return `link-${d.source.data.f}-p`;
+        } else if (d.target.data.f === '-') {
+          return `link-${d.source.data.f}-n`;
+        } else {
+          return `link-${d.source.data.f}-${d.target.data.f}`;
+        }
+      })
       .attr('d', d => {
         return d3.line()([
           // @ts-ignore
@@ -204,5 +216,21 @@ export class TreeWindow {
       .append('text')
       .attr('dy', 0.5)
       .text(d => d.data.f);
+
+    // Highlight the current decision path
+    for (let i = 0; i < this.curAncestorFs.length - 1; i++) {
+      if (this.curAncestorFs[i + 1] === '_') {
+        linkGroup
+          .select(`#link-${this.curAncestorFs[i]}-p`)
+          .classed('highlighted', true);
+        linkGroup
+          .select(`#link-${this.curAncestorFs[i]}-n`)
+          .classed('highlighted', true);
+      } else {
+        linkGroup
+          .select(`#link-${this.curAncestorFs[i]}-${this.curAncestorFs[i + 1]}`)
+          .classed('highlighted', true);
+      }
+    }
   }
 }

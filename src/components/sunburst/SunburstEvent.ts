@@ -153,3 +153,49 @@ export function arcMouseleaveHandler(
     this.svg.select(`path#arc-${node.nid}`).classed('highlighted', false);
   });
 }
+
+/**
+ * Handler for mouseenter event on leaf arcs
+ * @param this Sunburst
+ * @param e Event
+ * @param d Node data
+ */
+export function leafArcMouseenterHandler(
+  this: Sunburst,
+  e: MouseEvent,
+  d: HierarchyNode
+) {
+  if (d.data.t === undefined) return;
+
+  e.preventDefault();
+  e.stopPropagation();
+
+  const treeID = d.data.t;
+  this.treeWindowStoreValue.treeID = +treeID;
+
+  // Trace the ancestors for this leaf
+  const ancestorFs = d
+    .ancestors()
+    .filter(d => d.depth !== 0)
+    .map(d => d.data.f)
+    .reverse();
+  this.treeWindowStoreValue.ancestorFs = ancestorFs;
+  this.treeWindowStore.set(this.treeWindowStoreValue);
+}
+
+/**
+ * Handler for mouseleave event on leaf arcs
+ * @param this Sunburst
+ * @param e Event
+ * @param d Node data
+ */
+export function leafArcMouseleaveHandler(
+  this: Sunburst,
+  e: MouseEvent,
+  d: HierarchyNode
+) {
+  if (d.data.t === undefined) return;
+
+  e.preventDefault();
+  e.stopPropagation();
+}
