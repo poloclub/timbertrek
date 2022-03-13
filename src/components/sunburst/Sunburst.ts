@@ -710,7 +710,7 @@ export class Sunburst {
     const ancestors = this.curHeadNode.ancestors().filter(d => d.depth !== 0);
 
     /**
-     * Very edgy case! Cannot use this.yscale() here because its domain is being
+     * Very edgy case! Cannot use this.yScale() here because its domain is being
      * interpolated in the sector zooming function
      */
     const newYScale = d3
@@ -730,13 +730,16 @@ export class Sunburst {
 
     const smallestR = radiusScale(1);
 
-    const circles = midCircleGroup
+    midCircleGroup
       .selectAll('g.mid-circle')
       // Use the node count as key
       .data(ancestors, d => (d as HierarchyNode).value!)
       .join(
         enter => {
-          const newEnter = enter.append('g').attr('class', 'mid-circle');
+          const newEnter = enter
+            .append('g')
+            .attr('class', 'mid-circle')
+            .on('click', e => this.#arcClicked(e as MouseEvent, null));
 
           // Draw the circle
           newEnter
@@ -763,6 +766,11 @@ export class Sunburst {
               curPath.arc(0, 0, radius, angles[0], angles[1], false);
               return curPath.toString();
             });
+
+          // Add a title for hovering
+          newEnter
+            .append('title')
+            .text(d => this.getFeatureInfo(d.data.f).nameValue);
 
           return newEnter;
         },
@@ -796,14 +804,15 @@ export class Sunburst {
   /**
    * Event handler for arc clicking.
    * @param e Event
-   * @param d Datum
+   * @param d Datum of the hierarchy node. If it is null, return to the last
+   *   state
    */
-  #arcClicked(e: MouseEvent, d: HierarchyNode) {
+  #arcClicked(e: MouseEvent, d: HierarchyNode | null) {
     e.stopPropagation();
     e.preventDefault();
 
     // No interaction if users clicks a leaf node
-    if (d.data.f === '_') {
+    if (d !== null && d.data.f === '_') {
       return;
     }
 
@@ -818,7 +827,7 @@ export class Sunburst {
     const curDepthGap =
       this.sunburstStoreValue.depthHigh - this.sunburstStoreValue.depthLow;
 
-    if (d.x0 == curXDomain[0] && d.x1 == curXDomain[1]) {
+    if (d === null || (d.x0 == curXDomain[0] && d.x1 == curXDomain[1])) {
       // Case 1: Transition to the last domain in the domain stack
       const lastDomainData = this.arcDomainStack.pop();
 
@@ -876,7 +885,7 @@ export class Sunburst {
       this.sunburstStoreValue.depthMax
     ).fill('');
 
-    const ancestors = newHead.ancestors();
+    const ancestors = newHead!.ancestors();
     ancestors.forEach(a => {
       if (a.depth > 0) {
         const curColor = this.getFeatureColor(a.data.f);
@@ -889,7 +898,7 @@ export class Sunburst {
     this.sunburstStore.set(this.sunburstStoreValue);
 
     // Update the new head
-    this.curHeadNode = newHead;
+    this.curHeadNode = newHead!;
     this.#arcZoom(targetDomain);
   }
 }

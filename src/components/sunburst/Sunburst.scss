@@ -48,8 +48,6 @@
   }
 
   :global(g.mid-circle-group) {
-    pointer-events: none;
-
     :global(circle) {
       transition: transform 300ms ease-in-out;
       stroke: $gray-light-background;
