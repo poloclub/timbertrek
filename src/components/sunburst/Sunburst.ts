@@ -650,6 +650,8 @@ export class Sunburst {
       .style('display', d => {
         if (d.data.f === ';') {
           return 'none';
+        } else if (d.depth > this.sunburstStoreValue.depthHigh + 1) {
+          return 'none';
         } else {
           return 'initial';
         }
@@ -726,8 +728,19 @@ export class Sunburst {
     transition
       .selectAll('.arc')
       .attrTween('d', d => () => this.arc(d as d3.DefaultArcObject))
-      // @ts-ignore
-      .style('fill-opacity', d => (d.y0 >= newDomain.y1 ? 0.2 : 1));
+      .style('fill-opacity', d =>
+        (d as HierarchyNode).y0 >= newDomain.y1 ? 0.2 : 1
+      )
+      .style('display', d => {
+        const cd = d as HierarchyNode;
+        if (cd.data.f === ';') {
+          return 'none';
+        } else if (cd.depth > this.sunburstStoreValue.depthHigh + 1) {
+          return 'none';
+        } else {
+          return 'initial';
+        }
+      });
   }
 
   /**
