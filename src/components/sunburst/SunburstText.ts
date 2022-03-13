@@ -378,6 +378,142 @@ export function drawText(this: Sunburst) {
     drawnFeatureNames.add(featureInfo.name);
     return text;
   });
+
+  // Draw text on the secondary ring if the feature name is not drawn on
+  // the first ring
+  const undrawnFs = new Set<number>();
+
+  Array.from(this.featureMap.entries()).forEach(v => {
+    if (!drawnFeatureNames.has(v[1][0])) {
+      undrawnFs.add(v[0]);
+    }
+  });
+
+  this.drawSecondaryText(undrawnFs);
+}
+
+export function drawSecondaryText(this: Sunburst, undrawnFs: Set<number>) {
+  const arcGroup = this.svg.select('g.arc-group');
+  let secondaryArcs = arcGroup.selectAll(
+    `g.arc-${
+      this.xScale.domain()[0] === 0 && this.xScale.domain()[1] === 1
+        ? this.sunburstStoreValue.depthLow + 1
+        : this.sunburstStoreValue.depthLow + 2
+    }`
+  ) as d3.Selection<
+    d3.BaseType | SVGGElement,
+    HierarchyNode,
+    SVGGElement,
+    unknown
+  >;
+
+  // We only draw text on the visible rings
+  secondaryArcs = secondaryArcs.filter(
+    d =>
+      d.x0 >= this.xScale.domain()[0] &&
+      d.x1 <= this.xScale.domain()[1] &&
+      undrawnFs.has(+d.data['f'])
+  );
+
+  if (secondaryArcs.size() === 0) {
+    return;
+  }
+
+  secondaryArcs
+    .append('path')
+    .attr('class', 'text-arc')
+    .attr('id', (d, i) => `s-text-arc-${i}`)
+    .attr('d', d => this.textArc(d, TextArcMode.SectorArc));
+
+  secondaryArcs
+    .append('path')
+    .attr('class', 'text-line')
+    .attr('id', (d, i) => `s-text-line-${i}`)
+    .attr('d', d => this.textArc(d, TextArcMode.MidLine));
+
+  const secondaryTexts = secondaryArcs
+    .append('text')
+    .attr('class', 'feature-name');
+
+  const sectorRadius =
+    this.yScale(secondaryTexts.datum().y1) -
+    this.yScale(secondaryTexts.datum().y0) -
+    15;
+  const maxTextHeight = 18.5;
+
+  // Adaptively choose the font size (linear to depth gap)
+  const curFontSize = this.textFontScale(
+    this.sunburstStoreValue.depthHigh - this.sunburstStoreValue.depthLow
+  );
+
+  // Choose the text color based on the background color
+  secondaryTexts.style('fill', d => getTextColor(this.getFeatureColor, d));
+
+  // Add text path
+  const secondaryTextPaths = secondaryTexts
+    .style('font-size', `${curFontSize}rem`)
+    .append('textPath')
+    .attr('startOffset', '50%')
+    .attr('xlink:href', (d, i) => {
+      const featureInfo = this.getFeatureInfo(d.data.f);
+      const text = featureInfo.nameValue;
+
+      /**
+       * Determine the text layout.
+       * (1) firs time & we have enough space for full line => line
+       * (2) first time & we have enough space for arc => arc path
+       * (3) first time & not enough space => line
+       * (4) others => line
+       */
+      const textWidth = getLatoTextWidth(text, 16 * curFontSize);
+      if (textWidth < sectorRadius) {
+        return `#s-text-line-${i}`;
+      } else if (this.doesTextFitArc(d, 16 * curFontSize, text, 10)) {
+        return `#s-text-arc-${i}`;
+      } else {
+        return `#s-text-line-${i}`;
+      }
+    });
+
+  secondaryTextPaths.text(d => {
+    const featureInfo = this.getFeatureInfo(d.data.f);
+    let text = featureInfo.nameValue;
+
+    /**
+     * Shorten the text if necessary
+     * If text height > sector outer arc length: show nothing
+     * If text width > sector width: shorten the text
+     * To shorten the text:
+     *   (1) Use short name + condition
+     *   (2) Replace the end portion with ...
+     */
+
+    // Height check
+    const innerArcLength =
+      this.yScale(d.y1) * (this.xScale(d.x1) - this.xScale(d.x0));
+    if (innerArcLength < maxTextHeight) {
+      return '';
+    }
+
+    // Width check (first check)
+    let textWidth = getLatoTextWidth(text, 16 * curFontSize);
+    if (textWidth > sectorRadius) {
+      // If the width is larger than the sector radius, then we try to use
+      // its short name
+      text = featureInfo.shortValue;
+
+      // Check if the new width is okay, if not, replace the last portion
+      // of the string with ...
+      textWidth = getLatoTextWidth(text, 16 * curFontSize);
+      while (textWidth > sectorRadius) {
+        text = text.replace('...', '');
+        text = text.slice(0, text.length - 1);
+        text = `${text}...`;
+        textWidth = getLatoTextWidth(text, 16 * curFontSize);
+      }
+    }
+    return text;
+  });
 }
 
 /**

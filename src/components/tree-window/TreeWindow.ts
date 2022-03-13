@@ -60,7 +60,6 @@ export class TreeWindow {
     this.treeMap = treeMapMap;
     this.curTreeID = 332;
     this.treeWindowUpdated = treeWindowUpdated;
-    console.log(this.tree, this.treeMap);
 
     // Initialize the store
     this.treeWindowStore = treeWindowStore;

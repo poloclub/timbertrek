@@ -12,6 +12,7 @@ import {
   doesTextFitArc,
   removeText,
   drawText,
+  drawSecondaryText,
   drawCenterText
 } from './SunburstText';
 import { FeaturePosition, FeatureValuePairType } from './SunburstTypes';
@@ -80,6 +81,11 @@ export class Sunburst {
    * Draw feature names on the inner circles and the most inner ring
    */
   drawText = drawText;
+
+  /**
+   * Draw feature names that are not drawn on the first ring on the second ring
+   */
+  drawSecondaryText = drawSecondaryText;
 
   /**
    * Draw texts on the center circles
