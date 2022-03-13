@@ -12,6 +12,11 @@
 }
 
 .sunburst {
+  :global(.arc.highlighted) {
+    stroke: $gray-light-background;
+    stroke-width: 2px;
+  }
+
   :global(.arc.leaf) {
     fill: $gray-300;
   }

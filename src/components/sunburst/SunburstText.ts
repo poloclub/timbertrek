@@ -3,11 +3,7 @@
  */
 
 import type { Sunburst } from './Sunburst';
-import {
-  TextArcMode,
-  FeaturePosition,
-  FeatureValuePairType
-} from './SunburstTypes';
+import { TextArcMode } from './SunburstTypes';
 import type { HierarchyNode } from './SunburstTypes';
 import d3 from '../../utils/d3-import';
 import { getLatoTextWidth } from '../../utils/text-width';
@@ -227,6 +223,7 @@ export function drawCenterText(this: Sunburst) {
 export function drawText(this: Sunburst) {
   // Case 1: Draw text on the arc sectors
   const arcGroup = this.svg.select('g.arc-group');
+  const textGroup = this.svg.select('g.text-group');
 
   // We only draw text on the most inner ring (not circle)
   // Check of the user has clicked a sector
@@ -243,6 +240,10 @@ export function drawText(this: Sunburst) {
     unknown
   >;
 
+  // Need to sort the selections based on their hierarchy because their order
+  // is messed up in mouseover and mouseleave
+  innerArcs = innerArcs.sort((a, b) => a.x0 - b.x0);
+
   // We only draw text on the visible rings
   innerArcs = innerArcs.filter(
     d =>
@@ -251,19 +252,25 @@ export function drawText(this: Sunburst) {
       d.data['f'] !== '_'
   );
 
-  innerArcs
+  const textGroups = textGroup
+    .selectAll('g.text-group')
+    .data(innerArcs.data())
+    .join('g')
+    .attr('class', 'text-group');
+
+  textGroups
     .append('path')
     .attr('class', 'text-arc')
     .attr('id', (d, i) => `text-arc-${i}`)
     .attr('d', d => this.textArc(d, TextArcMode.SectorArc));
 
-  innerArcs
+  textGroups
     .append('path')
     .attr('class', 'text-line')
     .attr('id', (d, i) => `text-line-${i}`)
     .attr('d', d => this.textArc(d, TextArcMode.MidLine));
 
-  const texts = innerArcs.append('text').attr('class', 'feature-name');
+  const texts = textGroups.append('text').attr('class', 'feature-name');
 
   // Choose the text color based on the background color
   texts.style('fill', d => getTextColor(this.getFeatureColor, d));
@@ -394,6 +401,8 @@ export function drawText(this: Sunburst) {
 
 export function drawSecondaryText(this: Sunburst, undrawnFs: Set<number>) {
   const arcGroup = this.svg.select('g.arc-group');
+  const textGroup = this.svg.select('g.text-group');
+
   let secondaryArcs = arcGroup.selectAll(
     `g.arc-${
       this.xScale.domain()[0] === 0 && this.xScale.domain()[1] === 1
@@ -419,19 +428,29 @@ export function drawSecondaryText(this: Sunburst, undrawnFs: Set<number>) {
     return;
   }
 
-  secondaryArcs
+  // Need to sort the selections based on their hierarchy because their order
+  // is messed up in mouseover and mouseleave
+  secondaryArcs = secondaryArcs.sort((a, b) => a.x0 - b.x0);
+
+  const textGroups = textGroup
+    .selectAll('g.s-text-group')
+    .data(secondaryArcs.data())
+    .join('g')
+    .attr('class', 'text-group');
+
+  textGroups
     .append('path')
     .attr('class', 'text-arc')
     .attr('id', (d, i) => `s-text-arc-${i}`)
     .attr('d', d => this.textArc(d, TextArcMode.SectorArc));
 
-  secondaryArcs
+  textGroups
     .append('path')
     .attr('class', 'text-line')
     .attr('id', (d, i) => `s-text-line-${i}`)
     .attr('d', d => this.textArc(d, TextArcMode.MidLine));
 
-  const secondaryTexts = secondaryArcs
+  const secondaryTexts = textGroups
     .append('text')
     .attr('class', 'feature-name');
 
@@ -520,7 +539,6 @@ export function drawSecondaryText(this: Sunburst, undrawnFs: Set<number>) {
  * Remove all text
  */
 export function removeText(this: Sunburst) {
-  this.svg.selectAll('.text-arc').remove();
-  this.svg.selectAll('.text-line').remove();
+  this.svg.select('.text-group').selectAll('*').remove();
   this.svg.selectAll('text.feature-name').remove();
 }

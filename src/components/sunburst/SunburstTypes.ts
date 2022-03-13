@@ -65,6 +65,8 @@ export interface ArcPartition extends d3.DefaultArcObject {
 
 export interface HierarchyNode extends d3.HierarchyRectangularNode<unknown> {
   current?: d3.HierarchyRectangularNode<unknown>;
+  /** Unique number ID for each node */
+  nid: number;
   data: RuleNode;
 }
 

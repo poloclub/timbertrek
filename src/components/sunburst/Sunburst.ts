@@ -15,6 +15,11 @@ import {
   drawSecondaryText,
   drawCenterText
 } from './SunburstText';
+import {
+  arcClicked,
+  arcMouseenterHandler,
+  arcMouseleaveHandler
+} from './SunburstEvent';
 import { FeaturePosition, FeatureValuePairType } from './SunburstTypes';
 import type {
   ArcDomain,
@@ -50,7 +55,7 @@ export class Sunburst {
   textFontScale: d3.ScaleLinear<number, number, never>;
 
   data: RuleNode;
-  partition: d3.HierarchyRectangularNode<unknown>;
+  partition: HierarchyNode;
 
   featureCount: Map<string, number>;
   featureValueCount: Map<string, Map<string, number>>;
@@ -91,6 +96,30 @@ export class Sunburst {
    * Draw texts on the center circles
    */
   drawCenterText = drawCenterText;
+
+  /**
+   * Event handler for arc clicking.
+   * @param e Event
+   * @param d Datum of the hierarchy node. If it is null, return to the last
+   *   state
+   */
+  arcClicked = arcClicked;
+
+  /**
+   * Handler for mouseenter event
+   * @param this Sunburst
+   * @param e Event
+   * @param d Node data
+   */
+  arcMouseenterHandler = arcMouseenterHandler;
+
+  /**
+   * Handler for mouseenter event
+   * @param this Sunburst
+   * @param e Event
+   * @param d Node data
+   */
+  arcMouseleaveHandler = arcMouseleaveHandler;
 
   /**
    * The radius is determined by the number of levels to show.
@@ -168,7 +197,7 @@ export class Sunburst {
     this.partition = this.#partitionData();
 
     // The initial head node is the root
-    this.curHeadNode = this.partition as HierarchyNode;
+    this.curHeadNode = this.partition;
 
     // Figure out how many levels to show at the beginning
     // If `level` is not given, we show all the levels by default
@@ -393,7 +422,13 @@ export class Sunburst {
      * Step 3: Convert the hierarchy data into a partition
      * It gives [x0, y0, x1, y1] of each node
      */
-    const partition = d3.partition()(root);
+    const partition = d3.partition()(root) as HierarchyNode;
+
+    // Give a unique id to each node in the partition tree
+    let curID = 0;
+    partition.each(d => {
+      d.nid = curID++;
+    });
 
     return partition;
   }
@@ -514,7 +549,7 @@ export class Sunburst {
           // Need to specially handle case where the user has selected a sector
           const y0 =
             this.arcDomainStack.length > 0 ? this.yScale.domain()[0] : 0;
-          this.#arcZoom(
+          this.arcZoom(
             {
               x0: this.xScale.domain()[0],
               x1: this.xScale.domain()[1],
@@ -583,9 +618,12 @@ export class Sunburst {
     // Draw the arcs
     const arcGroup = content.append('g').attr('class', 'arc-group');
 
+    // Place holder for arc text (higher order)
+    content.append('g').attr('class', 'text-group');
+
     const arcGroups = arcGroup
       .selectAll('g.arc')
-      .data(this.partition.descendants().slice(1) as HierarchyNode[])
+      .data(this.partition.descendants().slice(1))
       .join('g')
       .attr('class', d => `arc-${d.depth}`)
       .classed('leaf', d => d.data.f === '_');
@@ -594,11 +632,13 @@ export class Sunburst {
     const arcs = arcGroups
       .append('path')
       .attr('class', 'arc')
-      // @ts-ignore
       .classed('leaf', d => d.data.f === '_')
+      .attr('id', d => `arc-${d.nid}`)
       // @ts-ignore
       .attr('d', d => this.arc(d))
-      .on('click', (e, d) => this.#arcClicked(e as MouseEvent, d))
+      .on('click', (e, d) => this.arcClicked(e as MouseEvent, d))
+      .on('mouseenter', (e, d) => this.arcMouseenterHandler(e as MouseEvent, d))
+      .on('mouseleave', (e, d) => this.arcMouseleaveHandler(e as MouseEvent, d))
       .style('fill', d => {
         // Let CSS handle the color for leaf nodes
         if (d.data.f === '_') {
@@ -631,7 +671,7 @@ export class Sunburst {
 
     // Zoom into the third level at the beginning
     const yGap = 1 / (this.sunburstStoreValue.depthMax + 1);
-    this.#arcZoom(
+    this.arcZoom(
       {
         x0: this.xScale.domain()[0],
         x1: this.xScale.domain()[1],
@@ -647,7 +687,7 @@ export class Sunburst {
    * @param newDomain Target domain
    * @param duration Transition duration (ms)
    */
-  #arcZoom(newDomain: ArcDomain, duration = ZOOM_DURATION) {
+  protected arcZoom(newDomain: ArcDomain, duration = ZOOM_DURATION) {
     // Clean up the text
     this.removeText();
     this.#drawMidCircles(newDomain);
@@ -745,7 +785,7 @@ export class Sunburst {
           const newEnter = enter
             .append('g')
             .attr('class', 'mid-circle')
-            .on('click', e => this.#arcClicked(e as MouseEvent, null));
+            .on('click', e => this.arcClicked(e as MouseEvent, null));
 
           // Draw the circle
           newEnter
@@ -805,106 +845,5 @@ export class Sunburst {
           return newUpdate;
         }
       );
-  }
-
-  /**
-   * Event handler for arc clicking.
-   * @param e Event
-   * @param d Datum of the hierarchy node. If it is null, return to the last
-   *   state
-   */
-  #arcClicked(e: MouseEvent, d: HierarchyNode | null) {
-    e.stopPropagation();
-    e.preventDefault();
-
-    // No interaction if users clicks a leaf node
-    if (d !== null && d.data.f === '_') {
-      return;
-    }
-
-    let targetDomain: ArcDomain = { x0: 0, x1: 1, y0: 0, y1: 1 };
-    let newHead = d;
-
-    // Detect if the user clicks the center
-    const curXDomain = this.xScale.domain();
-    const curYDomain = this.yScale.domain();
-
-    // We keep the current depth gap for the transition
-    const curDepthGap =
-      this.sunburstStoreValue.depthHigh - this.sunburstStoreValue.depthLow;
-
-    if (d === null || (d.x0 == curXDomain[0] && d.x1 == curXDomain[1])) {
-      // Case 1: Transition to the last domain in the domain stack
-      const lastDomainData = this.arcDomainStack.pop();
-
-      if (lastDomainData !== undefined) {
-        newHead = lastDomainData.node;
-        targetDomain = lastDomainData;
-
-        // Update the low and high pointer
-        this.sunburstStoreValue.depthLow =
-          newHead.depth === 0 ? 1 : newHead.depth;
-        this.sunburstStoreValue.depthHigh = Math.min(
-          this.sunburstStoreValue.depthLow + lastDomainData.depthGap,
-          this.sunburstStoreValue.depthMax
-        );
-      } else {
-        console.error('No more arc domain from the stack to pop!');
-      }
-    } else {
-      // Case 2: Transition to the clicked arc
-      const yGap = 1 / (this.sunburstStoreValue.depthMax + 1);
-
-      // Update the low and high pointers
-      this.sunburstStoreValue.depthLow = d.depth;
-      this.sunburstStoreValue.depthHigh = Math.min(
-        d.depth + curDepthGap,
-        this.sunburstStoreValue.depthMax
-      );
-
-      targetDomain = {
-        x0: d.x0,
-        x1: d.x1,
-        y0: d.y0,
-        y1:
-          d.y0 +
-          yGap *
-            (this.sunburstStoreValue.depthHigh -
-              this.sunburstStoreValue.depthLow +
-              1)
-      };
-
-      // Save the current domain in the stack
-      const curDomainData: ArcDomainData = {
-        x0: curXDomain[0],
-        x1: curXDomain[1],
-        y0: curYDomain[0],
-        y1: curYDomain[1],
-        node: this.curHeadNode,
-        depthGap: curDepthGap
-      };
-      this.arcDomainStack.push(curDomainData);
-    }
-
-    // Update the depth box color based on the clicked arc
-    const depthColors = new Array<string>(
-      this.sunburstStoreValue.depthMax
-    ).fill('');
-
-    const ancestors = newHead!.ancestors();
-    ancestors.forEach(a => {
-      if (a.depth > 0) {
-        const curColor = this.getFeatureColor(a.data.f);
-        depthColors[a.depth - 1] = curColor;
-      }
-    });
-
-    // Update the store
-    this.sunburstStoreValue.depthColors = depthColors;
-    this.sunburstStore.set(this.sunburstStoreValue);
-
-    // Update the new head
-    this.curHeadNode = newHead!;
-    this.#arcZoom(targetDomain);
   }
 }
