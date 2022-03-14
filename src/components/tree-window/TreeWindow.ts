@@ -103,7 +103,15 @@ export class TreeWindow {
 
       // Show the tree window with the selected tree
       if (this.svg !== undefined) {
-        if (this.treeWindowStoreValue.treeID !== this.curTreeID) {
+        // We redraw if (1) new tree id, or (2) same tree, new decision path
+        if (
+          this.treeWindowStoreValue.treeID !== this.curTreeID ||
+          this.treeWindowStoreValue.ancestorFs.length !==
+            this.curAncestorFs.length ||
+          !this.treeWindowStoreValue.ancestorFs.every(
+            (d, i) => d === this.curAncestorFs[i]
+          )
+        ) {
           const newTreeTuple = this.treeMap.get(
             this.treeWindowStoreValue.treeID
           );

@@ -5,6 +5,10 @@ const layout = {
   treeWindowHeight: 0
 };
 
+const time = {
+  mouseenterDelay: 200
+};
+
 layout.treeWindowHeight =
   layout.treeWindowHeaderHeight + layout.treeWindowWidth;
 
@@ -286,5 +290,6 @@ const colors = {
 
 export const config = {
   colors,
-  layout
+  layout,
+  time
 };

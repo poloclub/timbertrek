@@ -14,6 +14,10 @@ interface OuterCenter {
   quad: number;
 }
 
+let mouseenterTimeoutID: number | null = null;
+let mouseleaveTimeoutID: number | null = null;
+let lastLeafMouseenterTime = new Date().getTime();
+
 /**
  * Event handler for arc clicking.
  * @param e Event
@@ -172,28 +176,57 @@ export function leafArcMouseenterHandler(
   e: MouseEvent,
   d: HierarchyNode
 ) {
-  if (d.data.t === undefined) return;
-
   e.preventDefault();
   e.stopPropagation();
 
-  const treeID = d.data.t;
-  this.treeWindowStoreValue.treeID = +treeID;
+  // Highlight the ancestors
+  this.arcMouseenterHandler(e, d);
 
-  // Trace the ancestors for this leaf
-  const ancestorFs = d
-    .ancestors()
-    .filter(d => d.depth !== 0)
-    .map(d => d.data.f)
-    .reverse();
-  this.treeWindowStoreValue.ancestorFs = ancestorFs;
+  if (mouseleaveTimeoutID !== null) {
+    window.clearTimeout(mouseleaveTimeoutID);
+    mouseleaveTimeoutID = null;
+  }
 
-  // Figure out the coordinate to put the tree window
-  const curTPPoint = this.getTreeWindowPos(d);
-  this.treeWindowStoreValue.x = curTPPoint.x;
-  this.treeWindowStoreValue.y = curTPPoint.y;
+  const showTreeWindow = () => {
+    if (d.data.t === undefined) return;
+    const treeID = d.data.t;
+    this.treeWindowStoreValue.treeID = +treeID;
 
-  this.treeWindowStore.set(this.treeWindowStoreValue);
+    // Trace the ancestors for this leaf
+    const ancestorFs = d
+      .ancestors()
+      .filter(d => d.depth !== 0)
+      .map(d => d.data.f)
+      .reverse();
+    this.treeWindowStoreValue.ancestorFs = ancestorFs;
+
+    // Figure out the coordinate to put the tree window
+    const curTPPoint = this.getTreeWindowPos(d);
+    this.treeWindowStoreValue.x = curTPPoint.x;
+    this.treeWindowStoreValue.y = curTPPoint.y;
+    this.treeWindowStoreValue.show = true;
+
+    this.treeWindowStore.set(this.treeWindowStoreValue);
+
+    mouseenterTimeoutID = null;
+  };
+
+  /**
+   * Decide the delay
+   * If users have hovered over in the past 500ms, no delay
+   * Else: delay x ms
+   */
+  if (
+    this.treeWindowStoreValue.show ||
+    new Date().getTime() - lastLeafMouseenterTime < 500
+  ) {
+    showTreeWindow();
+  } else {
+    mouseenterTimeoutID = window.setTimeout(
+      showTreeWindow,
+      config.time.mouseenterDelay
+    );
+  }
 }
 
 /**
@@ -211,13 +244,27 @@ export function leafArcMouseleaveHandler(
 
   e.preventDefault();
   e.stopPropagation();
+
+  // Dehighlight the ancestors
+  this.arcMouseleaveHandler(e, d);
+
+  if (mouseenterTimeoutID !== null) {
+    window.clearTimeout(mouseenterTimeoutID);
+    mouseenterTimeoutID = null;
+  }
+
+  mouseleaveTimeoutID = window.setTimeout(() => {
+    this.treeWindowStoreValue.show = false;
+    this.treeWindowStore.set(this.treeWindowStoreValue);
+    lastLeafMouseenterTime = new Date().getTime();
+  }, 100);
 }
 
 export function getTreeWindowPos(this: Sunburst, d: HierarchyNode): Point {
   let outerCenterAngle =
     (this.xScale(d.x0) + this.xScale(d.x1)) / 2 - Math.PI / 2;
 
-  const outerCenterR = this.yScale(d.y1) + 5;
+  const outerCenterR = this.yScale(d.y1) + 8;
 
   // Get the outer center point on the sector
   const outerCenter: OuterCenter = {
