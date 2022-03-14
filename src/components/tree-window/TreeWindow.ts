@@ -58,8 +58,8 @@ export class TreeWindow {
     height?: number;
   }) {
     this.treeMap = treeMapMap;
-    this.curTreeID = 332;
-    this.curAncestorFs = ['11', '1', '0', '_'];
+    this.curTreeID = 0;
+    this.curAncestorFs = [];
     this.treeWindowUpdated = treeWindowUpdated;
 
     // Initialize the store
@@ -86,12 +86,6 @@ export class TreeWindow {
 
     this.width = width - this.padding.left - this.padding.right;
     this.height = height - this.padding.top - this.padding.bottom;
-
-    // Draw the tree
-    this.#drawCurTree();
-
-    this.treeWindowStoreValue.show = true;
-    this.treeWindowStore.set(this.treeWindowStoreValue);
   }
 
   /**

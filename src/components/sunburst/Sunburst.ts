@@ -739,6 +739,9 @@ export class Sunburst {
       .style('fill-opacity', d =>
         (d as HierarchyNode).y0 >= newDomain.y1 ? 0.2 : 1
       )
+      .style('pointer-events', d =>
+        (d as HierarchyNode).y0 >= newDomain.y1 ? 'none' : 'initial'
+      )
       .style('display', d => {
         const cd = d as HierarchyNode;
         if (cd.data.f === ';') {

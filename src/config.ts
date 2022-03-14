@@ -6,7 +6,7 @@ const layout = {
 };
 
 const time = {
-  mouseenterDelay: 200
+  mouseenterDelay: 300
 };
 
 layout.treeWindowHeight =
