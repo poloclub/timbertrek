@@ -1,6 +1,6 @@
 import d3 from '../../utils/d3-import';
 import type { Writable } from 'svelte/store';
-import type { TreeNode, TreeMap, Padding } from '../sunburst/SunburstTypes';
+import type { TreeNode, Point, Padding } from '../sunburst/SunburstTypes';
 import type { TreeWindowStoreValue } from '../../stores';
 import { getTreeWindowStoreDefaultValue } from '../../stores';
 
@@ -160,15 +160,17 @@ export class TreeWindow {
     const nodeR = 7;
     const rectR = nodeR * 1;
 
-    d3.tree().size([this.width, this.height])(root);
+    const treeRoot = d3.tree().size([this.width, this.height])(
+      root
+    ) as d3.HierarchyPointNode<TreeNode>;
 
     // Draw the links
     const linkGroup = content.append('g').attr('class', 'link-group');
     linkGroup
       .selectAll('path.link')
-      .data(root.links())
+      .data(treeRoot.links())
       .join('path')
-      .attr('class', 'link')
+      .attr('class', d => `link link-${d.source.data.f}`)
       .attr('id', d => {
         if (d.target.data.f === '+') {
           return `link-${d.source.data.f}-p`;
@@ -180,9 +182,7 @@ export class TreeWindow {
       })
       .attr('d', d => {
         return d3.line()([
-          // @ts-ignore
           [d.source.x, d.source.y],
-          // @ts-ignore
           [d.target.x, d.target.y]
         ]);
       });
@@ -191,10 +191,9 @@ export class TreeWindow {
     const nodeGroup = content.append('g').attr('class', 'node-group');
     const nodes = nodeGroup
       .selectAll('g')
-      .data(root.descendants())
+      .data(treeRoot.descendants())
       .join('g')
       .attr('class', 'node')
-      // @ts-ignore
       .attr('transform', d => `translate(${d.x}, ${d.y})`);
 
     // Draw decision points as a circle
@@ -243,6 +242,38 @@ export class TreeWindow {
           .classed('highlighted', true);
       }
     }
+
+    // Add true/false label on the first split point
+    const firstPathData = linkGroup
+      .selectAll(`.link-${this.curAncestorFs[0]}`)
+      .data() as d3.HierarchyPointLink<TreeNode>[];
+
+    // Here we can assume the order is left to right from the tree layout
+    // Parse the mid point of each path
+    const xGap = 5;
+    const yGap = -1;
+
+    const midpoints: Point[] = [
+      {
+        x: (firstPathData[0].source.x + firstPathData[0].target.x) / 2 - xGap,
+        y: (firstPathData[0].source.y + firstPathData[0].target.y) / 2 + yGap
+      },
+      {
+        x: (firstPathData[1].source.x + firstPathData[1].target.x) / 2 + xGap,
+        y: (firstPathData[1].source.y + firstPathData[1].target.y) / 2 + yGap
+      }
+    ];
+
+    const labelGroup = content.append('g').attr('class', 'label-group');
+    labelGroup
+      .selectAll('text.split-label')
+      .data(midpoints)
+      .join('text')
+      .attr('class', 'split-label')
+      .classed('split-label-left', (d, i) => i === 0)
+      .attr('x', d => d.x)
+      .attr('y', d => d.y)
+      .text((d, i) => (i === 0 ? 'true' : 'false'));
   }
 
   /**

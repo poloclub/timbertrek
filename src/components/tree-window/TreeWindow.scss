@@ -31,6 +31,7 @@
   background-color: $gray-200;
 
   display: flex;
+  position: relative;
   flex-direction: row;
   justify-content: center;
   align-items: baseline;
@@ -44,36 +45,54 @@
 .content {
   display: flex;
   position: relative;
+}
 
-  .label {
-    position: absolute;
-    top: 7px;
-    right: 0px;
-    padding: 1px 5px 1px 3px;
-    border-top-left-radius: 5px;
-    border-bottom-left-radius: 5px;
+.label-container {
+  position: absolute;
+  overflow: hidden;
+  top: 0px;
+  right: 0px;
+  width: 60px;
+  height: 60px;
+  z-index: 1;
+}
 
+.label {
+  position: absolute;
+  // top: 8px;
+  // right: -30px;
+  // width: 90px;
+  // transform: rotate(45deg);
+
+  top: 4px;
+  right: 0px;
+
+  padding: 1px 5px 1px 3px;
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 2px;
+  text-align: center;
+
+  font-size: 0.9rem;
+  line-height: 1;
+  color: $indigo-600;
+  background-color: change-color($color: $indigo-100, $alpha: 0.3);
+  // background-color: change-color($color: $indigo-100, $alpha: 0.7);
+
+  .svg-icon {
     display: flex;
-    flex-direction: row;
+    justify-content: center;
     align-items: center;
-    gap: 2px;
+    fill: $indigo-600;
 
-    font-size: 0.9rem;
-    line-height: 1;
-    color: $indigo-600;
-    // background-color: change-color($color: $blue-300, $alpha: 0.3);
-    background-color: change-color($color: $indigo-100, $alpha: 0.3);
-
-    .svg-icon {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      fill: $indigo-600;
-
-      :global(svg) {
-        width: 1rem;
-        height: 1rem;
-      }
+    :global(svg) {
+      width: 1rem;
+      height: 1rem;
     }
   }
 }
@@ -105,6 +124,18 @@
     fill: $gray-700;
     dominant-baseline: middle;
     text-anchor: middle;
+  }
+
+  :global(text.split-label) {
+    text-anchor: start;
+    dominant-baseline: auto;
+    fill: $gray-700;
+    font-weight: 300;
+    font-size: 0.8rem;
+  }
+
+  :global(text.split-label.split-label-left) {
+    text-anchor: end;
   }
 }
 

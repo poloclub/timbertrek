@@ -72,12 +72,15 @@
   </div>
 
   <div class="content">
-    <div class="label">
-      <div class="svg-icon">
-        {@html iconClick}
+    <div class="label-container">
+      <div class="label">
+        <div class="svg-icon">
+          {@html iconClick}
+        </div>
+        <span>pin</span>
       </div>
-      <span>Pin</span>
     </div>
+
     <svg class="tree-svg" />
   </div>
 </div>
