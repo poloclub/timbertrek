@@ -21,6 +21,7 @@ import {
   arcMouseleaveHandler,
   leafArcMouseenterHandler,
   leafArcMouseleaveHandler,
+  leafArcClickHandler,
   getTreeWindowPos
 } from './SunburstEvent';
 import { FeaturePosition, FeatureValuePairType } from './SunburstTypes';
@@ -123,6 +124,14 @@ export class Sunburst {
    * @param d Node data
    */
   arcMouseleaveHandler = arcMouseleaveHandler;
+
+  /**
+   * Handler for mouse click event
+   * @param this Sunburst
+   * @param e Event
+   * @param d Node data
+   */
+  leafArcClickHandler = leafArcClickHandler;
 
   leafArcMouseenterHandler = leafArcMouseenterHandler;
   leafArcMouseleaveHandler = leafArcMouseleaveHandler;
@@ -668,6 +677,7 @@ export class Sunburst {
     // Add hover event for leaf arcs
     arcs
       .filter(d => d.data.f === '_')
+      .on('click', (e, d) => this.leafArcClickHandler(e as MouseEvent, d))
       .on('mouseenter', (e, d) =>
         this.leafArcMouseenterHandler(e as MouseEvent, d)
       )

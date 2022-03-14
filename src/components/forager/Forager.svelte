@@ -1,7 +1,10 @@
-<script lang='ts'>
+<script lang="ts">
   import { onMount } from 'svelte';
-  import { getAppearanceStore, getSunburstStore,
-    getTreeWindowStore } from '../../stores';
+  import {
+    getAppearanceStore,
+    getSunburstStore,
+    getTreeWindowStore
+  } from '../../stores';
   import Toolbar from '../toolbar/Toolbar.svelte';
   import Sunburst from '../sunburst/Sunburst.svelte';
   import TreeWindow from '../tree-window/TreeWindow.svelte';
@@ -37,55 +40,46 @@
   });
 </script>
 
-<style lang='scss'>
+<style lang="scss">
   @import './Forager.scss';
 </style>
 
-<div class='forager-page' bind:this={component}>
-
-  <div class='forager'>
-
-    <div class='header'>
-
-      <div class='logo'>
-        <div class='logo-icon'>
-          Forager
-        </div>
-        <div class='logo-tag'>
+<div class="forager-page" bind:this={component}>
+  <div class="forager">
+    <div class="header">
+      <div class="logo">
+        <div class="logo-icon">Forager</div>
+        <div class="logo-tag">
           Identifying accurate decision trees that align with human knowledge
         </div>
       </div>
     </div>
 
-    <div class='content'>
-
-      <div class='toolbar'>
-        <Toolbar
-          appearanceStore={appearanceStore}
-          sunburstStore={sunburstStore}
-        />
+    <div class="content">
+      <div class="toolbar">
+        <Toolbar {appearanceStore} {sunburstStore} />
       </div>
 
-      <div class='sunburst'>
-        <Sunburst
-          data={data}
-          sunburstStore={sunburstStore}
-          treeWindowStore={treeWindowStore}
-        />
+      <div class="sunburst">
+        <Sunburst {data} {sunburstStore} {treeWindowStore} />
       </div>
-
     </div>
 
-    <div class='sidebar'>
-      <AppearancePanel
-        appearanceStore={appearanceStore}
-      />
+    <div class="sidebar">
+      <AppearancePanel {appearanceStore} />
     </div>
   </div>
 
-  <TreeWindow
-    data={data}
-    featureMap={featureMap}
-    treeWindowStore={treeWindowStore}
-  />
+  <TreeWindow {data} {featureMap} {treeWindowStore} />
+
+  <div class="dev-bar">
+    <div
+      class="button"
+      on:click={() => {
+        localStorage.clear();
+      }}
+    >
+      localStorage.clear()
+    </div>
+  </div>
 </div>

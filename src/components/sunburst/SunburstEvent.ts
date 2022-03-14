@@ -370,3 +370,15 @@ export function getTreeWindowPos(this: Sunburst, d: HierarchyNode): Point {
 
   return curTLPoint;
 }
+
+/**
+ * Handler for clicking even on the leaf arc
+ * @param e Mouse event
+ * @param d HierarchyNode data
+ */
+export function leafArcClickHandler(e: MouseEvent, d: HierarchyNode) {
+  e.preventDefault();
+  e.stopPropagation();
+
+  localStorage.setItem('treeWindowPinnedOnce', 'true');
+}

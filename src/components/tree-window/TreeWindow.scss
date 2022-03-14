@@ -55,6 +55,10 @@
   width: 60px;
   height: 60px;
   z-index: 1;
+
+  &.no-display {
+    display: none;
+  }
 }
 
 .label {

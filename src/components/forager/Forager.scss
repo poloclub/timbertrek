@@ -83,3 +83,38 @@
   box-shadow: -1px 0px 6px 0px hsla(0, 0%, 0%, 0.1);
   border-radius: $border-radius;
 }
+
+.dev-bar {
+  position: absolute;
+  bottom: 0px;
+  right: 5px;
+
+  .button {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    gap: 3px;
+
+    border-radius: 5px;
+    padding: 0px 5px;
+    user-select: none;
+    -webkit-user-select: none;
+    cursor: default;
+
+    color: $gray-700;
+    font-size: 0.9rem;
+    border: 1px solid $gray-300;
+    background-color: $gray-50;
+
+    transition: background-color 100ms ease-in-out, fill 100ms ease-in-out,
+      color 100ms ease-in-out;
+
+    &:hover {
+      background-color: adjust-color($color: white, $lightness: -7%);
+    }
+
+    &:active {
+      background-color: adjust-color($color: white, $lightness: -12%);
+    }
+  }
+}

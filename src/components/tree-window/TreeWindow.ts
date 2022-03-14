@@ -284,4 +284,16 @@ export class TreeWindow {
     return `left: ${this.treeWindowStoreValue.x}px;
       top: ${this.treeWindowStoreValue.y}px;`;
   };
+
+  /**
+   * Determine if we should show or hide the click to pin label
+   */
+  shouldHidePinLabel = (): boolean => {
+    if (localStorage.getItem('treeWindowPinnedOnce') === null) {
+      localStorage.setItem('treeWindowPinnedOnce', 'false');
+      return false;
+    } else {
+      return localStorage.getItem('treeWindowPinnedOnce') === 'true';
+    }
+  };
 }

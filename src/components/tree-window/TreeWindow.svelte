@@ -72,7 +72,10 @@
   </div>
 
   <div class="content">
-    <div class="label-container">
+    <div
+      class="label-container"
+      class:no-display={treeWindow?.shouldHidePinLabel()}
+    >
       <div class="label">
         <div class="svg-icon">
           {@html iconClick}
