@@ -60,6 +60,7 @@
   class="tree-window"
   bind:this={component}
   class:show={treeWindow?.treeWindowStoreValue.show}
+  style={treeWindow?.getStyle()}
 >
   <div class="tree-header">Tree {treeWindow?.treeWindowStoreValue.treeID}</div>
   <svg class="tree-svg" />

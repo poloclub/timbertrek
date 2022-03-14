@@ -26,6 +26,7 @@
     0px 0px 10px hsla(0, 0%, 0%, 0.05);
 
   position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
 }

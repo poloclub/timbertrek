@@ -97,6 +97,11 @@ export interface FeatureInfo {
   shortValue: string;
 }
 
+export interface Point {
+  x: number;
+  y: number;
+}
+
 /**
  * This enum defines which feature to extract. The node can include two
  * features.

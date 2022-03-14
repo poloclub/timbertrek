@@ -17,6 +17,8 @@ export interface TreeWindowStoreValue {
   treeID: number;
   ancestorFs: string[];
   show: boolean;
+  x: number;
+  y: number;
   getFeatureColor: null | ((f: string) => string);
 }
 
@@ -50,6 +52,8 @@ export const getTreeWindowStoreDefaultValue = (): TreeWindowStoreValue => {
     treeID: 0,
     ancestorFs: [],
     show: false,
+    x: 20,
+    y: 20,
     getFeatureColor: null
   };
 };

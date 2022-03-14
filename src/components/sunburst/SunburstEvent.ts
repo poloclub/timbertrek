@@ -2,10 +2,17 @@
  * Implement Sunburst event handlers
  */
 
+import { config } from '../../config';
 import type { Sunburst } from './Sunburst';
-import { TextArcMode } from './SunburstTypes';
+import type { Point } from './SunburstTypes';
 import type { HierarchyNode, ArcDomain, ArcDomainData } from './SunburstTypes';
 import d3 from '../../utils/d3-import';
+
+interface OuterCenter {
+  x: number;
+  y: number;
+  quad: number;
+}
 
 /**
  * Event handler for arc clicking.
@@ -180,6 +187,12 @@ export function leafArcMouseenterHandler(
     .map(d => d.data.f)
     .reverse();
   this.treeWindowStoreValue.ancestorFs = ancestorFs;
+
+  // Figure out the coordinate to put the tree window
+  const curTPPoint = this.getTreeWindowPos(d);
+  this.treeWindowStoreValue.x = curTPPoint.x;
+  this.treeWindowStoreValue.y = curTPPoint.y;
+
   this.treeWindowStore.set(this.treeWindowStoreValue);
 }
 
@@ -198,4 +211,115 @@ export function leafArcMouseleaveHandler(
 
   e.preventDefault();
   e.stopPropagation();
+}
+
+export function getTreeWindowPos(this: Sunburst, d: HierarchyNode): Point {
+  let outerCenterAngle =
+    (this.xScale(d.x0) + this.xScale(d.x1)) / 2 - Math.PI / 2;
+
+  const outerCenterR = this.yScale(d.y1) + 5;
+
+  // Get the outer center point on the sector
+  const outerCenter: OuterCenter = {
+    x: Math.cos(outerCenterAngle) * outerCenterR,
+    y: Math.sin(outerCenterAngle) * outerCenterR,
+    /**
+     * Clockwise from 12 o'clock : 1 => 2 => 3 => 4
+     */
+    quad: Math.floor(outerCenterAngle / (Math.PI / 2)) + 2
+  };
+
+  const getTLPoint = (outerCenter: OuterCenter): Point => {
+    const curPoint = { x: 0, y: 0 };
+
+    switch (outerCenter.quad) {
+      case 1: {
+        curPoint.x = outerCenter.x;
+        curPoint.y = outerCenter.y - config.layout.treeWindowHeight;
+        break;
+      }
+      case 2: {
+        curPoint.x = outerCenter.x;
+        curPoint.y = outerCenter.y;
+        break;
+      }
+      case 3: {
+        curPoint.x = outerCenter.x - config.layout.treeWindowWidth;
+        curPoint.y = outerCenter.y;
+        break;
+      }
+      case 4: {
+        curPoint.x = outerCenter.x - config.layout.treeWindowWidth;
+        curPoint.y = outerCenter.y - config.layout.treeWindowHeight;
+        break;
+      }
+      default: {
+        console.warn('Unknown quad!');
+      }
+    }
+
+    return curPoint;
+  };
+
+  let containerHeight = window.innerHeight;
+  if (d3.select('.forager-page').size() > 0) {
+    containerHeight = (
+      d3.select('.forager-page').node() as HTMLElement
+    ).getBoundingClientRect().height;
+  }
+
+  const borderPadding = 5;
+  const ringBBox = (this.svg.node() as HTMLElement).getBoundingClientRect();
+  const ringCenter = {
+    x: ringBBox.x + ringBBox.width / 2,
+    y: ringBBox.y + ringBBox.height / 2
+  };
+
+  // Get the initial position
+  let curTLPoint = getTLPoint(outerCenter);
+
+  // Change curTLPoint if it is overflow on y (top)
+  if (curTLPoint.y + ringCenter.y < borderPadding) {
+    const extremeHeight =
+      ringCenter.y - config.layout.treeWindowHeight - borderPadding;
+    const extremeY = -extremeHeight;
+    outerCenterAngle = Math.asin(extremeY / outerCenterR);
+
+    if (outerCenter.quad === 4) {
+      outerCenterAngle = Math.PI - outerCenterAngle;
+    }
+
+    outerCenter.x = Math.cos(outerCenterAngle) * outerCenterR;
+    outerCenter.y = Math.sin(outerCenterAngle) * outerCenterR;
+    outerCenter.quad = Math.floor(outerCenterAngle / (Math.PI / 2)) + 2;
+    curTLPoint = getTLPoint(outerCenter);
+  }
+
+  // Change curTLPoint if it is overflow on y (bottom)
+  if (
+    curTLPoint.y + ringCenter.y + config.layout.treeWindowHeight >
+    containerHeight - borderPadding
+  ) {
+    const extremeY =
+      containerHeight -
+      borderPadding -
+      ringCenter.y -
+      config.layout.treeWindowHeight;
+
+    outerCenterAngle = Math.asin(extremeY / outerCenterR);
+    if (outerCenter.quad === 3) {
+      outerCenterAngle = Math.PI - outerCenterAngle;
+    }
+
+    outerCenter.x = Math.cos(outerCenterAngle) * outerCenterR;
+    outerCenter.y = Math.sin(outerCenterAngle) * outerCenterR;
+    outerCenter.quad = Math.floor(outerCenterAngle / (Math.PI / 2)) + 2;
+    curTLPoint = getTLPoint(outerCenter);
+  }
+
+  // Translate from the local coordinate to world coordinate
+  curTLPoint.x = ringCenter.x + curTLPoint.x;
+  curTLPoint.y = ringCenter.y + curTLPoint.y;
+
+  return curTLPoint;
 }

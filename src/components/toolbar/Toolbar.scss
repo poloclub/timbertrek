@@ -84,6 +84,7 @@ $depth-box-width: 24px;
     justify-content: center;
 
     user-select: none;
+    -webkit-user-select: none;
     cursor: default;
 
     transition: background-color 100ms linear, color 100ms linear,
@@ -118,6 +119,8 @@ $depth-box-width: 24px;
     border-radius: 5px;
     padding: 4px 5px;
     user-select: none;
+    -webkit-user-select: none;
+    cursor: default;
 
     color: $gray-700;
     border: 1px solid $gray-300;

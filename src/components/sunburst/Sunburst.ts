@@ -20,7 +20,8 @@ import {
   arcMouseenterHandler,
   arcMouseleaveHandler,
   leafArcMouseenterHandler,
-  leafArcMouseleaveHandler
+  leafArcMouseleaveHandler,
+  getTreeWindowPos
 } from './SunburstEvent';
 import { FeaturePosition, FeatureValuePairType } from './SunburstTypes';
 import type {
@@ -124,8 +125,9 @@ export class Sunburst {
   arcMouseleaveHandler = arcMouseleaveHandler;
 
   leafArcMouseenterHandler = leafArcMouseenterHandler;
-
   leafArcMouseleaveHandler = leafArcMouseleaveHandler;
+
+  getTreeWindowPos = getTreeWindowPos;
 
   /**
    * The radius is determined by the number of levels to show.

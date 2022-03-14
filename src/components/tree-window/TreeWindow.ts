@@ -46,8 +46,8 @@ export class TreeWindow {
     featureMap,
     treeWindowStore,
     treeWindowUpdated,
-    width = 200,
-    height = 200
+    width = 150,
+    height = 150
   }: {
     component: HTMLElement;
     treeMapMap: Map<number, [TreeNode, number]>;
@@ -73,15 +73,15 @@ export class TreeWindow {
       .select('svg')
       .attr('width', width)
       .attr('height', height)
-      .attr('viewbox', '0 0 200 200')
+      .attr('viewbox', `0 0 ${width} ${height}`)
       .attr('preserveAspectRatio', 'none');
 
     // Configure the view size
     this.padding = {
       top: 20,
       bottom: 20,
-      left: 10,
-      right: 10
+      left: 0,
+      right: 0
     };
 
     this.width = width - this.padding.left - this.padding.right;
@@ -149,6 +149,7 @@ export class TreeWindow {
     const root = d3.hierarchy(this.tree, d => d.c);
     const nodeR = 7;
     const rectR = nodeR * 1;
+
     d3.tree().size([this.width, this.height])(root);
 
     // Draw the links
@@ -233,4 +234,13 @@ export class TreeWindow {
       }
     }
   }
+
+  /**
+   * Get the style string for the current tree window
+   * @returns TreeWindow style string
+   */
+  getStyle = () => {
+    return `left: ${this.treeWindowStoreValue.x}px;
+      top: ${this.treeWindowStoreValue.y}px;`;
+  };
 }

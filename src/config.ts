@@ -1,6 +1,12 @@
 const layout = {
-  sunburstWidth: 650
+  sunburstWidth: 650,
+  treeWindowWidth: 150,
+  treeWindowHeaderHeight: 26,
+  treeWindowHeight: 0
 };
+
+layout.treeWindowHeight =
+  layout.treeWindowHeaderHeight + layout.treeWindowWidth;
 
 const colors = {
   'red-50': 'hsl(350, 100.0%, 96.08%)',
