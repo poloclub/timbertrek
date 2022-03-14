@@ -4,6 +4,7 @@
   import type { Writable } from 'svelte/store';
   import type { TreeWindowStoreValue } from '../../stores';
   import type { HierarchyJSON, TreeNode } from '../sunburst/SunburstTypes';
+  import iconClick from '../../imgs/icon-click.svg?raw';
 
   // Component variables
   export let data: HierarchyJSON | null = null;
@@ -62,6 +63,21 @@
   class:show={treeWindow?.treeWindowStoreValue.show}
   style={treeWindow?.getStyle()}
 >
-  <div class="tree-header">Tree {treeWindow?.treeWindowStoreValue.treeID}</div>
-  <svg class="tree-svg" />
+  <div class="tree-header">
+    <span class="tree-name">
+      Tree {treeWindow?.treeWindowStoreValue.treeID}
+    </span>
+
+    <span class="tree-acc"> (0.32) </span>
+  </div>
+
+  <div class="content">
+    <div class="label">
+      <div class="svg-icon">
+        {@html iconClick}
+      </div>
+      <span>Pin</span>
+    </div>
+    <svg class="tree-svg" />
+  </div>
 </div>
