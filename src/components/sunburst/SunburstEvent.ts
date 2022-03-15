@@ -411,20 +411,24 @@ export function leafArcClickHandler(
       height: config.layout.treeWindowHeight
     };
 
+    // Find where to put this new window
+    // Simple heuristic => put it next to the last window
+    const endPoint = { x: 20, y: 20 };
+    if (this.pinnedTreeStoreValue.pinnedTrees.length > 0) {
+      endPoint.x = this.pinnedTreeStoreValue.pinnedTrees.slice(-1)[0].x + 10;
+      endPoint.y = this.pinnedTreeStoreValue.pinnedTrees.slice(-1)[0].y + 20;
+    }
+
     const pinnedTree: PinnedTree = {
       tree: treeTuple[0],
       treeMetric: round(treeTuple[1], 4),
       treeID: treeID,
-      x: this.pinnedTreeStoreValue.startPoint.x,
-      y: this.pinnedTreeStoreValue.startPoint.y,
+      x: endPoint.x,
+      y: endPoint.y,
       z: 1,
       startPos,
       isFav: false
     };
-
-    // Update the starting point
-    this.pinnedTreeStoreValue.startPoint.x += 10;
-    this.pinnedTreeStoreValue.startPoint.y += 20;
 
     this.pinnedTreeStoreValue.pinnedTrees.push(pinnedTree);
     this.pinnedTreeStore.set(this.pinnedTreeStoreValue);
@@ -437,20 +441,22 @@ export function tempShowPinnedTree(this: Sunburst) {
   const treeTuple = this.treeWindowStoreValue.treeMap.get(treeID);
 
   if (treeTuple !== undefined) {
+    const endPoint = { x: 20, y: 20 };
+    if (this.pinnedTreeStoreValue.pinnedTrees.length > 0) {
+      endPoint.x = this.pinnedTreeStoreValue.pinnedTrees.slice(-1)[0].x + 10;
+      endPoint.y = this.pinnedTreeStoreValue.pinnedTrees.slice(-1)[0].y + 10;
+    }
+
     const pinnedTree: PinnedTree = {
       tree: treeTuple[0],
       treeMetric: round(treeTuple[1], 4),
       treeID: treeID,
-      x: this.pinnedTreeStoreValue.startPoint.x,
-      y: this.pinnedTreeStoreValue.startPoint.y,
+      x: endPoint.x,
+      y: endPoint.y,
       z: 1,
       startPos: { x: 0, y: 0, width: 0, height: 0 },
       isFav: false
     };
-
-    // Update the starting point
-    this.pinnedTreeStoreValue.startPoint.x += 10;
-    this.pinnedTreeStoreValue.startPoint.y += 20;
 
     this.pinnedTreeStoreValue.pinnedTrees.push(pinnedTree);
     this.pinnedTreeStore.set(this.pinnedTreeStoreValue);

@@ -9,8 +9,8 @@ import type {
   PinnedTree,
   Position
 } from '../ForagerTypes';
-import type { TreeWindowStoreValue } from '../../stores';
-import { getTreeWindowStoreDefaultValue } from '../../stores';
+import type { PinnedTreeStoreValue } from '../../stores';
+import { getPinnedTreeStoreDefaultValue } from '../../stores';
 
 export class PinnedTreeWindow {
   pinnedTree: PinnedTree;
@@ -21,6 +21,9 @@ export class PinnedTreeWindow {
   width: number;
   height: number;
 
+  pinnedTreeStore: Writable<PinnedTreeStoreValue>;
+  pinnedTreeStoreValue: PinnedTreeStoreValue;
+
   // FLIP animation
   hidden = true;
   endPos: Position;
@@ -29,12 +32,14 @@ export class PinnedTreeWindow {
   constructor({
     component,
     pinnedTree,
+    pinnedTreeStore,
     pinnedTreeWindowUpdated,
     width = 200,
     height = 200
   }: {
     component: HTMLElement;
     pinnedTree: PinnedTree;
+    pinnedTreeStore: Writable<PinnedTreeStoreValue>;
     pinnedTreeWindowUpdated: () => void;
     width?: number;
     height?: number;
@@ -44,6 +49,12 @@ export class PinnedTreeWindow {
     this.width = width;
     this.height = height;
     this.node = component;
+
+    this.pinnedTreeStore = pinnedTreeStore;
+    this.pinnedTreeStoreValue = getPinnedTreeStoreDefaultValue();
+    this.pinnedTreeStore.subscribe(value => {
+      this.pinnedTreeStoreValue = value;
+    });
 
     // Initialize the svg
     this.svg = d3
@@ -128,6 +139,10 @@ export class PinnedTreeWindow {
     `;
   };
 
+  /**
+   * Handler for heart icon clicking event
+   * @param e Mouse event
+   */
   heartClicked = (e: MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -157,5 +172,31 @@ export class PinnedTreeWindow {
     }
 
     this.pinnedTreeWindowUpdated();
+  };
+
+  /**
+   * Handler for close icon clicking event
+   * @param e Mouse event
+   */
+  closeClicked = (e: MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    // Remove the pinned tree window from the store array
+    for (
+      let i = this.pinnedTreeStoreValue.pinnedTrees.length - 1;
+      i >= 0;
+      i--
+    ) {
+      if (
+        this.pinnedTreeStoreValue.pinnedTrees[i].treeID ===
+        this.pinnedTree.treeID
+      ) {
+        this.pinnedTreeStoreValue.pinnedTrees.splice(i, 1);
+        break;
+      }
+    }
+
+    this.pinnedTreeStore.set(this.pinnedTreeStoreValue);
   };
 }

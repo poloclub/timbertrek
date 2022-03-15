@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import { PinnedTreeWindow } from './PinnedTreeWindow';
   import type { Writable } from 'svelte/store';
-  import type { TreeWindowStoreValue } from '../../stores';
+  import type { PinnedTreeStoreValue } from '../../stores';
   import type { HierarchyJSON, PinnedTree } from '../ForagerTypes';
   import iconCloseCircle from '../../imgs/icon-close-circle.svg?raw';
   import iconHeartCircle from '../../imgs/icon-heart-circle.svg?raw';
@@ -10,7 +10,7 @@
 
   // Component variables
   export let pinnedTree: PinnedTree | null = null;
-  // export let treeWindowStore: Writable<TreeWindowStoreValue> | null = null;
+  export let pinnedTreeStore: Writable<PinnedTreeStoreValue> | null = null;
 
   let component: HTMLElement | null = null;
   let mounted = false;
@@ -29,16 +29,22 @@
 
   const initView = () => {
     initialized = true;
-    if (component && pinnedTree) {
+    if (component && pinnedTree && pinnedTreeStore) {
       pinnedTreeWindow = new PinnedTreeWindow({
         component,
         pinnedTree,
+        pinnedTreeStore,
         pinnedTreeWindowUpdated
       });
     }
   };
 
-  $: pinnedTree && mounted && component && !initialized && initView();
+  $: pinnedTree &&
+    mounted &&
+    component &&
+    pinnedTreeStore &&
+    !initialized &&
+    initView();
 </script>
 
 <style lang="scss">
@@ -78,7 +84,10 @@
         {/if}
       </div>
 
-      <div class="control-close">
+      <div
+        class="control-close"
+        on:click={e => pinnedTreeWindow?.closeClicked(e)}
+      >
         <div class="svg-icon">
           {@html iconCloseCircle}
         </div>

@@ -1,5 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { fade } from 'svelte/transition';
+  import { cubicInOut } from 'svelte/easing';
   import {
     getAppearanceStore,
     getSunburstStore,
@@ -83,7 +85,12 @@
   <TreeWindow {data} {featureMap} {treeWindowStore} />
 
   {#each pinnedTreeStoreValue.pinnedTrees as pinnedTree (pinnedTree.treeID)}
-    <PinnedTreeWindow {pinnedTree} />
+    <div
+      class="pinned-tree-window-wrapper"
+      out:fade={{ duration: 200, easing: cubicInOut }}
+    >
+      <PinnedTreeWindow {pinnedTree} {pinnedTreeStore} />
+    </div>
   {/each}
 
   <div class="dev-bar">

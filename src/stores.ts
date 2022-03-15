@@ -26,7 +26,6 @@ export interface TreeWindowStoreValue {
 
 export interface PinnedTreeStoreValue {
   pinnedTrees: PinnedTree[];
-  startPoint: Point;
 }
 
 /**
@@ -68,11 +67,7 @@ export const getTreeWindowStoreDefaultValue = (): TreeWindowStoreValue => {
 
 export const getPinnedTreeStoreDefaultValue = (): PinnedTreeStoreValue => {
   return {
-    pinnedTrees: [],
-    startPoint: {
-      x: 20,
-      y: 20
-    }
+    pinnedTrees: []
   };
 };
 
