@@ -2,10 +2,15 @@ import d3 from '../../utils/d3-import';
 import { config } from '../../config';
 import type { Writable } from 'svelte/store';
 import { SunburstAction } from '../../stores';
-import type { SunburstStoreValue, TreeWindowStoreValue } from '../../stores';
+import type {
+  SunburstStoreValue,
+  TreeWindowStoreValue,
+  PinnedTreeStoreValue
+} from '../../stores';
 import {
   getSunburstStoreDefaultValue,
-  getTreeWindowStoreDefaultValue
+  getTreeWindowStoreDefaultValue,
+  getPinnedTreeStoreDefaultValue
 } from '../../stores';
 import {
   textArc,
@@ -24,7 +29,7 @@ import {
   leafArcClickHandler,
   getTreeWindowPos
 } from './SunburstEvent';
-import { FeaturePosition, FeatureValuePairType } from './SunburstTypes';
+import { FeaturePosition, FeatureValuePairType } from '../ForagerTypes';
 import type {
   ArcDomain,
   ArcDomainData,
@@ -34,7 +39,7 @@ import type {
   HierarchyNode,
   Padding,
   RuleNode
-} from './SunburstTypes';
+} from '../ForagerTypes';
 
 const ZOOM_DURATION = 800;
 
@@ -48,6 +53,9 @@ export class Sunburst {
 
   treeWindowStore: Writable<TreeWindowStoreValue>;
   treeWindowStoreValue: TreeWindowStoreValue;
+
+  pinnedTreeStore: Writable<PinnedTreeStoreValue>;
+  pinnedTreeStoreValue: PinnedTreeStoreValue;
 
   padding: Padding;
   width: number;
@@ -165,6 +173,7 @@ export class Sunburst {
     data,
     sunburstStore,
     treeWindowStore,
+    pinnedTreeStore,
     width = config.layout.sunburstWidth,
     height = config.layout.sunburstWidth
   }: {
@@ -172,6 +181,7 @@ export class Sunburst {
     data: HierarchyJSON;
     sunburstStore: Writable<SunburstStoreValue>;
     treeWindowStore: Writable<TreeWindowStoreValue>;
+    pinnedTreeStore: Writable<PinnedTreeStoreValue>;
     width?: number;
     height?: number;
   }) {
@@ -226,6 +236,10 @@ export class Sunburst {
     this.treeWindowStore = treeWindowStore;
     this.treeWindowStoreValue = getTreeWindowStoreDefaultValue();
     this.#initTreeWindowStore();
+
+    this.pinnedTreeStore = pinnedTreeStore;
+    this.pinnedTreeStoreValue = getPinnedTreeStoreDefaultValue();
+    this.#initPinnedTreeStore();
 
     // Create scales
     this.maxRadius = this.width / 2;
@@ -613,6 +627,15 @@ export class Sunburst {
     // Pass the color scale to tree window store
     this.treeWindowStoreValue.getFeatureColor = this.getFeatureColor;
     this.treeWindowStore.set(this.treeWindowStoreValue);
+  }
+
+  /**
+   * Initialize the pinned tree store
+   */
+  #initPinnedTreeStore() {
+    this.pinnedTreeStore.subscribe(value => {
+      this.pinnedTreeStoreValue = value;
+    });
   }
 
   /**

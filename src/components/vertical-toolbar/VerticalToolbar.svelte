@@ -1,4 +1,4 @@
-<script lang='ts'>
+<script lang="ts">
   import { onMount } from 'svelte';
   import { preProcessSVG } from '../../utils/utils';
   import iconGear from '../../imgs/icon-gear.svg?raw';
@@ -21,36 +21,30 @@
   $: data && mounted;
 </script>
 
-<style lang='scss'>
+<style lang="scss">
   @import './Toolbar.scss';
 </style>
 
-<div class='toolbar' bind:this={component}>
-
-
-  <div class='tools'>
-
-    <div class=svg-icon>
+<div class="toolbar" bind:this={component}>
+  <div class="tools">
+    <div class="svg-icon">
       {@html iconGear}
     </div>
 
-    <div class=svg-icon>
+    <div class="svg-icon">
       {@html iconStar}
     </div>
-
   </div>
 
-  <div class='levels'>
-
-    <div class='svg-icon level-icon'>
+  <div class="levels">
+    <div class="svg-icon level-icon">
       {@html processedIconDepth}
     </div>
 
     {#each [...Array(levelNum).keys()] as i}
-      <div class='level-box'>
+      <div class="level-box">
         {i + 1}
       </div>
     {/each}
-
   </div>
 </div>

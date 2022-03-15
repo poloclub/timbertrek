@@ -1,0 +1,92 @@
+@import '../../define';
+
+.pinned-tree-window {
+  position: absolute;
+  z-index: 2;
+
+  background-color: $gray-light-background;
+  border-radius: $border-radius;
+  box-shadow: $shadow-border-light;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.tree-header {
+  width: 100%;
+  padding: 2px 10px;
+  height: 26px;
+
+  font-size: 0.9rem;
+  text-align: center;
+  border-top-left-radius: $border-radius;
+  border-top-right-radius: $border-radius;
+
+  color: $gray-700;
+  background-color: $gray-200;
+
+  display: flex;
+  position: relative;
+  flex-direction: row;
+  justify-content: center;
+  align-items: baseline;
+  gap: 3px;
+
+  .tree-name {
+    font-weight: 600;
+  }
+}
+
+.content {
+  display: flex;
+  position: relative;
+}
+
+.tree-svg {
+  stroke-linecap: round;
+  stroke-linejoin: round;
+
+  :global(path.link) {
+    fill: none;
+    stroke: $gray-700;
+    stroke-width: 1px;
+  }
+
+  :global(path.link.highlighted) {
+    stroke-width: 2px;
+    stroke: $gray-600;
+    stroke-dasharray: 2px 5px;
+    animation: dash 60s infinite linear;
+  }
+
+  :global(.node rect) {
+    fill: $gray-light-background;
+    stroke: $gray-700;
+    stroke-width: 1px;
+  }
+
+  :global(.node text) {
+    fill: $gray-700;
+    dominant-baseline: middle;
+    text-anchor: middle;
+  }
+
+  :global(text.split-label) {
+    text-anchor: start;
+    dominant-baseline: auto;
+    fill: $gray-700;
+    font-weight: 300;
+    font-size: 0.8rem;
+  }
+
+  :global(text.split-label.split-label-left) {
+    text-anchor: end;
+  }
+}
+
+@keyframes dash {
+  to {
+    stroke-dashoffset: -1000;
+  }
+}

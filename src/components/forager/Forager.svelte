@@ -1,29 +1,32 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { Forager } from './Forager';
   import {
     getAppearanceStore,
     getSunburstStore,
-    getTreeWindowStore
+    getTreeWindowStore,
+    getPinnedTreeStore
   } from '../../stores';
   import Toolbar from '../toolbar/Toolbar.svelte';
   import Sunburst from '../sunburst/Sunburst.svelte';
   import TreeWindow from '../tree-window/TreeWindow.svelte';
+  import PinnedTreeWindow from '../tree-window/PinnedTreeWindow.svelte';
   import AppearancePanel from '../appearance-panel/AppearancePanel.svelte';
   import d3 from '../../utils/d3-import';
-  import type { HierarchyJSON } from '../sunburst/SunburstTypes';
+  import type { HierarchyJSON } from '../ForagerTypes';
 
   let component: HTMLElement | null = null;
 
   // Load the data and pass to child components
   let data: HierarchyJSON | null | undefined = null;
-  let featureMap: Map<number, string[]> = null;
+  let featureMap: Map<number, string[]> | null = null;
 
   const initData = async () => {
     // Init the model
     data = await d3.json('/data/compas_rules_0.01_0.05.json');
 
     featureMap = new Map<number, string[]>();
-    for (const [k, v] of Object.entries(data.featureMap)) {
+    for (const [k, v] of Object.entries(data!.featureMap)) {
       featureMap.set(parseInt(k), v as string[]);
     }
   };
@@ -34,6 +37,15 @@
   const appearanceStore = getAppearanceStore();
   const sunburstStore = getSunburstStore();
   const treeWindowStore = getTreeWindowStore();
+  const pinnedTreeStore = getPinnedTreeStore();
+
+  // Initialize the forager object
+  let forager: Forager;
+  const foragerUpdated = () => {
+    forager = forager;
+  };
+
+  forager = new Forager(pinnedTreeStore, foragerUpdated);
 
   onMount(() => {
     console.log('mounted!');
@@ -61,7 +73,7 @@
       </div>
 
       <div class="sunburst">
-        <Sunburst {data} {sunburstStore} {treeWindowStore} />
+        <Sunburst {data} {sunburstStore} {treeWindowStore} {pinnedTreeStore} />
       </div>
     </div>
 
@@ -71,6 +83,10 @@
   </div>
 
   <TreeWindow {data} {featureMap} {treeWindowStore} />
+
+  {#each forager.pinnedTreeStoreValue.pinnedTrees as pinnedTree}
+    <PinnedTreeWindow {pinnedTree} />
+  {/each}
 
   <div class="dev-bar">
     <div

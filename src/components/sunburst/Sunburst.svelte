@@ -3,13 +3,18 @@
   import { onMount } from 'svelte';
   import { config } from '../../config';
   import type { Writable } from 'svelte/store';
-  import type { SunburstStoreValue, TreeWindowStoreValue } from '../../stores';
-  import type { HierarchyJSON } from './SunburstTypes';
+  import type {
+    SunburstStoreValue,
+    TreeWindowStoreValue,
+    PinnedTreeStoreValue
+  } from '../../stores';
+  import type { HierarchyJSON } from '../ForagerTypes';
 
   // Component variables
   export let data: HierarchyJSON | null = null;
   export let sunburstStore: Writable<SunburstStoreValue> | null = null;
   export let treeWindowStore: Writable<TreeWindowStoreValue> | null = null;
+  export let pinnedTreeStore: Writable<PinnedTreeStoreValue> | null = null;
 
   let component: HTMLElement | null = null;
   let mounted = false;
@@ -24,12 +29,19 @@
   });
 
   const initView = () => {
-    if (component && data && sunburstStore && treeWindowStore) {
+    if (
+      component &&
+      data &&
+      sunburstStore &&
+      treeWindowStore &&
+      pinnedTreeStore
+    ) {
       sunburst = new Sunburst({
         component,
         data,
         sunburstStore,
         treeWindowStore,
+        pinnedTreeStore,
         width,
         height
       });
@@ -39,6 +51,7 @@
   $: data &&
     sunburstStore &&
     treeWindowStore &&
+    pinnedTreeStore &&
     mounted &&
     component &&
     initView();

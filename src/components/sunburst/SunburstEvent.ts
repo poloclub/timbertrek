@@ -4,8 +4,14 @@
 
 import { config } from '../../config';
 import type { Sunburst } from './Sunburst';
-import type { Point } from './SunburstTypes';
-import type { HierarchyNode, ArcDomain, ArcDomainData } from './SunburstTypes';
+import type { Point } from '../ForagerTypes';
+import type {
+  HierarchyNode,
+  ArcDomain,
+  ArcDomainData,
+  PinnedTree
+} from '../ForagerTypes';
+import { round } from '../../utils/utils';
 import d3 from '../../utils/d3-import';
 
 interface OuterCenter {
@@ -376,9 +382,40 @@ export function getTreeWindowPos(this: Sunburst, d: HierarchyNode): Point {
  * @param e Mouse event
  * @param d HierarchyNode data
  */
-export function leafArcClickHandler(e: MouseEvent, d: HierarchyNode) {
+export function leafArcClickHandler(
+  this: Sunburst,
+  e: MouseEvent,
+  d: HierarchyNode
+) {
   e.preventDefault();
   e.stopPropagation();
 
-  localStorage.setItem('treeWindowPinnedOnce', 'true');
+  // If this is the first time that the user pins a tree, update localStorage
+  if (localStorage.getItem('treeWindowPinnedOnce') !== 'true') {
+    localStorage.setItem('treeWindowPinnedOnce', 'true');
+  }
+
+  // Pass the selected tree information to PinnedTreeStore
+  if (d.data.t === undefined) return;
+  const treeID = d.data.t;
+  const treeTuple = this.treeWindowStoreValue.treeMap.get(treeID);
+
+  if (treeTuple !== undefined) {
+    const pinnedTree: PinnedTree = {
+      tree: treeTuple[0],
+      treeMetric: round(treeTuple[1], 4),
+      treeID: treeID,
+      x: this.pinnedTreeStoreValue.startPoint.x,
+      y: this.pinnedTreeStoreValue.startPoint.y,
+      z: 1,
+      isFav: false
+    };
+
+    // Update the starting point
+    this.pinnedTreeStoreValue.startPoint.x += 10;
+    this.pinnedTreeStoreValue.startPoint.y += 20;
+
+    this.pinnedTreeStoreValue.pinnedTrees.push(pinnedTree);
+    this.pinnedTreeStore.set(this.pinnedTreeStoreValue);
+  }
 }

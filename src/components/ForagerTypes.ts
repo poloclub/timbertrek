@@ -1,3 +1,17 @@
+/**
+ * Custom types for Forager
+ */
+
+export interface PinnedTree {
+  tree: TreeNode;
+  treeMetric: number;
+  treeID: number;
+  x: number;
+  y: number;
+  z: number;
+  isFav: boolean;
+}
+
 export interface FeatureMap {
   [featureID: number]: string[];
 }

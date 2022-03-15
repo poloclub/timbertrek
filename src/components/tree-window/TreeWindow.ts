@@ -1,7 +1,7 @@
 import d3 from '../../utils/d3-import';
 import { round } from '../../utils/utils';
 import type { Writable } from 'svelte/store';
-import type { TreeNode, Point, Padding } from '../sunburst/SunburstTypes';
+import type { TreeNode, Point, Padding } from '../ForagerTypes';
 import type { TreeWindowStoreValue } from '../../stores';
 import { getTreeWindowStoreDefaultValue } from '../../stores';
 
@@ -148,6 +148,7 @@ export class TreeWindow {
 
     // Set up the initial store value
     this.treeWindowStoreValue.featureMap = featureMap;
+    this.treeWindowStoreValue.treeMap = this.treeMap;
     this.treeWindowStore.set(this.treeWindowStoreValue);
   }
 
