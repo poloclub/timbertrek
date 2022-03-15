@@ -4,7 +4,9 @@
   import type { Writable } from 'svelte/store';
   import type { TreeWindowStoreValue } from '../../stores';
   import type { HierarchyJSON, PinnedTree } from '../ForagerTypes';
-  import iconClick from '../../imgs/icon-click.svg?raw';
+  import iconCloseCircle from '../../imgs/icon-close-circle.svg?raw';
+  import iconHeartCircle from '../../imgs/icon-heart-circle.svg?raw';
+  import iconHeartCircleClicked from '../../imgs/icon-heart-circle-clicked.svg?raw';
 
   // Component variables
   export let pinnedTree: PinnedTree | null = null;
@@ -26,7 +28,11 @@
 
   const initView = () => {
     if (component && pinnedTree) {
-      pinnedTreeWindow = new PinnedTreeWindow({ component, pinnedTree });
+      pinnedTreeWindow = new PinnedTreeWindow({
+        component,
+        pinnedTree,
+        pinnedTreeWindowUpdated
+      });
     }
   };
 
@@ -43,11 +49,38 @@
   style={pinnedTreeWindow?.getStyle()}
 >
   <div class="tree-header">
-    <span class="tree-name">
-      Tree {pinnedTree?.treeID}
-    </span>
+    <div class="tree-info">
+      <span class="tree-name">
+        Tree {pinnedTreeWindow?.pinnedTree.treeID}
+      </span>
 
-    <span class="tree-acc"> ({pinnedTree?.treeMetric}) </span>
+      <span class="tree-acc">
+        ({pinnedTreeWindow?.pinnedTree.treeMetric})
+      </span>
+    </div>
+
+    <div class="control-buttons">
+      <div
+        class="control-fav"
+        on:click={e => pinnedTreeWindow?.heartClicked(e)}
+      >
+        {#if pinnedTreeWindow?.pinnedTree.isFav}
+          <div class="svg-icon icon-heart">
+            {@html iconHeartCircleClicked}
+          </div>
+        {:else}
+          <div class="svg-icon">
+            {@html iconHeartCircle}
+          </div>
+        {/if}
+      </div>
+
+      <div class="control-close">
+        <div class="svg-icon">
+          {@html iconCloseCircle}
+        </div>
+      </div>
+    </div>
   </div>
 
   <div class="content">

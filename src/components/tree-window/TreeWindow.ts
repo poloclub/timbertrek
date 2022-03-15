@@ -44,7 +44,6 @@ export class TreeWindow {
     if (mapValue !== undefined) {
       return round(mapValue[1], 4);
     } else {
-      console.warn(`No such tree on the record ${this.curTreeID}`);
       return null;
     }
   }
@@ -104,13 +103,13 @@ export class TreeWindow {
     this.width = width - this.padding.left - this.padding.right;
     this.height = height - this.padding.top - this.padding.bottom;
 
-    this.curTreeID = 335;
-    this.curAncestorFs = ['11', '_'];
-    this.treeWindowStoreValue.treeID = this.curTreeID;
-    this.treeWindowStoreValue.ancestorFs = this.curAncestorFs;
-    this.treeWindowStoreValue.show = true;
-    this.treeWindowStore.set(this.treeWindowStoreValue);
-    this.#drawCurTree();
+    // this.curTreeID = 335;
+    // this.curAncestorFs = ['11', '_'];
+    // this.treeWindowStoreValue.treeID = this.curTreeID;
+    // this.treeWindowStoreValue.ancestorFs = this.curAncestorFs;
+    // this.treeWindowStoreValue.show = true;
+    // this.treeWindowStore.set(this.treeWindowStoreValue);
+    // this.#drawCurTree();
   }
 
   /**

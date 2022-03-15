@@ -150,9 +150,46 @@ $depth-box-width: 24px;
   align-items: center;
   fill: currentColor;
   color: currentColor;
+  position: relative;
 
   :global(svg) {
     width: 0.92em;
     height: 0.92em;
+  }
+
+  .hidden-heart {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    fill: $red-400;
+    color: $red-400;
+
+    opacity: 0;
+    transform: scale(0);
+    transform-origin: center 90%;
+
+    :global(svg) {
+      width: 0.92em;
+      height: 0.92em;
+    }
+
+    &.pulse {
+      animation: heart-pulse 600ms 300ms infinite;
+    }
+  }
+}
+
+@keyframes heart-pulse {
+  0% {
+    transform: scale(1);
+  }
+
+  30% {
+    transform: scale(1.4);
+  }
+
+  60% {
+    transform: scale(1);
   }
 }

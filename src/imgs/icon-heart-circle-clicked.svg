@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 50 50" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g transform="matrix(1,0,0,1,-3641,-31)">
+        <g transform="matrix(1,0,0,1,-0.831706,0)">
+            <g id="icon-heart-circle-clicked">
+                <g transform="matrix(3.03726,0,0,3.03726,3642.35,31.6476)">
+                    <path d="M8,16C12.389,16 16,12.389 16,8C16,3.611 12.389,0 8,0C3.611,0 -0,3.611 0,8C0,12.389 3.611,16 8,16Z" style="fill:rgb(244,67,54);"/>
+                </g>
+                <g transform="matrix(3.03726,0,0,3.03726,3642.35,31.6476)">
+                    <path d="M8,16C12.389,16 16,12.389 16,8C16,3.611 12.389,0 8,0C3.611,0 -0,3.611 0,8C0,12.389 3.611,16 8,16ZM10.33,4.5C9.11,4.5 8.5,5 8.007,5.636C7.513,5 6.903,4.5 5.682,4.5C4.654,4.5 3.513,5.284 3.513,7C3.513,8.499 5.006,10.433 6.759,11.517C7.279,11.838 7.649,11.996 8.007,12.001C8.364,11.996 8.735,11.838 9.254,11.517C11.007,10.433 12.5,8.5 12.5,7C12.5,5.284 11.36,4.5 10.33,4.5Z"/>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

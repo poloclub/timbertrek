@@ -27,7 +27,8 @@ import {
   leafArcMouseenterHandler,
   leafArcMouseleaveHandler,
   leafArcClickHandler,
-  getTreeWindowPos
+  getTreeWindowPos,
+  tempShowPinnedTree
 } from './SunburstEvent';
 import { FeaturePosition, FeatureValuePairType } from '../ForagerTypes';
 import type {
@@ -145,6 +146,8 @@ export class Sunburst {
   leafArcMouseleaveHandler = leafArcMouseleaveHandler;
 
   getTreeWindowPos = getTreeWindowPos;
+
+  tempShowPinnedTree = tempShowPinnedTree;
 
   /**
    * The radius is determined by the number of levels to show.
@@ -292,6 +295,12 @@ export class Sunburst {
     console.time('Draw sunburst');
     this.#initView();
     console.timeEnd('Draw sunburst');
+
+    if (this.pinnedTreeStoreValue.pinnedTrees.length < 1) {
+      setTimeout(() => {
+        this.tempShowPinnedTree();
+      }, 500);
+    }
   }
 
   /**

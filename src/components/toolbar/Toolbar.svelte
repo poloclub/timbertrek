@@ -7,7 +7,8 @@
 
   import iconBrush from '../../imgs/icon-brush.svg?raw';
   import iconSearch from '../../imgs/icon-search.svg?raw';
-  import iconStar from '../../imgs/icon-star.svg?raw';
+  import iconHeart from '../../imgs/icon-heart.svg?raw';
+  import iconHeartSolid from '../../imgs/icon-heart-solid.svg?raw';
 
   // Component variables
   // export let data: object | null = null;
@@ -86,21 +87,24 @@
       }}
       class:shown={handler?.appearanceStoreValue.shown}
     >
-      <span class="svg-icon icon-brush">
+      <span class="svg-icon">
         {@html iconBrush}
       </span>
       <span class="tool-name"> Appearance </span>
     </div>
 
     <div class="tool-button">
-      <span class="svg-icon icon-brush">
-        {@html iconStar}
+      <span class="svg-icon">
+        {@html iconHeart}
+        <div class="hidden-heart" class:pulse={false}>
+          {@html iconHeartSolid}
+        </div>
       </span>
       <span class="tool-name"> Favorites </span>
     </div>
 
     <div class="tool-button">
-      <span class="svg-icon icon-brush">
+      <span class="svg-icon">
         {@html iconSearch}
       </span>
       <span class="tool-name"> Search </span>

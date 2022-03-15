@@ -419,3 +419,28 @@ export function leafArcClickHandler(
     this.pinnedTreeStore.set(this.pinnedTreeStoreValue);
   }
 }
+
+// TODO: Remove this function
+export function tempShowPinnedTree(this: Sunburst) {
+  const treeID = 322;
+  const treeTuple = this.treeWindowStoreValue.treeMap.get(treeID);
+
+  if (treeTuple !== undefined) {
+    const pinnedTree: PinnedTree = {
+      tree: treeTuple[0],
+      treeMetric: round(treeTuple[1], 4),
+      treeID: treeID,
+      x: this.pinnedTreeStoreValue.startPoint.x,
+      y: this.pinnedTreeStoreValue.startPoint.y,
+      z: 1,
+      isFav: false
+    };
+
+    // Update the starting point
+    this.pinnedTreeStoreValue.startPoint.x += 10;
+    this.pinnedTreeStoreValue.startPoint.y += 20;
+
+    this.pinnedTreeStoreValue.pinnedTrees.push(pinnedTree);
+    this.pinnedTreeStore.set(this.pinnedTreeStoreValue);
+  }
+}
