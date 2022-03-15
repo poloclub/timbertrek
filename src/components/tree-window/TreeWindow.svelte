@@ -68,7 +68,7 @@
       Tree {treeWindow?.treeWindowStoreValue.treeID}
     </span>
 
-    <span class="tree-acc"> (0.32) </span>
+    <span class="tree-acc"> ({treeWindow?.treeMetric}) </span>
   </div>
 
   <div class="content">

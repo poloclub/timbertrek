@@ -1,4 +1,5 @@
 import d3 from '../../utils/d3-import';
+import { round } from '../../utils/utils';
 import type { Writable } from 'svelte/store';
 import type { TreeNode, Point, Padding } from '../sunburst/SunburstTypes';
 import type { TreeWindowStoreValue } from '../../stores';
@@ -22,10 +23,26 @@ export class TreeWindow {
   width: number;
   height: number;
 
+  /**
+   * Current tree
+   */
   get tree(): TreeNode | null {
     const mapValue = this.treeMap.get(this.curTreeID);
     if (mapValue !== undefined) {
       return mapValue[0];
+    } else {
+      console.warn(`No such tree on the record ${this.curTreeID}`);
+      return null;
+    }
+  }
+
+  /**
+   * Current tree metric
+   */
+  get treeMetric(): number | null {
+    const mapValue = this.treeMap.get(this.curTreeID);
+    if (mapValue !== undefined) {
+      return round(mapValue[1], 4);
     } else {
       console.warn(`No such tree on the record ${this.curTreeID}`);
       return null;
