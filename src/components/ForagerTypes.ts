@@ -2,6 +2,13 @@
  * Custom types for Forager
  */
 
+export interface Position {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
 export interface PinnedTree {
   tree: TreeNode;
   treeMetric: number;
@@ -9,6 +16,7 @@ export interface PinnedTree {
   x: number;
   y: number;
   z: number;
+  startPos: Position;
   isFav: boolean;
 }
 

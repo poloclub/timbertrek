@@ -2,7 +2,13 @@ import { TreeWindow } from './TreeWindow';
 import d3 from '../../utils/d3-import';
 import { round } from '../../utils/utils';
 import type { Writable } from 'svelte/store';
-import type { TreeNode, Point, Padding, PinnedTree } from '../ForagerTypes';
+import type {
+  TreeNode,
+  Point,
+  Padding,
+  PinnedTree,
+  Position
+} from '../ForagerTypes';
 import type { TreeWindowStoreValue } from '../../stores';
 import { getTreeWindowStoreDefaultValue } from '../../stores';
 
@@ -14,6 +20,11 @@ export class PinnedTreeWindow {
   padding: Padding;
   width: number;
   height: number;
+
+  // FLIP animation
+  hidden = true;
+  endPos: Position;
+  node: HTMLElement;
 
   constructor({
     component,
@@ -32,6 +43,7 @@ export class PinnedTreeWindow {
     this.pinnedTreeWindowUpdated = pinnedTreeWindowUpdated;
     this.width = width;
     this.height = height;
+    this.node = component;
 
     // Initialize the svg
     this.svg = d3
@@ -41,8 +53,6 @@ export class PinnedTreeWindow {
       .attr('height', height)
       .attr('viewbox', `0 0 ${width} ${height}`)
       .attr('preserveAspectRatio', 'none');
-
-    console.log(this.svg);
 
     // Configure the view size
     this.padding = {
@@ -54,7 +64,58 @@ export class PinnedTreeWindow {
 
     this.width = width - this.padding.left - this.padding.right;
     this.height = height - this.padding.top - this.padding.bottom;
+
+    // FLIP animation
+
+    // Step 1: Register the end position (we know start position)
+    const bbox = d3.select(component).node()!.getBoundingClientRect();
+    this.endPos = {
+      x: this.pinnedTree.x,
+      y: this.pinnedTree.y,
+      width: bbox.width,
+      height: bbox.height
+    };
+
+    // Step 2: Show the element and play the animation
+    this.hidden = false;
+    this.pinnedTreeWindowUpdated();
+    this.playLaunchingAnimation();
   }
+
+  /**
+   * Animate the launching process of the pinned tree window
+   */
+  playLaunchingAnimation = () => {
+    // Compute the transformation from end to the start
+    const widthScale = this.pinnedTree.startPos.width / this.endPos.width;
+    const heightScale = this.pinnedTree.startPos.height / this.endPos.height;
+    const xTranslate = this.pinnedTree.startPos.x - this.endPos.x;
+    const yTranslate = this.pinnedTree.startPos.y - this.endPos.y;
+
+    // Apply the transform
+    this.node.animate(
+      [
+        {
+          transformOrigin: 'top left',
+          opacity: 0,
+          transform: `
+            translate(${xTranslate}px, ${yTranslate}px)
+            scale(${widthScale}, ${heightScale})
+          `
+        },
+        {
+          transformOrigin: 'top left',
+          opacity: 1,
+          transform: 'none'
+        }
+      ],
+      {
+        duration: 300,
+        easing: 'cubic-bezier(0.4, 0.0, 0.2, 1)',
+        fill: 'both'
+      }
+    );
+  };
 
   /**
    * Get the current style string
@@ -91,7 +152,7 @@ export class PinnedTreeWindow {
               .duration(400)
               .style('transform', 'scale(0)')
               .style('opacity', 0);
-          }, 1400);
+          }, 1500);
         });
     }
 

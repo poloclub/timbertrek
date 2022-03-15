@@ -9,7 +9,8 @@ import type {
   HierarchyNode,
   ArcDomain,
   ArcDomainData,
-  PinnedTree
+  PinnedTree,
+  Position
 } from '../ForagerTypes';
 import { round } from '../../utils/utils';
 import d3 from '../../utils/d3-import';
@@ -401,6 +402,15 @@ export function leafArcClickHandler(
   const treeTuple = this.treeWindowStoreValue.treeMap.get(treeID);
 
   if (treeTuple !== undefined) {
+    // Get the current small window position for FLIP animation
+    const startPoint = this.getTreeWindowPos(d);
+    const startPos: Position = {
+      x: startPoint.x,
+      y: startPoint.y,
+      width: config.layout.treeWindowWidth,
+      height: config.layout.treeWindowHeight
+    };
+
     const pinnedTree: PinnedTree = {
       tree: treeTuple[0],
       treeMetric: round(treeTuple[1], 4),
@@ -408,6 +418,7 @@ export function leafArcClickHandler(
       x: this.pinnedTreeStoreValue.startPoint.x,
       y: this.pinnedTreeStoreValue.startPoint.y,
       z: 1,
+      startPos,
       isFav: false
     };
 
@@ -433,6 +444,7 @@ export function tempShowPinnedTree(this: Sunburst) {
       x: this.pinnedTreeStoreValue.startPoint.x,
       y: this.pinnedTreeStoreValue.startPoint.y,
       z: 1,
+      startPos: { x: 0, y: 0, width: 0, height: 0 },
       isFav: false
     };
 

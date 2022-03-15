@@ -17,6 +17,7 @@
 
   // View variables
   let pinnedTreeWindow: PinnedTreeWindow | null = null;
+  let initialized = false;
 
   onMount(() => {
     mounted = true;
@@ -27,6 +28,7 @@
   };
 
   const initView = () => {
+    initialized = true;
     if (component && pinnedTree) {
       pinnedTreeWindow = new PinnedTreeWindow({
         component,
@@ -36,7 +38,7 @@
     }
   };
 
-  $: pinnedTree && mounted && component && initView();
+  $: pinnedTree && mounted && component && !initialized && initView();
 </script>
 
 <style lang="scss">
@@ -46,6 +48,7 @@
 <div
   class="pinned-tree-window"
   bind:this={component}
+  class:hidden={pinnedTreeWindow?.hidden}
   style={pinnedTreeWindow?.getStyle()}
 >
   <div class="tree-header">

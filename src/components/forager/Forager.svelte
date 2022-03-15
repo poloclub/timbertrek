@@ -1,11 +1,11 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { Forager } from './Forager';
   import {
     getAppearanceStore,
     getSunburstStore,
     getTreeWindowStore,
-    getPinnedTreeStore
+    getPinnedTreeStore,
+    getPinnedTreeStoreDefaultValue
   } from '../../stores';
   import Toolbar from '../toolbar/Toolbar.svelte';
   import Sunburst from '../sunburst/Sunburst.svelte';
@@ -13,7 +13,7 @@
   import PinnedTreeWindow from '../tree-window/PinnedTreeWindow.svelte';
   import AppearancePanel from '../appearance-panel/AppearancePanel.svelte';
   import d3 from '../../utils/d3-import';
-  import type { HierarchyJSON } from '../ForagerTypes';
+  import type { HierarchyJSON, PinnedTree } from '../ForagerTypes';
 
   let component: HTMLElement | null = null;
 
@@ -39,16 +39,14 @@
   const treeWindowStore = getTreeWindowStore();
   const pinnedTreeStore = getPinnedTreeStore();
 
-  // Initialize the forager object
-  let forager: Forager;
-  const foragerUpdated = () => {
-    forager = forager;
-  };
-
-  forager = new Forager(pinnedTreeStore, foragerUpdated);
+  // Initialize the store
+  let pinnedTreeStoreValue = getPinnedTreeStoreDefaultValue();
+  pinnedTreeStore.subscribe(value => {
+    pinnedTreeStoreValue = value;
+  });
 
   onMount(() => {
-    console.log('mounted!');
+    console.log('Forager mounted!');
   });
 </script>
 
@@ -84,7 +82,7 @@
 
   <TreeWindow {data} {featureMap} {treeWindowStore} />
 
-  {#each forager.pinnedTreeStoreValue.pinnedTrees as pinnedTree}
+  {#each pinnedTreeStoreValue.pinnedTrees as pinnedTree (pinnedTree.treeID)}
     <PinnedTreeWindow {pinnedTree} />
   {/each}
 
