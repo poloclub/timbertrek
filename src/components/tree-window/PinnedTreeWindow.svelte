@@ -62,7 +62,10 @@
     on:mousedown={e => pinnedTreeWindow?.headerMousedownHandler(e)}
     on:click={e => pinnedTreeWindow?.cancelEvent(e)}
   >
-    <div class="tree-info">
+    <div
+      class="tree-info"
+      title={`Tree ${pinnedTreeWindow?.pinnedTree.treeID} - Accuracy ${pinnedTreeWindow?.pinnedTree.treeMetric}`}
+    >
       <span class="tree-name">
         Tree {pinnedTreeWindow?.pinnedTree.treeID}
       </span>
@@ -75,6 +78,7 @@
     <div class="control-buttons">
       <div
         class="control-fav"
+        title="Add to my favorites"
         on:click={e => pinnedTreeWindow?.heartClicked(e)}
         on:mousedown={e => pinnedTreeWindow?.cancelEvent(e)}
       >
@@ -91,6 +95,7 @@
 
       <div
         class="control-close"
+        title="Close the window"
         on:click={e => pinnedTreeWindow?.closeClicked(e)}
         on:mousedown={e => pinnedTreeWindow?.cancelEvent(e)}
       >
