@@ -26,6 +26,7 @@ export interface TreeWindowStoreValue {
 
 export interface PinnedTreeStoreValue {
   pinnedTrees: PinnedTree[];
+  getFeatureColor: null | ((f: string) => string);
 }
 
 /**
@@ -67,7 +68,8 @@ export const getTreeWindowStoreDefaultValue = (): TreeWindowStoreValue => {
 
 export const getPinnedTreeStoreDefaultValue = (): PinnedTreeStoreValue => {
   return {
-    pinnedTrees: []
+    pinnedTrees: [],
+    getFeatureColor: null
   };
 };
 
