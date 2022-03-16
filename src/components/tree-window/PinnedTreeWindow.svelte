@@ -6,6 +6,7 @@
   import type { HierarchyJSON, PinnedTree } from '../ForagerTypes';
   import iconCloseCircle from '../../imgs/icon-close-circle.svg?raw';
   import iconHeartCircle from '../../imgs/icon-heart-circle.svg?raw';
+  import iconNoteCircle from '../../imgs/icon-note-circle.svg?raw';
   import iconHeartCircleClicked from '../../imgs/icon-heart-circle-clicked.svg?raw';
 
   // Component variables
@@ -91,6 +92,31 @@
             {@html iconHeartCircle}
           </div>
         {/if}
+      </div>
+
+      <div
+        class="control-note"
+        title="Leave a comment"
+        on:click={e => pinnedTreeWindow?.noteClicked(e)}
+        on:mousedown={e => {
+          e.stopPropagation();
+        }}
+      >
+        <div class="svg-icon">
+          {@html iconNoteCircle}
+        </div>
+        <div class="note-window" class:show={false} title="">
+          <div
+            class="input-wrapper"
+            on:click={e => pinnedTreeWindow?.cancelEvent(e)}
+          >
+            <textarea
+              class="note-window-input"
+              name="note-input"
+              placeholder="Leave a comment."
+            />
+          </div>
+        </div>
       </div>
 
       <div

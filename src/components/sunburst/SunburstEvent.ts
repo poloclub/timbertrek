@@ -415,8 +415,8 @@ export function leafArcClickHandler(
     // Simple heuristic => put it next to the last window
     const endPoint = { x: 20, y: 20 };
     if (this.pinnedTreeStoreValue.pinnedTrees.length > 0) {
-      endPoint.x = this.pinnedTreeStoreValue.pinnedTrees.slice(-1)[0].x + 10;
-      endPoint.y = this.pinnedTreeStoreValue.pinnedTrees.slice(-1)[0].y + 20;
+      endPoint.x = this.pinnedTreeStoreValue.pinnedTrees.slice(-1)[0].x + 20;
+      endPoint.y = this.pinnedTreeStoreValue.pinnedTrees.slice(-1)[0].y + 30;
     }
 
     const pinnedTree: PinnedTree = {

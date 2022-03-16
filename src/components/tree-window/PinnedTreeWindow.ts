@@ -312,6 +312,19 @@ export class PinnedTreeWindow {
   };
 
   /**
+   * Handler for note icon clicking event
+   * @param e Mouse event
+   */
+  noteClicked = (e: MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const window = d3.select(this.node).select('.note-window');
+
+    window.classed('show', !window.classed('show'));
+  };
+
+  /**
    * Handler for close icon clicking event
    * @param e Mouse event
    */
