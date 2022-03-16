@@ -15,7 +15,6 @@ export interface PinnedTree {
   treeID: number;
   x: number;
   y: number;
-  z: number;
   startPos: Position;
   isFav: boolean;
 }

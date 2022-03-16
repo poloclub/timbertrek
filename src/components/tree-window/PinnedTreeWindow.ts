@@ -1,4 +1,5 @@
 import { TreeWindow } from './TreeWindow';
+import { tick } from 'svelte';
 import d3 from '../../utils/d3-import';
 import { round } from '../../utils/utils';
 import type { Writable } from 'svelte/store';
@@ -56,6 +57,8 @@ export class PinnedTreeWindow {
       this.pinnedTreeStoreValue = value;
     });
 
+    this.#bringWindowToTop();
+
     // Initialize the svg
     this.svg = d3
       .select(component)
@@ -93,6 +96,14 @@ export class PinnedTreeWindow {
     this.hidden = false;
     this.pinnedTreeWindowUpdated();
     this.playLaunchingAnimation();
+  }
+
+  /**
+   * Helper function to bring this pinned tree window to top
+   */
+  #bringWindowToTop() {
+    const wrapperNode = this.node.parentNode;
+    wrapperNode?.parentNode?.appendChild(wrapperNode);
   }
 
   /**
@@ -252,22 +263,25 @@ export class PinnedTreeWindow {
   getStyle = () => {
     return `
       left: ${this.pinnedTree.x}px;\
-      top: ${this.pinnedTree.y}px;\
-    `;
+      top: ${this.pinnedTree.y}px;`;
   };
 
   /**
    * Handler for heart icon clicking event
    * @param e Mouse event
    */
-  heartClicked = (e: MouseEvent) => {
+  heartClicked = async (e: MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
     this.pinnedTree.isFav = !this.pinnedTree.isFav;
+    this.pinnedTreeWindowUpdated();
 
-    // Trigger animation on the tool bar if the user likes this tree
     if (this.pinnedTree.isFav) {
+      // Trigger animation of the heart icon on the pinned window
+      await tick();
+
+      // Trigger animation on the tool bar if the user likes this tree
       const hiddenHeart = d3.select('.hidden-heart');
       hiddenHeart
         .transition()
@@ -286,9 +300,15 @@ export class PinnedTreeWindow {
               .style('opacity', 0);
           }, 1500);
         });
-    }
 
-    this.pinnedTreeWindowUpdated();
+      const iconHeart = d3
+        .select(this.node)
+        .select('.icon-heart')
+        .classed('play-animation', true)
+        .on('animationend', () => {
+          iconHeart.classed('play-animation', false);
+        });
+    }
   };
 
   /**
@@ -318,6 +338,15 @@ export class PinnedTreeWindow {
   };
 
   /**
+   * Cancel the event
+   * @param e Mouse event
+   */
+  cancelEvent = (e: MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  /**
    * Handler for mousedown event on the window header
    * @param e Mouse event
    */
@@ -326,8 +355,7 @@ export class PinnedTreeWindow {
     e.stopPropagation();
 
     // Raise the clicked window
-    const wrapperNode = this.node.parentNode;
-    wrapperNode?.parentNode?.appendChild(wrapperNode);
+    this.#bringWindowToTop();
 
     // Register the offset from the initial click position to the div location
     const lastMousePoint: Point = {
@@ -366,5 +394,13 @@ export class PinnedTreeWindow {
     document.addEventListener('mousemove', mousemoveHandler, true);
     document.addEventListener('mouseup', mouseupHandler, true);
     document.body.style.cursor = 'move';
+  };
+
+  /**
+   * Handler for mousedown event on the content element
+   * @param e Mouse event
+   */
+  contentMousedownHandler = (e: MouseEvent) => {
+    this.#bringWindowToTop();
   };
 }

@@ -28,7 +28,7 @@
   border-top-left-radius: $border-radius;
   border-top-right-radius: $border-radius;
 
-  color: $gray-200;
+  color: $gray-100;
   background-color: $gray-700;
 
   cursor: move;
@@ -92,7 +92,10 @@
 }
 
 .icon-heart {
-  animation: heart-animation 300ms cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+  &.play-animation {
+    animation: heart-animation 300ms cubic-bezier(0.175, 0.885, 0.32, 1.275)
+      both;
+  }
 }
 
 @keyframes heart-animation {

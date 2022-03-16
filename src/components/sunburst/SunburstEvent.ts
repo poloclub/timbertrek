@@ -425,7 +425,6 @@ export function leafArcClickHandler(
       treeID: treeID,
       x: endPoint.x,
       y: endPoint.y,
-      z: 1,
       startPos,
       isFav: false
     };
@@ -453,7 +452,6 @@ export function tempShowPinnedTree(this: Sunburst) {
       treeID: treeID,
       x: endPoint.x,
       y: endPoint.y,
-      z: 1,
       startPos: { x: 0, y: 0, width: 0, height: 0 },
       isFav: false
     };

@@ -85,10 +85,7 @@
   <TreeWindow {data} {featureMap} {treeWindowStore} />
 
   {#each pinnedTreeStoreValue.pinnedTrees as pinnedTree (pinnedTree.treeID)}
-    <div
-      class="pinned-tree-window-wrapper"
-      out:fade={{ duration: 200, easing: cubicInOut }}
-    >
+    <div class="pinned-tree-window-wrapper" out:fade={{ duration: 100 }}>
       <PinnedTreeWindow {pinnedTree} {pinnedTreeStore} />
     </div>
   {/each}

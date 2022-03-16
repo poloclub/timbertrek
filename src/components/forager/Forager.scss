@@ -9,14 +9,14 @@
   align-items: center;
   border-bottom: 1px solid $gray-light-border;
 
-  // $rect-width: 1px;
-  // $rect-gap: 35px;
-  // background-image: linear-gradient(
-  //     $gray-200 $rect-width,
-  //     transparent $rect-width
-  //   ),
-  //   linear-gradient(to right, $gray-200 $rect-width, white $rect-width);
-  // background-size: $rect-gap $rect-gap;
+  $rect-width: 1px;
+  $rect-gap: 25px;
+  background-image: linear-gradient(
+      $gray-200 $rect-width,
+      transparent $rect-width
+    ),
+    linear-gradient(to right, $gray-200 $rect-width, white $rect-width);
+  background-size: $rect-gap $rect-gap;
 
   // $dot-width: 1px;
   // $dot-gap: 20px;
@@ -123,4 +123,8 @@
       background-color: adjust-color($color: white, $lightness: -12%);
     }
   }
+}
+
+.pinned-tree-window-wrapper {
+  z-index: 1;
 }

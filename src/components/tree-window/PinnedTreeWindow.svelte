@@ -60,6 +60,7 @@
   <div
     class="tree-header"
     on:mousedown={e => pinnedTreeWindow?.headerMousedownHandler(e)}
+    on:click={e => pinnedTreeWindow?.cancelEvent(e)}
   >
     <div class="tree-info">
       <span class="tree-name">
@@ -75,9 +76,10 @@
       <div
         class="control-fav"
         on:click={e => pinnedTreeWindow?.heartClicked(e)}
+        on:mousedown={e => pinnedTreeWindow?.cancelEvent(e)}
       >
         {#if pinnedTreeWindow?.pinnedTree.isFav}
-          <div class="svg-icon icon-heart">
+          <div class="svg-icon icon-heart" class:play-animation={false}>
             {@html iconHeartCircleClicked}
           </div>
         {:else}
@@ -90,6 +92,7 @@
       <div
         class="control-close"
         on:click={e => pinnedTreeWindow?.closeClicked(e)}
+        on:mousedown={e => pinnedTreeWindow?.cancelEvent(e)}
       >
         <div class="svg-icon">
           {@html iconCloseCircle}
@@ -98,7 +101,10 @@
     </div>
   </div>
 
-  <div class="content">
+  <div
+    class="content"
+    on:mousedown={e => pinnedTreeWindow?.contentMousedownHandler(e)}
+  >
     <svg class="tree-svg" />
   </div>
 </div>
