@@ -63,4 +63,8 @@
 
 <div class="sunburst" bind:this={component}>
   <svg class="sunburst-svg" />
+  <div class="stat-overlay">
+    <span class="rule-stat">2533 paths</span>
+    <span class="tree-stat">3233 trees</span>
+  </div>
 </div>

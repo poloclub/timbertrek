@@ -1,18 +1,16 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  // import { preProcessSVG } from '../../utils/utils';
   import { ToolbarEventHandler } from './Toolbar';
   import type { Writable } from 'svelte/store';
-  import type { AppearanceStoreValue, SunburstStoreValue } from 'src/stores';
+  import type { FavoritesStoreValue, SunburstStoreValue } from 'src/stores';
 
-  import iconBrush from '../../imgs/icon-brush.svg?raw';
   import iconSearch from '../../imgs/icon-search.svg?raw';
   import iconHeart from '../../imgs/icon-heart.svg?raw';
   import iconHeartSolid from '../../imgs/icon-heart-solid.svg?raw';
 
   // Component variables
   // export let data: object | null = null;
-  export let appearanceStore: Writable<AppearanceStoreValue> | null = null;
+  export let favoritesStore: Writable<FavoritesStoreValue> | null = null;
   export let sunburstStore: Writable<SunburstStoreValue> | null = null;
 
   let component: HTMLElement | null = null;
@@ -33,16 +31,16 @@
   };
 
   const initView = () => {
-    if (appearanceStore && sunburstStore) {
+    if (favoritesStore && sunburstStore) {
       handler = new ToolbarEventHandler(
         handlerUpdated,
-        appearanceStore,
+        favoritesStore,
         sunburstStore
       );
     }
   };
 
-  $: appearanceStore && sunburstStore && initView();
+  $: favoritesStore && sunburstStore && initView();
 </script>
 
 <style lang="scss">
@@ -80,27 +78,33 @@
   </div>
 
   <div class="tools">
-    <div
+    <!-- <div
       class="tool-button"
       on:click={() => {
-        handler?.appearanceClicked();
+        handler?.favoritesClicked();
       }}
-      class:shown={handler?.appearanceStoreValue.shown}
+      class:shown={handler?.favoritesStoreValue.shown}
     >
       <span class="svg-icon">
         {@html iconBrush}
       </span>
-      <span class="tool-name"> Appearance </span>
-    </div>
+      <span class="tool-name"> Favorites </span>
+    </div> -->
 
-    <div class="tool-button">
+    <div
+      class="tool-button"
+      on:click={() => {
+        handler?.favoritesClicked();
+      }}
+      class:shown={handler?.favoritesStoreValue.shown}
+    >
       <span class="svg-icon">
         {@html iconHeart}
         <div class="hidden-heart" class:pulse={false}>
           {@html iconHeartSolid}
         </div>
       </span>
-      <span class="tool-name"> Favorites </span>
+      <span class="tool-name"> My Favorites </span>
     </div>
 
     <div class="tool-button">

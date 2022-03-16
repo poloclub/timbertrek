@@ -1,6 +1,6 @@
 @import '../../define';
 
-.appearance-panel {
+.favorites-panel {
   display: none;
   flex-direction: column;
   align-items: center;
@@ -9,6 +9,7 @@
   min-height: 400px;
   max-height: $sunburst-width + $toolbar-height - 1px;
 
+  border-radius: $border-radius;
   border: 1px solid $gray-light-border;
   background-color: $gray-light-background;
 

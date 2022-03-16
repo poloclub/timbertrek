@@ -3,7 +3,7 @@
   import { fade } from 'svelte/transition';
   import { cubicInOut } from 'svelte/easing';
   import {
-    getAppearanceStore,
+    getFavoritesStore,
     getSunburstStore,
     getTreeWindowStore,
     getPinnedTreeStore,
@@ -13,7 +13,7 @@
   import Sunburst from '../sunburst/Sunburst.svelte';
   import TreeWindow from '../tree-window/TreeWindow.svelte';
   import PinnedTreeWindow from '../tree-window/PinnedTreeWindow.svelte';
-  import AppearancePanel from '../appearance-panel/AppearancePanel.svelte';
+  import FavoritesPanel from '../favorites-panel/FavoritesPanel.svelte';
   import d3 from '../../utils/d3-import';
   import type { HierarchyJSON, PinnedTree } from '../ForagerTypes';
 
@@ -36,7 +36,7 @@
   initData();
 
   // Construct stores
-  const appearanceStore = getAppearanceStore();
+  const favoritesStore = getFavoritesStore();
   const sunburstStore = getSunburstStore();
   const treeWindowStore = getTreeWindowStore();
   const pinnedTreeStore = getPinnedTreeStore();
@@ -69,7 +69,7 @@
 
     <div class="content">
       <div class="toolbar">
-        <Toolbar {appearanceStore} {sunburstStore} />
+        <Toolbar {favoritesStore} {sunburstStore} />
       </div>
 
       <div class="sunburst">
@@ -78,7 +78,7 @@
     </div>
 
     <div class="sidebar">
-      <AppearancePanel {appearanceStore} />
+      <FavoritesPanel {favoritesStore} />
     </div>
   </div>
 

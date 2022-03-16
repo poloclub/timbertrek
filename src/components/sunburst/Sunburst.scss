@@ -74,3 +74,25 @@
     opacity: 1;
   }
 }
+
+.stat-overlay {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 6px;
+
+  position: absolute;
+  left: 0px;
+  bottom: 0px;
+
+  text-align: start;
+  font-size: 0.85rem;
+  line-height: 1;
+
+  padding: 4px 6px 5px 6px;
+  border-bottom-left-radius: $border-radius;
+  border-bottom-right-radius: 5px;
+  border-top-right-radius: 5px;
+  background-color: change-color($color: $gray-200, $alpha: 0.5);
+  color: $gray-700;
+}

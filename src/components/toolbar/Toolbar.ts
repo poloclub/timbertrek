@@ -2,9 +2,9 @@ import type { Writable } from 'svelte/store';
 import d3 from '../../utils/d3-import';
 // import { config } from '../../config';
 import { getContrastRatio } from '../../utils/utils';
-import type { AppearanceStoreValue, SunburstStoreValue } from '../../stores';
+import type { FavoritesStoreValue, SunburstStoreValue } from '../../stores';
 import {
-  getAppearanceStoreDefaultValue,
+  getFavoritesStoreDefaultValue,
   getSunburstStoreDefaultValue
 } from '../../stores';
 import { SunburstAction } from '../../stores';
@@ -13,8 +13,8 @@ import { SunburstAction } from '../../stores';
  * Class to handle events in the toolbar
  */
 export class ToolbarEventHandler {
-  appearanceStore: Writable<AppearanceStoreValue>;
-  appearanceStoreValue: AppearanceStoreValue;
+  favoritesStore: Writable<FavoritesStoreValue>;
+  favoritesStoreValue: FavoritesStoreValue;
 
   sunburstStore: Writable<SunburstStoreValue>;
   sunburstStoreValue: SunburstStoreValue;
@@ -23,18 +23,18 @@ export class ToolbarEventHandler {
 
   constructor(
     handlerUpdated: () => void,
-    appearanceStore: Writable<AppearanceStoreValue>,
+    favoritesStore: Writable<FavoritesStoreValue>,
     sunburstStore: Writable<SunburstStoreValue>
   ) {
     // We need to use this function to tell the component that the handler
     // object is updated
     this.handlerUpdated = handlerUpdated;
 
-    // Appearance button store bonding
-    this.appearanceStore = appearanceStore;
-    this.appearanceStoreValue = getAppearanceStoreDefaultValue();
-    this.appearanceStore.subscribe(value => {
-      this.appearanceStoreValue = value;
+    // Favorites button store bonding
+    this.favoritesStore = favoritesStore;
+    this.favoritesStoreValue = getFavoritesStoreDefaultValue();
+    this.favoritesStore.subscribe(value => {
+      this.favoritesStoreValue = value;
       this.handlerUpdated();
     });
 
@@ -48,11 +48,11 @@ export class ToolbarEventHandler {
   }
 
   /**
-   * Handler for appearance button clicking event
+   * Handler for favorites button clicking event
    */
-  appearanceClicked = () => {
-    this.appearanceStoreValue.shown = !this.appearanceStoreValue.shown;
-    this.appearanceStore.set(this.appearanceStoreValue);
+  favoritesClicked = () => {
+    this.favoritesStoreValue.shown = !this.favoritesStoreValue.shown;
+    this.favoritesStore.set(this.favoritesStoreValue);
   };
 
   /**

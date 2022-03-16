@@ -1,7 +1,7 @@
 import { writable } from 'svelte/store';
 import type { PinnedTree, TreeNode, Point } from './components/ForagerTypes';
 
-export interface AppearanceStoreValue {
+export interface FavoritesStoreValue {
   shown: boolean;
 }
 
@@ -37,7 +37,7 @@ export enum SunburstAction {
   None = ''
 }
 
-export const getAppearanceStoreDefaultValue = (): AppearanceStoreValue => {
+export const getFavoritesStoreDefaultValue = (): FavoritesStoreValue => {
   return {
     shown: false
   };
@@ -74,11 +74,11 @@ export const getPinnedTreeStoreDefaultValue = (): PinnedTreeStoreValue => {
 };
 
 /**
- * Factory function for AppearanceStore
- * @returns AppearanceStore
+ * Factory function for FavoritesStore
+ * @returns FavoritesStore
  */
-export const getAppearanceStore = () => {
-  return writable(getAppearanceStoreDefaultValue());
+export const getFavoritesStore = () => {
+  return writable(getFavoritesStoreDefaultValue());
 };
 
 export const getSunburstStore = () => {
