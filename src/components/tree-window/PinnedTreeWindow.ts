@@ -253,7 +253,6 @@ export class PinnedTreeWindow {
     return `
       left: ${this.pinnedTree.x}px;\
       top: ${this.pinnedTree.y}px;\
-      z-index: ${this.pinnedTree.z};
     `;
   };
 
@@ -316,5 +315,56 @@ export class PinnedTreeWindow {
     }
 
     this.pinnedTreeStore.set(this.pinnedTreeStoreValue);
+  };
+
+  /**
+   * Handler for mousedown event on the window header
+   * @param e Mouse event
+   */
+  headerMousedownHandler = (e: MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    // Raise the clicked window
+    const wrapperNode = this.node.parentNode;
+    wrapperNode?.parentNode?.appendChild(wrapperNode);
+
+    // Register the offset from the initial click position to the div location
+    const lastMousePoint: Point = {
+      x: e.pageX,
+      y: e.pageY
+    };
+
+    // Handling dragging mouse move
+    const mousemoveHandler = (e: MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const newX = this.node.offsetLeft + e.pageX - lastMousePoint.x;
+      const newY = this.node.offsetTop + e.pageY - lastMousePoint.y;
+
+      lastMousePoint.x = e.pageX;
+      lastMousePoint.y = e.pageY;
+
+      this.node.style.left = `${newX}px`;
+      this.node.style.top = `${newY}px`;
+    };
+
+    // Cancel the dragging when mouse is up
+    const mouseupHandler = () => {
+      document.removeEventListener('mousemove', mousemoveHandler, true);
+      document.removeEventListener('mouseup', mouseupHandler, true);
+      document.body.style.cursor = 'default';
+
+      // Record the last left and top to the object
+      this.pinnedTree.x = parseFloat(this.node.style.left);
+      this.pinnedTree.y = parseFloat(this.node.style.top);
+    };
+
+    // Bind the mouse event listener to the document so we can track the
+    // movement if outside the header region
+    document.addEventListener('mousemove', mousemoveHandler, true);
+    document.addEventListener('mouseup', mouseupHandler, true);
+    document.body.style.cursor = 'move';
   };
 }

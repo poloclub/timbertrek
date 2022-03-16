@@ -57,7 +57,10 @@
   class:hidden={pinnedTreeWindow?.hidden}
   style={pinnedTreeWindow?.getStyle()}
 >
-  <div class="tree-header">
+  <div
+    class="tree-header"
+    on:mousedown={e => pinnedTreeWindow?.headerMousedownHandler(e)}
+  >
     <div class="tree-info">
       <span class="tree-name">
         Tree {pinnedTreeWindow?.pinnedTree.treeID}
