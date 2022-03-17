@@ -424,11 +424,15 @@ export function leafArcClickHandler(
     };
 
     // Find where to put this new window
-    // Simple heuristic => put it next to the last window
+    // Simple heuristic => put it next to the last active window
     const endPoint = { x: 20, y: 20 };
-    if (this.pinnedTreeStoreValue.pinnedTrees.length > 0) {
-      endPoint.x = this.pinnedTreeStoreValue.pinnedTrees.slice(-1)[0].x + 20;
-      endPoint.y = this.pinnedTreeStoreValue.pinnedTrees.slice(-1)[0].y + 30;
+    if (this.pinnedTreeStoreValue.lastActiveTreeIndex !== null) {
+      const lastActiveTree =
+        this.pinnedTreeStoreValue.pinnedTrees[
+          this.pinnedTreeStoreValue.lastActiveTreeIndex
+        ];
+      endPoint.x = lastActiveTree.x + 20;
+      endPoint.y = lastActiveTree.y + 30;
     }
 
     const pinnedTree: PinnedTree = {
@@ -452,10 +456,14 @@ export function tempShowPinnedTree(this: Sunburst) {
   const treeTuple = this.treeWindowStoreValue.treeMap.get(treeID);
 
   if (treeTuple !== undefined) {
-    const endPoint = { x: 20, y: 20 };
-    if (this.pinnedTreeStoreValue.pinnedTrees.length > 0) {
-      endPoint.x = this.pinnedTreeStoreValue.pinnedTrees.slice(-1)[0].x + 10;
-      endPoint.y = this.pinnedTreeStoreValue.pinnedTrees.slice(-1)[0].y + 10;
+    const endPoint = { x: 70, y: 150 };
+    if (this.pinnedTreeStoreValue.lastActiveTreeIndex !== null) {
+      const lastActiveTree =
+        this.pinnedTreeStoreValue.pinnedTrees[
+          this.pinnedTreeStoreValue.lastActiveTreeIndex
+        ];
+      endPoint.x = lastActiveTree.x + 20;
+      endPoint.y = lastActiveTree.y + 30;
     }
 
     const pinnedTree: PinnedTree = {

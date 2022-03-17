@@ -104,6 +104,10 @@ export class PinnedTreeWindow {
   #bringWindowToTop() {
     const wrapperNode = this.node.parentNode;
     wrapperNode?.parentNode?.appendChild(wrapperNode);
+
+    // Also mark this window as the current active window
+    this.pinnedTreeStoreValue.lastActiveTreeIndex =
+      this.pinnedTreeStoreValue.pinnedTrees.indexOf(this.pinnedTree);
   }
 
   /**
