@@ -58,6 +58,8 @@ export class Sunburst {
   pinnedTreeStore: Writable<PinnedTreeStoreValue>;
   pinnedTreeStoreValue: PinnedTreeStoreValue;
 
+  sunburstUpdated: () => void;
+
   padding: Padding;
   width: number;
   height: number;
@@ -177,6 +179,7 @@ export class Sunburst {
     sunburstStore,
     treeWindowStore,
     pinnedTreeStore,
+    sunburstUpdated,
     width = config.layout.sunburstWidth,
     height = config.layout.sunburstWidth
   }: {
@@ -185,6 +188,7 @@ export class Sunburst {
     sunburstStore: Writable<SunburstStoreValue>;
     treeWindowStore: Writable<TreeWindowStoreValue>;
     pinnedTreeStore: Writable<PinnedTreeStoreValue>;
+    sunburstUpdated: () => void;
     width?: number;
     height?: number;
   }) {
@@ -244,6 +248,8 @@ export class Sunburst {
     this.pinnedTreeStoreValue = getPinnedTreeStoreDefaultValue();
     this.#initPinnedTreeStore();
 
+    this.sunburstUpdated = sunburstUpdated;
+
     // Create scales
     this.maxRadius = this.width / 2;
     this.xScale = d3
@@ -295,6 +301,13 @@ export class Sunburst {
     console.time('Draw sunburst');
     this.#initView();
     console.timeEnd('Draw sunburst');
+
+    // Update the tree and path numbers
+    this.sunburstStoreValue.treeNum = [
+      ...this.treeWindowStoreValue.treeMap.keys()
+    ].length;
+    this.sunburstStoreValue.pathNum = this.partition.value || 0;
+    this.sunburstStore.set(this.sunburstStoreValue);
 
     if (this.pinnedTreeStoreValue.pinnedTrees.length < 1) {
       setTimeout(() => {
@@ -468,6 +481,29 @@ export class Sunburst {
     let curID = 0;
     partition.each(d => {
       d.nid = curID++;
+    });
+
+    /**
+     * Step 4: Store number of unique trees in descendants for each node
+     */
+    partition.eachAfter(d => {
+      if (d.data.f === '_') {
+        d.uniqueTreeIDs = new Set([d.data.t!]);
+      } else {
+        const curIDs = new Set<number>();
+        d.children?.forEach(c => {
+          c.uniqueTreeIDs?.forEach(id => {
+            curIDs.add(id);
+          });
+        });
+        d.uniqueTreeIDs = curIDs;
+      }
+    });
+
+    // Transfer the ID set to its length at each node
+    partition.each(d => {
+      d.treeNum = d.uniqueTreeIDs?.size || 0;
+      d.uniqueTreeIDs = null;
     });
 
     return partition;

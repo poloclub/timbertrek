@@ -24,6 +24,13 @@
   const height = config.layout.sunburstWidth;
   let sunburst: Sunburst | null = null;
 
+  /**
+   * Trigger svelte reactivity
+   */
+  const sunburstUpdated = () => {
+    sunburst = sunburst;
+  };
+
   onMount(() => {
     mounted = true;
   });
@@ -42,6 +49,7 @@
         sunburstStore,
         treeWindowStore,
         pinnedTreeStore,
+        sunburstUpdated,
         width,
         height
       });
@@ -63,8 +71,13 @@
 
 <div class="sunburst" bind:this={component}>
   <svg class="sunburst-svg" />
-  <div class="stat-overlay">
-    <span class="rule-stat">2533 paths</span>
-    <span class="tree-stat">3233 trees</span>
+  <div
+    class="stat-overlay"
+    title={`There are ${sunburst?.curHeadNode.value} decision paths `.concat(
+      `and ${sunburst?.curHeadNode.treeNum} decisions trees in the current selection.`
+    )}
+  >
+    <span class="rule-stat">{sunburst?.curHeadNode.value | 0} paths</span>
+    <span class="tree-stat">{sunburst?.curHeadNode.treeNum | 0} trees</span>
   </div>
 </div>

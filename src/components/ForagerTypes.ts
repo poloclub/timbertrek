@@ -88,6 +88,10 @@ export interface HierarchyNode extends d3.HierarchyRectangularNode<unknown> {
   current?: d3.HierarchyRectangularNode<unknown>;
   /** Unique number ID for each node */
   nid: number;
+  /** Number of unique trees in the descendants */
+  treeNum: number;
+  /** Temporary data of tree ides in the descendants, will be all null */
+  uniqueTreeIDs: Set<number> | null;
   data: RuleNode;
 }
 

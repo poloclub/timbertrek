@@ -127,6 +127,7 @@ export function arcClicked(
 
   // Update the new head
   this.curHeadNode = newHead!;
+  this.sunburstUpdated();
   this.arcZoom(targetDomain);
 }
 
@@ -401,7 +402,10 @@ export function leafArcClickHandler(
   const treeID = d.data.t;
   const treeTuple = this.treeWindowStoreValue.treeMap.get(treeID);
 
-  if (treeTuple !== undefined) {
+  if (
+    treeTuple !== undefined &&
+    !this.pinnedTreeStoreValue.pinnedTrees.map(d => d.treeID).includes(treeID)
+  ) {
     // Get the current small window position for FLIP animation
     const startPoint = this.getTreeWindowPos(d);
     const startPos: Position = {

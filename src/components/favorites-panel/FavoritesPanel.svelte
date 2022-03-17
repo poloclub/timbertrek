@@ -34,5 +34,5 @@
   bind:this={component}
   class:shown={favoritesStoreValue.shown}
 >
-  <div class="header">Favorites</div>
+  <div class="header">My Favorites</div>
 </div>
