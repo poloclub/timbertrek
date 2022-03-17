@@ -302,13 +302,6 @@ export class Sunburst {
     this.#initView();
     console.timeEnd('Draw sunburst');
 
-    // Update the tree and path numbers
-    this.sunburstStoreValue.treeNum = [
-      ...this.treeWindowStoreValue.treeMap.keys()
-    ].length;
-    this.sunburstStoreValue.pathNum = this.partition.value || 0;
-    this.sunburstStore.set(this.sunburstStoreValue);
-
     if (this.pinnedTreeStoreValue.pinnedTrees.length < 1) {
       setTimeout(() => {
         this.tempShowPinnedTree();

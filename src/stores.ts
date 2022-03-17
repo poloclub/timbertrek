@@ -11,8 +11,6 @@ export interface SunburstStoreValue {
   depthHigh: number;
   depthColors: string[];
   action: SunburstAction;
-  treeNum: number;
-  pathNum: number;
 }
 
 export interface TreeWindowStoreValue {
@@ -51,9 +49,7 @@ export const getSunburstStoreDefaultValue = (): SunburstStoreValue => {
     depthLow: 0,
     depthHigh: 0,
     depthColors: [],
-    action: SunburstAction.None,
-    treeNum: 0,
-    pathNum: 0
+    action: SunburstAction.None
   };
 };
 

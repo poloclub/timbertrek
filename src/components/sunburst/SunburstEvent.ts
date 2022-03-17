@@ -284,6 +284,14 @@ export function getTreeWindowPos(this: Sunburst, d: HierarchyNode): Point {
     quad: Math.floor(outerCenterAngle / (Math.PI / 2)) + 2
   };
 
+  // Special case: if the node is a full ring, we put the hover window on the
+  // second quad
+  if (d.x0 === this.xScale.domain()[0] && d.x1 === this.xScale.domain()[1]) {
+    outerCenter.x = Math.cos(-Math.PI / 4) * outerCenterR;
+    outerCenter.y = Math.sin(-Math.PI / 4) * outerCenterR;
+    outerCenter.quad = 1;
+  }
+
   const getTLPoint = (outerCenter: OuterCenter): Point => {
     const curPoint = { x: 0, y: 0 };
 
