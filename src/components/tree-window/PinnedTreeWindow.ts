@@ -10,8 +10,11 @@ import type {
   PinnedTree,
   Position
 } from '../ForagerTypes';
-import type { PinnedTreeStoreValue } from '../../stores';
-import { getPinnedTreeStoreDefaultValue } from '../../stores';
+import type { PinnedTreeStoreValue, FavoritesStoreValue } from '../../stores';
+import {
+  getPinnedTreeStoreDefaultValue,
+  getFavoritesStoreDefaultValue
+} from '../../stores';
 
 export class PinnedTreeWindow {
   pinnedTree: PinnedTree;
@@ -25,6 +28,9 @@ export class PinnedTreeWindow {
   pinnedTreeStore: Writable<PinnedTreeStoreValue>;
   pinnedTreeStoreValue: PinnedTreeStoreValue;
 
+  favoritesStore: Writable<FavoritesStoreValue>;
+  favoritesStoreValue: FavoritesStoreValue;
+
   // FLIP animation
   hidden = true;
   endPos: Position;
@@ -34,6 +40,7 @@ export class PinnedTreeWindow {
     component,
     pinnedTree,
     pinnedTreeStore,
+    favoritesStore,
     pinnedTreeWindowUpdated,
     width = 200,
     height = 200
@@ -41,6 +48,7 @@ export class PinnedTreeWindow {
     component: HTMLElement;
     pinnedTree: PinnedTree;
     pinnedTreeStore: Writable<PinnedTreeStoreValue>;
+    favoritesStore: Writable<FavoritesStoreValue>;
     pinnedTreeWindowUpdated: () => void;
     width?: number;
     height?: number;
@@ -51,10 +59,17 @@ export class PinnedTreeWindow {
     this.height = height;
     this.node = component;
 
+    // Init the stores
     this.pinnedTreeStore = pinnedTreeStore;
     this.pinnedTreeStoreValue = getPinnedTreeStoreDefaultValue();
     this.pinnedTreeStore.subscribe(value => {
       this.pinnedTreeStoreValue = value;
+    });
+
+    this.favoritesStore = favoritesStore;
+    this.favoritesStoreValue = getFavoritesStoreDefaultValue();
+    this.favoritesStore.subscribe(value => {
+      this.favoritesStoreValue = value;
     });
 
     this.#bringWindowToTop();
@@ -96,6 +111,9 @@ export class PinnedTreeWindow {
     this.hidden = false;
     this.pinnedTreeWindowUpdated();
     this.playLaunchingAnimation();
+
+    // TODO: delete this
+    // this.heartClicked(new MouseEvent('click'));
   }
 
   /**
@@ -106,8 +124,7 @@ export class PinnedTreeWindow {
     wrapperNode?.parentNode?.appendChild(wrapperNode);
 
     // Also mark this window as the current active window
-    this.pinnedTreeStoreValue.lastActiveTreeIndex =
-      this.pinnedTreeStoreValue.pinnedTrees.indexOf(this.pinnedTree);
+    this.pinnedTreeStoreValue.lastActiveTreeID = this.pinnedTree.treeID;
   }
 
   /**
@@ -312,7 +329,32 @@ export class PinnedTreeWindow {
         .on('animationend', () => {
           iconHeart.classed('play-animation', false);
         });
+
+      // Add the tree to the fav list
+      const curFavTreeIDs = new Set(
+        this.favoritesStoreValue.favTrees.map(d => d.pinnedTree.treeID)
+      );
+      if (!curFavTreeIDs.has(this.pinnedTree.treeID)) {
+        this.favoritesStoreValue.favTrees.push({
+          pinnedTree: this.pinnedTree,
+          pinnedTreeUpdated: () => {
+            this.pinnedTreeWindowUpdated();
+          }
+        });
+      }
+    } else {
+      // Remove the tree from the fav list
+      const curFavTreeIDs = [
+        ...this.favoritesStoreValue.favTrees.map(d => d.pinnedTree.treeID)
+      ];
+      const curIndex = curFavTreeIDs.indexOf(this.pinnedTree.treeID);
+      if (curIndex > -1) {
+        this.favoritesStoreValue.favTrees.splice(curIndex, 1);
+      }
     }
+
+    this.favoritesStore.set(this.favoritesStoreValue);
+    this.pinnedTreeStore.set(this.pinnedTreeStoreValue);
   };
 
   /**
@@ -336,22 +378,56 @@ export class PinnedTreeWindow {
     e.preventDefault();
     e.stopPropagation();
 
-    // Remove the pinned tree window from the store array
-    for (
-      let i = this.pinnedTreeStoreValue.pinnedTrees.length - 1;
-      i >= 0;
-      i--
-    ) {
-      if (
-        this.pinnedTreeStoreValue.pinnedTrees[i].treeID ===
-        this.pinnedTree.treeID
+    let curTreeIsActive = false;
+    if (this.pinnedTreeStoreValue.lastActiveTreeID !== null) {
+      curTreeIsActive =
+        this.pinnedTreeStoreValue.lastActiveTreeID === this.pinnedTree.treeID;
+    }
+
+    /**
+     * Check if this tree is liked first.
+     * (1) True: just set isPinned to false, and keep the tree in the array
+     * (2) False: remove the tree from the array
+     */
+
+    if (this.pinnedTree.isFav) {
+      this.pinnedTree.isPinned = false;
+    } else {
+      // Remove the pinned tree window from the store array
+      const curTreeIndex = this.pinnedTreeStoreValue.pinnedTrees.indexOf(
+        this.pinnedTree
+      );
+      if (curTreeIndex > -1) {
+        this.pinnedTreeStoreValue.pinnedTrees.splice(curTreeIndex, 1);
+      } else {
+        console.warn('Trying to delete a tree that does not exist!');
+      }
+    }
+
+    // If this tree happens to be the active tree, change the active index
+    // to the last pinned item
+    if (curTreeIsActive) {
+      let activeChanged = false;
+      for (
+        let i = this.pinnedTreeStoreValue.pinnedTrees.length - 1;
+        i >= 0;
+        i--
       ) {
-        this.pinnedTreeStoreValue.pinnedTrees.splice(i, 1);
-        break;
+        if (this.pinnedTreeStoreValue.pinnedTrees[i].isPinned) {
+          this.pinnedTreeStoreValue.lastActiveTreeID =
+            this.pinnedTreeStoreValue.pinnedTrees[i].treeID;
+          activeChanged = true;
+          break;
+        }
+      }
+
+      if (!activeChanged) {
+        this.pinnedTreeStoreValue.lastActiveTreeID = null;
       }
     }
 
     this.pinnedTreeStore.set(this.pinnedTreeStoreValue);
+    console.log(this.pinnedTreeStoreValue);
   };
 
   /**

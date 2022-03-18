@@ -410,31 +410,33 @@ export function leafArcClickHandler(
   const treeID = d.data.t;
   const treeTuple = this.treeWindowStoreValue.treeMap.get(treeID);
 
+  if (treeTuple === undefined) return;
+
+  // Get the current small window position for FLIP animation
+  const startPoint = this.getTreeWindowPos(d);
+  const startPos: Position = {
+    x: startPoint.x,
+    y: startPoint.y,
+    width: config.layout.treeWindowWidth,
+    height: config.layout.treeWindowHeight
+  };
+
+  // Find where to put this new window
+  // Simple heuristic => put it next to the last active window
+  const endPoint = { x: 20, y: 20 };
+  if (this.pinnedTreeStoreValue.lastActiveTreeID !== null) {
+    const lastActiveTree = this.pinnedTreeStoreValue.pinnedTrees.filter(
+      d => d.treeID === this.pinnedTreeStoreValue.lastActiveTreeID
+    )[0];
+    endPoint.x = lastActiveTree.x + 20;
+    endPoint.y = lastActiveTree.y + 30;
+  }
+
+  // Check if this tree is stored in the pinnedTreeStore. Note that favorite
+  // trees are also stored in the array but their isPinned is false
   if (
-    treeTuple !== undefined &&
     !this.pinnedTreeStoreValue.pinnedTrees.map(d => d.treeID).includes(treeID)
   ) {
-    // Get the current small window position for FLIP animation
-    const startPoint = this.getTreeWindowPos(d);
-    const startPos: Position = {
-      x: startPoint.x,
-      y: startPoint.y,
-      width: config.layout.treeWindowWidth,
-      height: config.layout.treeWindowHeight
-    };
-
-    // Find where to put this new window
-    // Simple heuristic => put it next to the last active window
-    const endPoint = { x: 20, y: 20 };
-    if (this.pinnedTreeStoreValue.lastActiveTreeIndex !== null) {
-      const lastActiveTree =
-        this.pinnedTreeStoreValue.pinnedTrees[
-          this.pinnedTreeStoreValue.lastActiveTreeIndex
-        ];
-      endPoint.x = lastActiveTree.x + 20;
-      endPoint.y = lastActiveTree.y + 30;
-    }
-
     const pinnedTree: PinnedTree = {
       tree: treeTuple[0],
       treeMetric: round(treeTuple[1], 4),
@@ -442,10 +444,37 @@ export function leafArcClickHandler(
       x: endPoint.x,
       y: endPoint.y,
       startPos,
-      isFav: false
+      isFav: false,
+      isPinned: true,
+      note: ''
     };
 
     this.pinnedTreeStoreValue.pinnedTrees.push(pinnedTree);
+    this.pinnedTreeStore.set(this.pinnedTreeStoreValue);
+  } else {
+    /**
+     * This tree is in the pinnedTreeStore
+     * Need to check if it is pinned: (1) true => do nothing; (2) false =>
+     * display it at the right location
+     */
+    let pinnedTreeIndex = -1;
+    for (let i = 0; i < this.pinnedTreeStoreValue.pinnedTrees.length; i++) {
+      if (this.pinnedTreeStoreValue.pinnedTrees[i].treeID === treeID) {
+        pinnedTreeIndex = i;
+        break;
+      }
+    }
+    if (pinnedTreeIndex === -1) {
+      console.warn('Could not find the clicked tree in the pinnedTrees array!');
+      return;
+    }
+
+    const pinnedTree = this.pinnedTreeStoreValue.pinnedTrees[pinnedTreeIndex];
+    pinnedTree.isPinned = true;
+    pinnedTree.startPos = startPos;
+    pinnedTree.x = endPoint.x;
+    pinnedTree.y = endPoint.y;
+
     this.pinnedTreeStore.set(this.pinnedTreeStoreValue);
   }
 }
@@ -457,11 +486,10 @@ export function tempShowPinnedTree(this: Sunburst) {
 
   if (treeTuple !== undefined) {
     const endPoint = { x: 70, y: 150 };
-    if (this.pinnedTreeStoreValue.lastActiveTreeIndex !== null) {
-      const lastActiveTree =
-        this.pinnedTreeStoreValue.pinnedTrees[
-          this.pinnedTreeStoreValue.lastActiveTreeIndex
-        ];
+    if (this.pinnedTreeStoreValue.lastActiveTreeID !== null) {
+      const lastActiveTree = this.pinnedTreeStoreValue.pinnedTrees.filter(
+        d => d.treeID === this.pinnedTreeStoreValue.lastActiveTreeID
+      )[0];
       endPoint.x = lastActiveTree.x + 20;
       endPoint.y = lastActiveTree.y + 30;
     }
@@ -473,7 +501,9 @@ export function tempShowPinnedTree(this: Sunburst) {
       x: endPoint.x,
       y: endPoint.y,
       startPos: { x: 0, y: 0, width: 0, height: 0 },
-      isFav: false
+      isFav: false,
+      isPinned: true,
+      note: ''
     };
 
     this.pinnedTreeStoreValue.pinnedTrees.push(pinnedTree);

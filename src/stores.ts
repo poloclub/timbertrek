@@ -1,8 +1,13 @@
 import { writable } from 'svelte/store';
-import type { PinnedTree, TreeNode, Point } from './components/ForagerTypes';
+import type {
+  PinnedTree,
+  TreeNode,
+  FavPinnedTree
+} from './components/ForagerTypes';
 
 export interface FavoritesStoreValue {
   shown: boolean;
+  favTrees: FavPinnedTree[];
 }
 
 export interface SunburstStoreValue {
@@ -29,7 +34,7 @@ export interface PinnedTreeStoreValue {
   /**
    * Index of the last focused pinned tree in the pinnedTrees array
    */
-  lastActiveTreeIndex: number | null;
+  lastActiveTreeID: number | null;
   getFeatureColor: null | ((f: string) => string);
 }
 
@@ -43,7 +48,8 @@ export enum SunburstAction {
 
 export const getFavoritesStoreDefaultValue = (): FavoritesStoreValue => {
   return {
-    shown: false
+    shown: false,
+    favTrees: []
   };
 };
 
@@ -73,7 +79,7 @@ export const getTreeWindowStoreDefaultValue = (): TreeWindowStoreValue => {
 export const getPinnedTreeStoreDefaultValue = (): PinnedTreeStoreValue => {
   return {
     pinnedTrees: [],
-    lastActiveTreeIndex: null,
+    lastActiveTreeID: null,
     getFeatureColor: null
   };
 };

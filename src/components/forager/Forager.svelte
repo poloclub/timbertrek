@@ -78,16 +78,18 @@
     </div>
 
     <div class="sidebar">
-      <FavoritesPanel {favoritesStore} />
+      <FavoritesPanel {favoritesStore} {pinnedTreeStore} />
     </div>
   </div>
 
   <TreeWindow {data} {featureMap} {treeWindowStore} />
 
   {#each pinnedTreeStoreValue.pinnedTrees as pinnedTree (pinnedTree.treeID)}
-    <div class="pinned-tree-window-wrapper" out:fade={{ duration: 100 }}>
-      <PinnedTreeWindow {pinnedTree} {pinnedTreeStore} />
-    </div>
+    {#if pinnedTree.isPinned}
+      <div class="pinned-tree-window-wrapper" out:fade={{ duration: 100 }}>
+        <PinnedTreeWindow {pinnedTree} {pinnedTreeStore} {favoritesStore} />
+      </div>
+    {/if}
   {/each}
 
   <div class="dev-bar">

@@ -17,11 +17,6 @@
     ),
     linear-gradient(to right, $gray-200 $rect-width, white $rect-width);
   background-size: $rect-gap $rect-gap;
-
-  // $dot-width: 1px;
-  // $dot-gap: 20px;
-  // background-image: radial-gradient($gray-400 $dot-width, white $dot-width);
-  // background-size: $dot-gap $dot-gap;
 }
 
 .forager {
@@ -81,7 +76,7 @@
 
 .sidebar {
   position: absolute;
-  right: 0px;
+  right: -2px;
   top: $header-height;
   transform: translateX(calc(100% - 2px));
 

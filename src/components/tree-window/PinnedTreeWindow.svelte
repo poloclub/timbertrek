@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import { PinnedTreeWindow } from './PinnedTreeWindow';
   import type { Writable } from 'svelte/store';
-  import type { PinnedTreeStoreValue } from '../../stores';
+  import type { PinnedTreeStoreValue, FavoritesStoreValue } from '../../stores';
   import type { HierarchyJSON, PinnedTree } from '../ForagerTypes';
   import iconCloseCircle from '../../imgs/icon-close-circle.svg?raw';
   import iconHeartCircle from '../../imgs/icon-heart-circle.svg?raw';
@@ -12,6 +12,7 @@
   // Component variables
   export let pinnedTree: PinnedTree | null = null;
   export let pinnedTreeStore: Writable<PinnedTreeStoreValue> | null = null;
+  export let favoritesStore: Writable<FavoritesStoreValue> | null = null;
 
   let component: HTMLElement | null = null;
   let mounted = false;
@@ -19,6 +20,8 @@
   // View variables
   let pinnedTreeWindow: PinnedTreeWindow | null = null;
   let initialized = false;
+
+  const tempNote = '';
 
   onMount(() => {
     mounted = true;
@@ -30,20 +33,31 @@
 
   const initView = () => {
     initialized = true;
-    if (component && pinnedTree && pinnedTreeStore) {
+    if (component && pinnedTree && pinnedTreeStore && favoritesStore) {
       pinnedTreeWindow = new PinnedTreeWindow({
         component,
         pinnedTree,
         pinnedTreeStore,
+        favoritesStore,
         pinnedTreeWindowUpdated
       });
     }
+  };
+
+  /**
+   * Trigger update in the favorite panel
+   * @param e Event
+   */
+  const noteChanged = (e: MouseEvent) => {
+    e.stopPropagation();
+    favoritesStore?.update(value => value);
   };
 
   $: pinnedTree &&
     mounted &&
     component &&
     pinnedTreeStore &&
+    favoritesStore &&
     !initialized &&
     initView();
 </script>
@@ -110,11 +124,15 @@
             class="input-wrapper"
             on:click={e => pinnedTreeWindow?.cancelEvent(e)}
           >
-            <textarea
-              class="note-window-input"
-              name="note-input"
-              placeholder="Leave a comment."
-            />
+            {#if pinnedTreeWindow !== null}
+              <textarea
+                class="note-window-input"
+                name="note-input"
+                placeholder="Leave a comment."
+                on:input={e => noteChanged(e)}
+                bind:value={pinnedTreeWindow.pinnedTree.note}
+              />
+            {/if}
           </div>
         </div>
       </div>

@@ -9,6 +9,14 @@ export interface Position {
   height: number;
 }
 
+/**
+ * A workaround to enable bi-directional communication.
+ */
+export interface FavPinnedTree {
+  pinnedTree: PinnedTree;
+  pinnedTreeUpdated: () => void;
+}
+
 export interface PinnedTree {
   tree: TreeNode;
   treeMetric: number;
@@ -17,6 +25,8 @@ export interface PinnedTree {
   y: number;
   startPos: Position;
   isFav: boolean;
+  isPinned: boolean;
+  note: string;
 }
 
 export interface FeatureMap {
