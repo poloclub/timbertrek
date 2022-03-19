@@ -70,6 +70,7 @@
   class="pinned-tree-window"
   bind:this={component}
   class:hidden={pinnedTreeWindow?.hidden}
+  class:jiggle={false}
   style={pinnedTreeWindow?.getStyle()}
 >
   <div

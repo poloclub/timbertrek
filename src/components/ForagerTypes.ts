@@ -27,6 +27,7 @@ export interface PinnedTree {
   isFav: boolean;
   isPinned: boolean;
   note: string;
+  jiggle: () => void;
 }
 
 export interface FeatureMap {

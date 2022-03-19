@@ -16,6 +16,10 @@
   &.hidden {
     visibility: hidden;
   }
+
+  &.jiggle {
+    animation: jiggle 800ms forwards cubic-bezier(0.215, 0.61, 0.355, 1);
+  }
 }
 
 .tree-header {
@@ -244,5 +248,26 @@ $border-color: $gray-light-border;
 @keyframes dash {
   to {
     stroke-dashoffset: -1000;
+  }
+}
+
+@keyframes jiggle {
+  0% {
+    transform: scale(0.9);
+  }
+  20% {
+    transform: scale(1.1);
+  }
+  40% {
+    transform: scale(0.95);
+  }
+  60% {
+    transform: scale(1.05);
+  }
+  80% {
+    transform: scale(0.975);
+  }
+  100% {
+    transform: scale(1);
   }
 }

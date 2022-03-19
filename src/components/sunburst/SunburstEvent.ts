@@ -446,7 +446,8 @@ export function leafArcClickHandler(
       startPos,
       isFav: false,
       isPinned: true,
-      note: ''
+      note: '',
+      jiggle: () => {}
     };
 
     this.pinnedTreeStoreValue.pinnedTrees.push(pinnedTree);
@@ -454,8 +455,9 @@ export function leafArcClickHandler(
   } else {
     /**
      * This tree is in the pinnedTreeStore
-     * Need to check if it is pinned: (1) true => do nothing; (2) false =>
-     * display it at the right location
+     * Need to check if it is pinned:
+     * (1) true => jiggle to highlight the window
+     * (2) false => pin it at the right location
      */
     let pinnedTreeIndex = -1;
     for (let i = 0; i < this.pinnedTreeStoreValue.pinnedTrees.length; i++) {
@@ -470,10 +472,17 @@ export function leafArcClickHandler(
     }
 
     const pinnedTree = this.pinnedTreeStoreValue.pinnedTrees[pinnedTreeIndex];
-    pinnedTree.isPinned = true;
-    pinnedTree.startPos = startPos;
-    pinnedTree.x = endPoint.x;
-    pinnedTree.y = endPoint.y;
+
+    if (pinnedTree.isPinned) {
+      // This tree is already pinned, jiggle to highlight the window
+      pinnedTree.jiggle();
+    } else {
+      // This tree is not pinned (it is in the array because it is liked)
+      pinnedTree.isPinned = true;
+      pinnedTree.startPos = startPos;
+      pinnedTree.x = endPoint.x;
+      pinnedTree.y = endPoint.y;
+    }
 
     this.pinnedTreeStore.set(this.pinnedTreeStoreValue);
   }
@@ -503,7 +512,8 @@ export function tempShowPinnedTree(this: Sunburst) {
       startPos: { x: 0, y: 0, width: 0, height: 0 },
       isFav: false,
       isPinned: true,
-      note: ''
+      note: '',
+      jiggle: () => {}
     };
 
     this.pinnedTreeStoreValue.pinnedTrees.push(pinnedTree);

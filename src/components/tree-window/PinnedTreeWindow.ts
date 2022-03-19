@@ -59,6 +59,18 @@ export class PinnedTreeWindow {
     this.height = height;
     this.node = component;
 
+    /**
+     * When the user tries to pin a tree that is already pinned, jiggle to
+     * highlight this window.
+     */
+    this.pinnedTree.jiggle = () => {
+      this.#bringWindowToTop();
+      this.node.classList.add('jiggle');
+      this.node.onanimationend = () => {
+        this.node.classList.remove('jiggle');
+      };
+    };
+
     // Init the stores
     this.pinnedTreeStore = pinnedTreeStore;
     this.pinnedTreeStoreValue = getPinnedTreeStoreDefaultValue();
@@ -111,9 +123,6 @@ export class PinnedTreeWindow {
     this.hidden = false;
     this.pinnedTreeWindowUpdated();
     this.playLaunchingAnimation();
-
-    // TODO: delete this
-    // this.heartClicked(new MouseEvent('click'));
   }
 
   /**
@@ -157,7 +166,7 @@ export class PinnedTreeWindow {
       {
         duration: 300,
         easing: 'cubic-bezier(0.4, 0.0, 0.2, 1)',
-        fill: 'both'
+        fill: 'none'
       }
     );
   };
