@@ -189,12 +189,18 @@ export class TreeWindow {
       .join('path')
       .attr('class', d => `link link-${d.source.data.f}`)
       .attr('id', d => {
+        const preSource =
+          d.source.ancestors().length > 1
+            ? d.source.ancestors()[1].data.f
+            : 'r';
+        const source = d.source.data.f;
+        const target = d.target.data.f;
         if (d.target.data.f === '+') {
-          return `link-${d.source.data.f}-p`;
+          return `link-${preSource}-${source}-p`;
         } else if (d.target.data.f === '-') {
-          return `link-${d.source.data.f}-n`;
+          return `link-${preSource}-${source}-n`;
         } else {
-          return `link-${d.source.data.f}-${d.target.data.f}`;
+          return `link-${preSource}-${source}-${target}`;
         }
       })
       .attr('d', d => {
@@ -246,16 +252,20 @@ export class TreeWindow {
 
     // Highlight the current decision path
     for (let i = 0; i < this.curAncestorFs.length - 1; i++) {
+      const preSource = i === 0 ? 'r' : this.curAncestorFs[i - 1];
+      const source = this.curAncestorFs[i];
+      const target = this.curAncestorFs[i + 1];
+
       if (this.curAncestorFs[i + 1] === '_') {
         linkGroup
-          .select(`#link-${this.curAncestorFs[i]}-p`)
+          .selectAll(`#link-${preSource}-${source}-p`)
           .classed('highlighted', true);
         linkGroup
-          .select(`#link-${this.curAncestorFs[i]}-n`)
+          .selectAll(`#link-${preSource}-${source}-n`)
           .classed('highlighted', true);
       } else {
         linkGroup
-          .select(`#link-${this.curAncestorFs[i]}-${this.curAncestorFs[i + 1]}`)
+          .selectAll(`#link-${preSource}-${source}-${target}`)
           .classed('highlighted', true);
       }
     }
