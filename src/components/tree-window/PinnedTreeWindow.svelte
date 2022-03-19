@@ -8,6 +8,7 @@
   import iconHeartCircle from '../../imgs/icon-heart-circle.svg?raw';
   import iconNoteCircle from '../../imgs/icon-note-circle.svg?raw';
   import iconHeartCircleClicked from '../../imgs/icon-heart-circle-clicked.svg?raw';
+  import iconNoteCircleClicked from '../../imgs/icon-note-circle-clicked.svg?raw';
 
   // Component variables
   export let pinnedTree: PinnedTree | null = null;
@@ -117,9 +118,16 @@
           e.stopPropagation();
         }}
       >
-        <div class="svg-icon">
-          {@html iconNoteCircle}
-        </div>
+        {#if pinnedTreeWindow?.pinnedTree.note === ''}
+          <div class="svg-icon">
+            {@html iconNoteCircle}
+          </div>
+        {:else}
+          <div class="svg-icon">
+            {@html iconNoteCircleClicked}
+          </div>
+        {/if}
+
         <div class="note-window" class:show={false} title="">
           <div
             class="input-wrapper"
