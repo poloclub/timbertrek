@@ -22,8 +22,6 @@
   let pinnedTreeWindow: PinnedTreeWindow | null = null;
   let initialized = false;
 
-  const tempNote = '';
-
   onMount(() => {
     mounted = true;
   });
