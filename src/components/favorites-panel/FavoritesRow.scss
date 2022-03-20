@@ -1,0 +1,91 @@
+@import '../../define';
+
+.tree {
+  display: flex;
+  justify-content: flex-start;
+  gap: 6px;
+
+  padding: 12px 12px 0px 12px;
+  font-size: 14px;
+
+  .tree-left {
+    flex-shrink: 0;
+    display: flex;
+
+    svg {
+      border: 1px solid $gray-200;
+      border-radius: 4px;
+      width: 70px;
+      height: 70px;
+    }
+  }
+
+  .tree-right {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+
+    .tree-info {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+
+      line-height: 1;
+      padding-bottom: 7px;
+
+      .tree-info-left {
+        display: flex;
+        align-items: baseline;
+        gap: 3px;
+
+        .tree-name {
+          font-weight: 600;
+        }
+      }
+
+      .svg-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: $gray-500;
+        cursor: pointer;
+        pointer-events: fill;
+
+        :global(svg) {
+          width: 0.875rem;
+          height: 0.875rem;
+        }
+
+        &:hover {
+          color: $gray-800;
+        }
+
+        &:active {
+          color: $gray-900;
+        }
+      }
+    }
+
+    .tree-note {
+      border: 1px solid $gray-200;
+      border-radius: 4px;
+
+      .note-window-input {
+        width: 100%;
+        // height: 200px;
+        padding: 0.4em;
+        margin: 0px;
+
+        border: none;
+        outline: none;
+        box-shadow: none;
+        resize: none;
+
+        font-size: 14px;
+        color: $gray-700;
+        background-color: $gray-light-background;
+      }
+    }
+  }
+}
