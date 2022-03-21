@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, onDestroy } from 'svelte';
   import { PinnedTreeWindow } from './PinnedTreeWindow';
   import type { Writable } from 'svelte/store';
   import type { PinnedTreeStoreValue, FavoritesStoreValue } from '../../stores';
@@ -24,6 +24,11 @@
 
   onMount(() => {
     mounted = true;
+  });
+
+  onDestroy(() => {
+    pinnedTreeWindow?.pinnedTreeStoreUnsubscriber();
+    pinnedTreeWindow?.favoritesStoreUnsubscriber();
   });
 
   const pinnedTreeWindowUpdated = () => {

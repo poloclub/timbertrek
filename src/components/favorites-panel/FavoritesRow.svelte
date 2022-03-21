@@ -3,7 +3,7 @@
   import type { Writable } from 'svelte/store';
   import type { FavoritesStoreValue } from '../../stores';
   import { FavoritesRow } from './FavoritesRow';
-  import { onMount } from 'svelte';
+  import { onMount, onDestroy } from 'svelte';
   import deleteIcon from '../../imgs/icon-trash.svg?raw';
 
   // Component variables
@@ -17,6 +17,11 @@
 
   onMount(() => {
     mounted = true;
+  });
+
+  onDestroy(() => {
+    // Unsubscribe the favorites store
+    favoriteRow?.favoritesStoreUnsubscriber();
   });
 
   const initView = () => {

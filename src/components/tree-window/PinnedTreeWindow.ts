@@ -1,8 +1,6 @@
-import { TreeWindow } from './TreeWindow';
 import { tick } from 'svelte';
 import d3 from '../../utils/d3-import';
-import { round } from '../../utils/utils';
-import type { Writable } from 'svelte/store';
+import type { Writable, Unsubscriber } from 'svelte/store';
 import type {
   TreeNode,
   Point,
@@ -27,9 +25,11 @@ export class PinnedTreeWindow {
 
   pinnedTreeStore: Writable<PinnedTreeStoreValue>;
   pinnedTreeStoreValue: PinnedTreeStoreValue;
+  pinnedTreeStoreUnsubscriber: Unsubscriber;
 
   favoritesStore: Writable<FavoritesStoreValue>;
   favoritesStoreValue: FavoritesStoreValue;
+  favoritesStoreUnsubscriber: Unsubscriber;
 
   // FLIP animation
   hidden = true;
@@ -74,13 +74,13 @@ export class PinnedTreeWindow {
     // Init the stores
     this.pinnedTreeStore = pinnedTreeStore;
     this.pinnedTreeStoreValue = getPinnedTreeStoreDefaultValue();
-    this.pinnedTreeStore.subscribe(value => {
+    this.pinnedTreeStoreUnsubscriber = this.pinnedTreeStore.subscribe(value => {
       this.pinnedTreeStoreValue = value;
     });
 
     this.favoritesStore = favoritesStore;
     this.favoritesStoreValue = getFavoritesStoreDefaultValue();
-    this.favoritesStore.subscribe(value => {
+    this.favoritesStoreUnsubscriber = this.favoritesStore.subscribe(value => {
       this.favoritesStoreValue = value;
     });
 
@@ -436,7 +436,6 @@ export class PinnedTreeWindow {
     }
 
     this.pinnedTreeStore.set(this.pinnedTreeStoreValue);
-    console.log(this.pinnedTreeStoreValue);
   };
 
   /**

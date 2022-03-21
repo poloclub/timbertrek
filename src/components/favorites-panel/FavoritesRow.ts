@@ -1,5 +1,5 @@
 import type { PinnedTree, FavPinnedTree } from '../ForagerTypes';
-import type { Writable } from 'svelte/store';
+import type { Writable, Unsubscriber } from 'svelte/store';
 import { tick } from 'svelte';
 import type { FavoritesStoreValue } from '../../stores';
 import { getFavoritesStoreDefaultValue } from '../../stores';
@@ -9,6 +9,7 @@ export class FavoritesRow {
   textAreaNode: HTMLElement;
   favoritesStore: Writable<FavoritesStoreValue>;
   favoritesStoreValue: FavoritesStoreValue;
+  favoritesStoreUnsubscriber: Unsubscriber;
 
   constructor({
     favTree,
@@ -24,7 +25,7 @@ export class FavoritesRow {
 
     this.favoritesStore = favoritesStore;
     this.favoritesStoreValue = getFavoritesStoreDefaultValue();
-    this.favoritesStore.subscribe(value => {
+    this.favoritesStoreUnsubscriber = this.favoritesStore.subscribe(value => {
       this.favoritesStoreValue = value;
 
       if (this.favoritesStoreValue.shown) {

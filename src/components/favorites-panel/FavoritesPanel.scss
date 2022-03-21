@@ -7,7 +7,7 @@
 
   width: 260px;
   min-height: 400px;
-  max-height: $sunburst-width + $toolbar-height - 1px;
+  max-height: $sunburst-width + $sidebar-header-height - 1px;
 
   border-radius: $border-radius;
   background-color: $gray-light-background;
@@ -18,7 +18,7 @@
 }
 
 .header {
-  height: $toolbar-height;
+  height: $sidebar-header-height;
   width: 100%;
 
   background-color: $gray-800;
