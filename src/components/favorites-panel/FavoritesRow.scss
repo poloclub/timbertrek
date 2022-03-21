@@ -71,9 +71,14 @@
       border: 1px solid $gray-200;
       border-radius: 4px;
 
+      transition: border-color 150ms cubic-bezier(0.4, 0, 0.2, 1);
+
+      &:hover {
+        border: 1px solid $gray-400;
+      }
+
       .note-window-input {
         width: 100%;
-        // height: 200px;
         padding: 0.4em;
         margin: 0px;
 
@@ -87,5 +92,29 @@
         background-color: $gray-light-background;
       }
     }
+  }
+}
+
+.tree-svg {
+  stroke-linecap: round;
+  stroke-linejoin: round;
+
+  :global(path.link) {
+    fill: none;
+    stroke: $gray-600;
+    stroke-width: 1px;
+  }
+
+  :global(.node rect) {
+    fill: $gray-light-background;
+    stroke: $gray-500;
+    stroke-width: 1px;
+  }
+
+  :global(.node text) {
+    fill: $gray-600;
+    font-size: 10px;
+    dominant-baseline: middle;
+    text-anchor: middle;
   }
 }

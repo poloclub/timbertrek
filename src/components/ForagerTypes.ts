@@ -15,6 +15,7 @@ export interface Position {
 export interface FavPinnedTree {
   pinnedTree: PinnedTree;
   pinnedTreeUpdated: () => void;
+  getFeatureColor: (f: string) => string;
 }
 
 export interface PinnedTree {

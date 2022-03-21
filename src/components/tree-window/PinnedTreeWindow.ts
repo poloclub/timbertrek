@@ -348,7 +348,11 @@ export class PinnedTreeWindow {
           pinnedTree: this.pinnedTree,
           pinnedTreeUpdated: () => {
             this.pinnedTreeWindowUpdated();
-          }
+          },
+          getFeatureColor:
+            this.pinnedTreeStoreValue.getFeatureColor === null
+              ? f => 'var(--md-gray-500)'
+              : this.pinnedTreeStoreValue.getFeatureColor
         });
       }
     } else {

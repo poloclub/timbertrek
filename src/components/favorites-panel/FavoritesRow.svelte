@@ -10,6 +10,7 @@
   export let favTree: FavPinnedTree | null = null;
   export let favoritesStore: Writable<FavoritesStoreValue> | null = null;
 
+  let component: HTMLElement | null = null;
   let textAreaNode: HTMLElement | null = null;
   let mounted = false;
   let initialized = false;
@@ -25,8 +26,13 @@
   });
 
   const initView = () => {
-    if (favTree && textAreaNode && favoritesStore) {
-      favoriteRow = new FavoritesRow({ favTree, textAreaNode, favoritesStore });
+    if (favTree && textAreaNode && component && favoritesStore) {
+      favoriteRow = new FavoritesRow({
+        favTree,
+        component,
+        textAreaNode,
+        favoritesStore
+      });
     }
 
     initialized = true;
@@ -34,6 +40,7 @@
 
   $: favTree &&
     textAreaNode &&
+    component &&
     favoritesStore &&
     mounted &&
     !initialized &&
@@ -44,7 +51,7 @@
   @import './FavoritesRow.scss';
 </style>
 
-<div class="tree">
+<div class="tree" bind:this={component}>
   <div class="tree-left">
     <svg class="tree-svg" />
   </div>
