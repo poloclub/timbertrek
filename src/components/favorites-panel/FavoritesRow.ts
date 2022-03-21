@@ -1,16 +1,29 @@
 import d3 from '../../utils/d3-import';
-import type { Padding, FavPinnedTree, TreeNode } from '../ForagerTypes';
+import type {
+  Padding,
+  FavPinnedTree,
+  TreeNode,
+  Position
+} from '../ForagerTypes';
 import type { Writable, Unsubscriber } from 'svelte/store';
 import { tick } from 'svelte';
-import type { FavoritesStoreValue } from '../../stores';
-import { getFavoritesStoreDefaultValue } from '../../stores';
+import type { FavoritesStoreValue, PinnedTreeStoreValue } from '../../stores';
+import {
+  getFavoritesStoreDefaultValue,
+  getPinnedTreeStoreDefaultValue
+} from '../../stores';
 
 export class FavoritesRow {
   favTree: FavPinnedTree;
   textAreaNode: HTMLElement;
+
   favoritesStore: Writable<FavoritesStoreValue>;
   favoritesStoreValue: FavoritesStoreValue;
   favoritesStoreUnsubscriber: Unsubscriber;
+
+  pinnedTreeStore: Writable<PinnedTreeStoreValue>;
+  pinnedTreeStoreValue: PinnedTreeStoreValue;
+  PinnedTreeStoreValueUnsubscriber: Unsubscriber;
 
   svg: d3.Selection<d3.BaseType, unknown, null, undefined>;
   padding: Padding;
@@ -21,12 +34,14 @@ export class FavoritesRow {
     favTree,
     component,
     textAreaNode,
-    favoritesStore
+    favoritesStore,
+    pinnedTreeStore
   }: {
     favTree: FavPinnedTree;
     component: HTMLElement;
     textAreaNode: HTMLElement;
     favoritesStore: Writable<FavoritesStoreValue>;
+    pinnedTreeStore: Writable<PinnedTreeStoreValue>;
   }) {
     this.favTree = favTree;
     this.textAreaNode = textAreaNode;
@@ -40,6 +55,14 @@ export class FavoritesRow {
         this.adjustTextAreaHeight();
       }
     });
+
+    this.pinnedTreeStore = pinnedTreeStore;
+    this.pinnedTreeStoreValue = getPinnedTreeStoreDefaultValue();
+    this.PinnedTreeStoreValueUnsubscriber = this.pinnedTreeStore.subscribe(
+      value => {
+        this.pinnedTreeStoreValue = value;
+      }
+    );
 
     // Initialize the svg
     const width = 70;
@@ -171,5 +194,56 @@ export class FavoritesRow {
 
     // Adjust the height when content grows
     this.adjustTextAreaHeight();
+  };
+
+  /**
+   * Event handler for clicking the delete button
+   * It removes this tree from the favorite list. If this tree is not pinned,
+   * this function also removes it from the pinned tree array.
+   * @param e Mouse event
+   */
+  deleteClicked = (e: MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  /**
+   * Event handler for clicking the tree thumbnail
+   * It shows/highlights the clicked tree
+   * @param e Mouse event
+   */
+  thumbnailClicked = (e: MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    // Find the current fav tree in the pinned tree window array
+    for (let i = 0; i < this.pinnedTreeStoreValue.pinnedTrees.length; i++) {
+      const curPinnedTree = this.pinnedTreeStoreValue.pinnedTrees[i];
+      if (curPinnedTree.treeID === this.favTree.pinnedTree.treeID) {
+        // Highlight the window if it is already pinned
+        if (curPinnedTree.isPinned) {
+          curPinnedTree.jiggle();
+        } else {
+          // Update the start position so it moves from the fav panel
+          const svgBBox = (
+            this.svg.node() as HTMLElement
+          ).getBoundingClientRect();
+
+          const svgPosition: Position = {
+            x: svgBBox.left,
+            y: svgBBox.top,
+            width: svgBBox.width,
+            height: svgBBox.height
+          };
+          curPinnedTree.startPos = svgPosition;
+
+          // Pin this window
+          curPinnedTree.isPinned = true;
+          this.pinnedTreeStore.set(this.pinnedTreeStoreValue);
+        }
+
+        break;
+      }
+    }
   };
 }

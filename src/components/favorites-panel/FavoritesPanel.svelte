@@ -82,7 +82,7 @@
     <div class="tree-list">
       {#each favoritesStoreValue.favTrees as favTree (favTree.pinnedTree.treeID)}
         <div class="tree-wrapper">
-          <FavoritesRow {favTree} {favoritesStore} />
+          <FavoritesRow {favTree} {favoritesStore} {pinnedTreeStore} />
         </div>
       {/each}
     </div>
