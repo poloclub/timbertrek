@@ -1,5 +1,6 @@
 <script lang="ts">
   import FavoritesRow from './FavoritesRow.svelte';
+  import { downloadClicked } from './FavoritesPanel';
   import type { FavoritesStoreValue, PinnedTreeStoreValue } from '../../stores';
   import {
     getFavoritesStoreDefaultValue,
@@ -8,7 +9,8 @@
   import type { PinnedTree, FavPinnedTree } from '../ForagerTypes';
   import type { Writable } from 'svelte/store';
   import { onMount } from 'svelte';
-  import closeIcon from '../../imgs/icon-close-outline.svg?raw';
+  import closeIcon from '../../imgs/icon-close.svg?raw';
+  import downloadIcon from '../../imgs/icon-download.svg?raw';
 
   // Component variables
   export let favoritesStore: Writable<FavoritesStoreValue> | null = null;
@@ -39,6 +41,14 @@
     initialized = true;
   };
 
+  const closeClicked = (e: MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+
+    favoritesStoreValue.shown = false;
+    favoritesStore?.set(favoritesStoreValue);
+  };
+
   $: favoritesStore && pinnedTreeStore && mounted && !initialized && initView();
 </script>
 
@@ -54,8 +64,16 @@
   <div class="header">
     <div class="header-title">
       <div class="title">My Favorite Trees</div>
-      <div class="svg-icon">
-        {@html closeIcon}
+      <div class="icons">
+        <div
+          class="svg-icon"
+          on:click={e => downloadClicked(e, favoritesStoreValue)}
+        >
+          {@html downloadIcon}
+        </div>
+        <div class="svg-icon close-icon" on:click={closeClicked}>
+          {@html closeIcon}
+        </div>
       </div>
     </div>
   </div>

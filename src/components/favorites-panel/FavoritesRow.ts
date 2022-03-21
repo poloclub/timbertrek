@@ -81,7 +81,7 @@ export class FavoritesRow {
       );
 
     const root = d3.hierarchy(this.favTree.pinnedTree.tree, d => d.c);
-    const nodeR = 5;
+    const nodeR = 4;
     const rectR = 4;
 
     const treeRoot = d3.tree().size([this.width, this.height])(

@@ -39,21 +39,46 @@
     justify-content: space-between;
     width: 100%;
 
-    .svg-icon {
+    cursor: default;
+    user-select: none;
+    -webkit-user-select: none;
+
+    .icons {
       display: flex;
+      flex-direction: row;
       align-items: center;
-      justify-content: center;
-      color: $gray-400;
-      cursor: pointer;
-      pointer-events: fill;
+      gap: 4px;
 
-      :global(svg) {
-        width: 1.1rem;
-        height: 1.1rem;
-      }
+      .svg-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: $gray-400;
+        fill: $gray-400;
+        cursor: pointer;
+        pointer-events: fill;
 
-      &:hover {
-        color: $gray-50;
+        :global(svg) {
+          width: 1rem;
+          height: 1rem;
+        }
+
+        &.close-icon {
+          :global(svg) {
+            width: $font-u1;
+            height: $font-u1;
+          }
+        }
+
+        &:hover {
+          color: $gray-50;
+          fill: $gray-50;
+        }
+
+        &:active {
+          color: white;
+          fill: white;
+        }
       }
     }
   }

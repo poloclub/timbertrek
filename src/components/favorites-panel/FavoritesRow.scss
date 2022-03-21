@@ -61,7 +61,7 @@
     }
 
     .tree-note {
-      border: 1px solid $gray-200;
+      border: 1px solid $gray-300;
       border-radius: 4px;
 
       transition: border-color 150ms cubic-bezier(0.4, 0, 0.2, 1);
@@ -89,7 +89,7 @@
 }
 
 .tree-svg {
-  border: 1px solid $gray-200;
+  border: 1px solid $gray-300;
   border-radius: 4px;
   width: 70px;
   height: 70px;
