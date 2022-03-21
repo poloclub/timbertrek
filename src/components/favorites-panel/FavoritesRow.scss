@@ -11,13 +11,6 @@
   .tree-left {
     flex-shrink: 0;
     display: flex;
-
-    svg {
-      border: 1px solid $gray-200;
-      border-radius: 4px;
-      width: 70px;
-      height: 70px;
-    }
   }
 
   .tree-right {
@@ -96,8 +89,24 @@
 }
 
 .tree-svg {
+  border: 1px solid $gray-200;
+  border-radius: 4px;
+  width: 70px;
+  height: 70px;
+  cursor: pointer;
+
   stroke-linecap: round;
   stroke-linejoin: round;
+
+  transition: border-color 150ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:hover {
+    border: 1px solid $gray-400;
+  }
+
+  &:active {
+    border: 1px solid $gray-500;
+  }
 
   :global(path.link) {
     fill: none;
