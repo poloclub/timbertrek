@@ -516,25 +516,34 @@ def count_leaf_samples(root, x_all, y_all):
         )[0]
         y_pred[list(false_indexes)] = cur_labels[1]
 
-        # Update the sample # in the original tree if hitting a leaf node
-        # Also compute the # of correctly classified samples
-        if cur_labels[0] == -2 or cur_labels[0] == -1:
-            cur_node["c"][0]["f"].append(len(true_indexes))
+        cur_node["f"] = [cur_node["f"][0], len(true_indexes) + len(false_indexes), -1]
 
+        # Update the sample # in the original tree on every node
+        # Also compute the # of correctly classified samples on leaf node (
+        # keep it as 0 for non-leaf nodes)
+        if cur_labels[0] == -2 or cur_labels[0] == -1:
             # Compute the # of correctly classified samples
             cur_pred = 1 if cur_labels[0] == -2 else 0
             correct_num = int(np.sum(y_all[true_indexes] == cur_pred))
-            cur_node["c"][0]["f"].append(correct_num)
+
+            cur_node["c"][0]["f"] = [
+                cur_node["c"][0]["f"][0],
+                len(true_indexes),
+                correct_num,
+            ]
 
             # Accumulate the number for total accuracy
             total_correct_num += correct_num
 
         if cur_labels[1] == -2 or cur_labels[1] == -1:
-            cur_node["c"][1]["f"].append(len(false_indexes))
-
             cur_pred = 1 if cur_labels[1] == -2 else 0
             correct_num = int(np.sum(y_all[false_indexes] == cur_pred))
-            cur_node["c"][1]["f"].append(correct_num)
+
+            cur_node["c"][1]["f"] = [
+                cur_node["c"][1]["f"][0],
+                len(false_indexes),
+                correct_num,
+            ]
 
             # Accumulate the number for total accuracy
             total_correct_num += correct_num
