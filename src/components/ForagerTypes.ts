@@ -37,15 +37,20 @@ export interface FeatureMap {
 
 export interface TreeNode {
   /**
-   * Feature name. It is either [featureID] or
-   * [prediction, number of samples, number of correctly classified samples]
+   * Feature name, number of samples, number of correctly classified samples
+   * If it is a non-leaf node, the number of correctly classified samples is -1
    */
-  f: [string] | [string, number, number];
+  f: [string, number, number];
 
   /**
    * Array of children
    */
   c: TreeNode[];
+}
+
+export interface SankeyHierarchyPointNode
+  extends d3.HierarchyPointNode<TreeNode> {
+  width: number;
 }
 
 /**

@@ -6,7 +6,8 @@ import type {
   Point,
   Padding,
   PinnedTree,
-  Position
+  Position,
+  SankeyHierarchyPointNode
 } from '../ForagerTypes';
 import type { PinnedTreeStoreValue, FavoritesStoreValue } from '../../stores';
 import {
@@ -107,7 +108,8 @@ export class PinnedTreeWindow {
     this.height = height - this.padding.top - this.padding.bottom;
 
     // Draw the tree
-    this.#drawCurTree();
+    // this.#drawCurTree();
+    this.#drawCurSankeyTree();
 
     // FLIP animation to show the window
     // Step 1: Register the end position (we know start position)
@@ -256,7 +258,7 @@ export class PinnedTreeWindow {
 
     // Add true/false label on the first split point
     const firstPathData = linkGroup
-      .selectAll(`.link-${this.pinnedTree.tree.f}`)
+      .selectAll(`.link-${this.pinnedTree.tree.f[0]}`)
       .data() as d3.HierarchyPointLink<TreeNode>[];
 
     // Here we can assume the order is left to right from the tree layout
@@ -285,6 +287,145 @@ export class PinnedTreeWindow {
       .attr('x', d => d.x)
       .attr('y', d => d.y)
       .text((d, i) => (i === 0 ? 'true' : 'false'));
+  }
+
+  /**
+   * Draw the tree with this.curTreeID in the sankey tree style
+   */
+  #drawCurSankeyTree() {
+    const content = this.svg
+      .append('g')
+      .attr('class', 'content')
+      .attr(
+        'transform',
+        `translate(${this.padding.left}, ${this.padding.top})`
+      );
+
+    // Step 1: Set up the tree layout
+    const root = d3.hierarchy(this.pinnedTree.tree, d => d.c);
+    const nodeR = 7;
+    const rectR = nodeR * 1;
+
+    const treeRoot = d3.tree().size([this.width, this.height])(
+      root
+    ) as d3.HierarchyPointNode<TreeNode>;
+
+    const linkGroup = content.append('g').attr('class', 'link-group');
+
+    // Step 2: Draw the nodes
+    const nodeGroup = content.append('g').attr('class', 'node-group');
+
+    // Configure the width scale for nodes
+    const localPadding = {
+      top: this.padding.top,
+      bottom: this.padding.bottom,
+      left: 20,
+      right: 20
+    };
+
+    const totalSampleNum = treeRoot.data.f[1];
+    const nodeWidthScale = d3
+      .scaleLinear()
+      .domain([0, totalSampleNum])
+      .range([
+        0,
+        this.width +
+          this.padding.left +
+          this.padding.right -
+          localPadding.left -
+          localPadding.right
+      ]);
+
+    // Calculate the x and width for each node
+    const sankeyNodes: SankeyHierarchyPointNode[] = [];
+
+    let nextStartX = 0;
+    let curDepth = -1;
+
+    // This is a BFS
+    treeRoot.descendants().forEach(d => {
+      const curNode = Object.assign(d) as SankeyHierarchyPointNode;
+
+      if (curNode.depth !== curDepth) {
+        nextStartX =
+          curNode.parent === null ? localPadding.left : curNode.parent.x;
+        curDepth = curNode.depth;
+      }
+
+      curNode.x = nextStartX;
+      curNode.width = nodeWidthScale(curNode.data.f[1]);
+      nextStartX += curNode.width;
+
+      sankeyNodes.push(curNode);
+    });
+
+    const nodes = nodeGroup
+      .selectAll('g')
+      .data(sankeyNodes)
+      .join('g')
+      .attr('class', 'node')
+      .attr('transform', d => `translate(${d.x}, ${d.y})`);
+
+    // Draw decision points as a circle
+    const decisionSet = new Set(['-', '+']);
+    nodes
+      .filter(d => !decisionSet.has(d.data.f[0]))
+      .append('rect')
+      .attr('y', -rectR)
+      .attr('width', d => d.width)
+      .attr('height', 2 * rectR)
+      .attr('rx', d => (d.width < 16 ? 1 : 2))
+      .attr('ry', d => (d.width < 16 ? 1 : 2))
+      .style('fill', d => {
+        if (this.pinnedTreeStoreValue.getFeatureColor) {
+          return this.pinnedTreeStoreValue.getFeatureColor(d.data.f[0]);
+        } else {
+          return 'var(--md-gray-500)';
+        }
+      });
+
+    // Draw decisions as a rectangle with a symbol
+    nodes
+      .filter(d => decisionSet.has(d.data.f[0]))
+      .append('rect')
+      .attr('y', -rectR)
+      .attr('rx', d => (d.width < 16 ? 1 : 2))
+      .attr('ry', d => (d.width < 16 ? 1 : 2))
+      .attr('width', d => d.width)
+      .attr('height', 2 * rectR);
+
+    nodes
+      .filter(d => decisionSet.has(d.data.f[0]))
+      .append('text')
+      .attr('x', d => d.width / 2)
+      .attr('dy', 0.5)
+      .text(d => d.data.f[0])
+      .style('display', d => (d.width < 16 ? 'none' : 'unset'));
+
+    // Step 3: Draw the links
+    linkGroup
+      .selectAll('path.link')
+      .data(treeRoot.links())
+      .join('path')
+      .attr('class', d => `link link-${d.source.data.f[0]}`)
+      .attr('id', d => {
+        if (d.target.data.f[0] === '+') {
+          return `link-${d.source.data.f[0]}-p`;
+        } else if (d.target.data.f[0] === '-') {
+          return `link-${d.source.data.f[0]}-n`;
+        } else {
+          return `link-${d.source.data.f[0]}-${d.target.data.f[0]}`;
+        }
+      })
+      .attr('d', d => {
+        const source = d.source as SankeyHierarchyPointNode;
+        const target = d.target as SankeyHierarchyPointNode;
+
+        return d3.line()([
+          [source.x + source.width / 2, source.y],
+          [target.x + target.width / 2, target.y - rectR]
+        ]);
+      });
   }
 
   /**
