@@ -197,14 +197,14 @@ export class PinnedTreeWindow {
       .selectAll('path.link')
       .data(treeRoot.links())
       .join('path')
-      .attr('class', d => `link link-${d.source.data.f}`)
+      .attr('class', d => `link link-${d.source.data.f[0]}`)
       .attr('id', d => {
-        if (d.target.data.f === '+') {
-          return `link-${d.source.data.f}-p`;
-        } else if (d.target.data.f === '-') {
-          return `link-${d.source.data.f}-n`;
+        if (d.target.data.f[0] === '+') {
+          return `link-${d.source.data.f[0]}-p`;
+        } else if (d.target.data.f[0] === '-') {
+          return `link-${d.source.data.f[0]}-n`;
         } else {
-          return `link-${d.source.data.f}-${d.target.data.f}`;
+          return `link-${d.source.data.f[0]}-${d.target.data.f[0]}`;
         }
       })
       .attr('d', d => {
@@ -226,12 +226,12 @@ export class PinnedTreeWindow {
     // Draw decision points as a circle
     const decisionSet = new Set(['-', '+']);
     nodes
-      .filter(d => !decisionSet.has(d.data.f))
+      .filter(d => !decisionSet.has(d.data.f[0]))
       .append('circle')
       .attr('r', nodeR)
       .style('fill', d => {
         if (this.pinnedTreeStoreValue.getFeatureColor) {
-          return this.pinnedTreeStoreValue.getFeatureColor(d.data.f);
+          return this.pinnedTreeStoreValue.getFeatureColor(d.data.f[0]);
         } else {
           return 'var(--md-gray-500)';
         }
@@ -239,7 +239,7 @@ export class PinnedTreeWindow {
 
     // Draw decisions as a rectangle with a symbol
     nodes
-      .filter(d => decisionSet.has(d.data.f))
+      .filter(d => decisionSet.has(d.data.f[0]))
       .append('rect')
       .attr('x', -rectR)
       .attr('y', -rectR)
@@ -249,10 +249,10 @@ export class PinnedTreeWindow {
       .attr('height', 2 * rectR);
 
     nodes
-      .filter(d => decisionSet.has(d.data.f))
+      .filter(d => decisionSet.has(d.data.f[0]))
       .append('text')
       .attr('dy', 0.5)
-      .text(d => d.data.f);
+      .text(d => d.data.f[0]);
 
     // Add true/false label on the first split point
     const firstPathData = linkGroup

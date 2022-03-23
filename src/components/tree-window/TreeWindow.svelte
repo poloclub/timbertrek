@@ -30,9 +30,9 @@
       const treeMap = data.treeMap;
 
       // Convert treeMap into a real Map
-      const treeMapMap = new Map<number, [TreeNode, number]>();
-      Object.keys(treeMap.map).forEach(k => {
-        treeMapMap.set(+k, treeMap.map[+k] as [TreeNode, number]);
+      const treeMapMap = new Map<number, [TreeNode, number, number]>();
+      Object.keys(treeMap).forEach(k => {
+        treeMapMap.set(+k, treeMap[+k] as [TreeNode, number, number]);
       });
 
       treeWindow = new TreeWindow({

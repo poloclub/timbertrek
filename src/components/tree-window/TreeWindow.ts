@@ -9,7 +9,7 @@ import { getTreeWindowStoreDefaultValue } from '../../stores';
  * Class for a tree window object.
  */
 export class TreeWindow {
-  treeMap: Map<number, [TreeNode, number]>;
+  treeMap: Map<number, [TreeNode, number, number]>;
   curTreeID: number;
   curAncestorFs: string[];
 
@@ -66,7 +66,7 @@ export class TreeWindow {
     height = 150
   }: {
     component: HTMLElement;
-    treeMapMap: Map<number, [TreeNode, number]>;
+    treeMapMap: Map<number, [TreeNode, number, number]>;
     featureMap: Map<number, string[]>;
     treeWindowStore: Writable<TreeWindowStoreValue>;
     treeWindowUpdated: () => void;
@@ -187,17 +187,17 @@ export class TreeWindow {
       .selectAll('path.link')
       .data(treeRoot.links())
       .join('path')
-      .attr('class', d => `link link-${d.source.data.f}`)
+      .attr('class', d => `link link-${d.source.data.f[0]}`)
       .attr('id', d => {
         const preSource =
           d.source.ancestors().length > 1
-            ? d.source.ancestors()[1].data.f
+            ? d.source.ancestors()[1].data.f[0]
             : 'r';
-        const source = d.source.data.f;
-        const target = d.target.data.f;
-        if (d.target.data.f === '+') {
+        const source = d.source.data.f[0];
+        const target = d.target.data.f[0];
+        if (d.target.data.f[0] === '+') {
           return `link-${preSource}-${source}-p`;
-        } else if (d.target.data.f === '-') {
+        } else if (d.target.data.f[0] === '-') {
           return `link-${preSource}-${source}-n`;
         } else {
           return `link-${preSource}-${source}-${target}`;
@@ -222,12 +222,12 @@ export class TreeWindow {
     // Draw decision points as a circle
     const decisionSet = new Set(['-', '+']);
     nodes
-      .filter(d => !decisionSet.has(d.data.f))
+      .filter(d => !decisionSet.has(d.data.f[0]))
       .append('circle')
       .attr('r', nodeR)
       .style('fill', d => {
         if (this.treeWindowStoreValue.getFeatureColor) {
-          return this.treeWindowStoreValue.getFeatureColor(d.data.f);
+          return this.treeWindowStoreValue.getFeatureColor(d.data.f[0]);
         } else {
           return 'var(--md-gray-500)';
         }
@@ -235,7 +235,7 @@ export class TreeWindow {
 
     // Draw decisions as a rectangle with a symbol
     nodes
-      .filter(d => decisionSet.has(d.data.f))
+      .filter(d => decisionSet.has(d.data.f[0]))
       .append('rect')
       .attr('x', -rectR)
       .attr('y', -rectR)
@@ -245,10 +245,10 @@ export class TreeWindow {
       .attr('height', 2 * rectR);
 
     nodes
-      .filter(d => decisionSet.has(d.data.f))
+      .filter(d => decisionSet.has(d.data.f[0]))
       .append('text')
       .attr('dy', 0.5)
-      .text(d => d.data.f);
+      .text(d => d.data.f[0]);
 
     // Highlight the current decision path
     for (let i = 0; i < this.curAncestorFs.length - 1; i++) {

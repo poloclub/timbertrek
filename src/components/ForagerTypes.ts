@@ -37,9 +37,10 @@ export interface FeatureMap {
 
 export interface TreeNode {
   /**
-   * Feature name
+   * Feature name. It is either [featureID] or
+   * [prediction, number of samples, number of correctly classified samples]
    */
-  f: string;
+  f: [string] | [string, number, number];
 
   /**
    * Array of children
@@ -47,16 +48,11 @@ export interface TreeNode {
   c: TreeNode[];
 }
 
+/**
+ * A map from tree ID to the tree's hierarchy dict, objective, and accuracy
+ */
 export interface TreeMap {
-  /**
-   * Number of trees
-   */
-  count: number;
-
-  /**
-   * A map from tree ID to the tree's hierarchy dict and accuracy
-   */
-  map: { [treeID: number]: [TreeNode, number] };
+  [treeID: number]: [TreeNode, number, number];
 }
 
 export interface HierarchyJSON {

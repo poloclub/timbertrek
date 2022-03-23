@@ -117,17 +117,17 @@ export class FavoritesRow {
       .selectAll('path.link')
       .data(treeRoot.links())
       .join('path')
-      .attr('class', d => `link link-${d.source.data.f}`)
+      .attr('class', d => `link link-${d.source.data.f[0]}`)
       .attr('id', d => {
         const preSource =
           d.source.ancestors().length > 1
-            ? d.source.ancestors()[1].data.f
+            ? d.source.ancestors()[1].data.f[0]
             : 'r';
-        const source = d.source.data.f;
-        const target = d.target.data.f;
-        if (d.target.data.f === '+') {
+        const source = d.source.data.f[0];
+        const target = d.target.data.f[0];
+        if (d.target.data.f[0] === '+') {
           return `link-${preSource}-${source}-p`;
-        } else if (d.target.data.f === '-') {
+        } else if (d.target.data.f[0] === '-') {
           return `link-${preSource}-${source}-n`;
         } else {
           return `link-${preSource}-${source}-${target}`;
@@ -152,14 +152,14 @@ export class FavoritesRow {
     // Draw decision points as a circle
     const decisionSet = new Set(['-', '+']);
     nodes
-      .filter(d => !decisionSet.has(d.data.f))
+      .filter(d => !decisionSet.has(d.data.f[0]))
       .append('circle')
       .attr('r', nodeR)
-      .style('fill', d => this.favTree.getFeatureColor(d.data.f));
+      .style('fill', d => this.favTree.getFeatureColor(d.data.f[0]));
 
     // Draw decisions as a rectangle with a symbol
     nodes
-      .filter(d => decisionSet.has(d.data.f))
+      .filter(d => decisionSet.has(d.data.f[0]))
       .append('rect')
       .attr('x', -rectR)
       .attr('y', -rectR)
@@ -169,10 +169,10 @@ export class FavoritesRow {
       .attr('height', 2 * rectR);
 
     nodes
-      .filter(d => decisionSet.has(d.data.f))
+      .filter(d => decisionSet.has(d.data.f[0]))
       .append('text')
       .attr('dy', 0.5)
-      .text(d => d.data.f);
+      .text(d => d.data.f[0]);
   }
 
   /**
