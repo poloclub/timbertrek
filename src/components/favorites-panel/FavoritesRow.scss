@@ -8,6 +8,9 @@
   padding: 12px 12px 0px 12px;
   font-size: 14px;
 
+  user-select: none;
+  -webkit-user-select: none;
+
   .tree-left {
     flex-shrink: 0;
     display: flex;

@@ -85,6 +85,9 @@
   left: 0px;
   bottom: 0px;
 
+  user-select: none;
+  -webkit-user-select: none;
+
   text-align: start;
   font-size: 0.85rem;
   line-height: 1;

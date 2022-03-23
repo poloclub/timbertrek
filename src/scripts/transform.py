@@ -305,6 +305,16 @@ def get_decision_rules(tree_strings):
 def get_hierarchy_tree(tree_strings):
     """Convert a tree string to a hierarchy dict
 
+    Each level in the hierarchy dict has two properties:
+        'f': ['3'] means current feature name is 3
+        'f': ['+', 300, 200] means current prediction is positive, there are
+            300 sample meeting the condition, and 200 of them are correctly
+            classified
+        'c': [nodes]
+
+    This function only populates 'f' as a single element list, need to call
+    another function to compute # of samples and accuracy at leaf nodes
+
     Args:
         tree_strings ([string]): tree strings parsed from the trie
     """
@@ -324,13 +334,13 @@ def get_hierarchy_tree(tree_strings):
 
         if len(cur_string_split) == 2:
             # Case 1: there are two values
-            sub_tree['f'] = cur_feature
+            sub_tree['f'] = [cur_feature]
             sub_tree['c'] = []
 
             for s in cur_string_split:
                 if s == '-1' or s == '-2':
                     # We hit a decision node, add a leaf to this branch
-                    sub_tree['c'].append({'f': '+' if s == '-2' else '-'})
+                    sub_tree['c'].append({'f': ['+'] if s == '-2' else ['-']})
                 else:
                     new_sub_tree = {}
                     sub_tree['c'].append(new_sub_tree)
@@ -339,13 +349,13 @@ def get_hierarchy_tree(tree_strings):
         elif len(cur_string_split) == 4:
             # Case 2: there are four values: the first two correspond to the cur item
             # and the last two correspond to the next item in the queue
-            sub_tree['f'] = cur_feature
+            sub_tree['f'] = [cur_feature]
             sub_tree['c'] = []
 
             for s in cur_string_split[:2]:
                 if s == '-1' or s == '-2':
                     # We hit a decision node, add a leaf to this branch
-                    sub_tree['c'].append({'f': '+' if s == '-2' else '-'})
+                    sub_tree['c'].append({'f': ['+'] if s == '-2' else ['-']})
                 else:
                     new_sub_tree = {}
                     sub_tree['c'].append(new_sub_tree)
@@ -353,13 +363,13 @@ def get_hierarchy_tree(tree_strings):
 
             # Load the next item in the queue
             cur_feature, sub_tree = working_queue.popleft()
-            sub_tree['f'] = cur_feature
+            sub_tree['f'] = [cur_feature]
             sub_tree['c'] = []
 
             for s in cur_string_split[2:]:
                 if s == '-1' or s == '-2':
                     # We hit a decision node, add a leaf to this branch
-                    sub_tree['c'].append({'f': '+' if s == '-2' else '-'})
+                    sub_tree['c'].append({'f': ['+'] if s == '-2' else ['-']})
                 else:
                     new_sub_tree = {}
                     sub_tree['c'].append(new_sub_tree)
