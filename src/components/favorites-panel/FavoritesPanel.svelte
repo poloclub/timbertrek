@@ -11,6 +11,7 @@
   import { onMount } from 'svelte';
   import closeIcon from '../../imgs/icon-close.svg?raw';
   import downloadIcon from '../../imgs/icon-download.svg?raw';
+  import heartDemoIcon from '../../imgs/icon-heart-circle.svg?raw';
 
   // Component variables
   export let favoritesStore: Writable<FavoritesStoreValue> | null = null;
@@ -79,12 +80,22 @@
   </div>
 
   {#if initialized}
-    <div class="tree-list">
-      {#each favoritesStoreValue.favTrees as favTree (favTree.pinnedTree.treeID)}
-        <div class="tree-wrapper">
-          <FavoritesRow {favTree} {favoritesStore} {pinnedTreeStore} />
+    {#if favoritesStoreValue.favTrees.length === 0}
+      <div class="tree-placeholder">
+        <div class="tree-placeholder-text">
+          Click the heart button <span class="svg-icon"
+            >{@html heartDemoIcon}</span
+          > on tree windows to add favorite trees.
         </div>
-      {/each}
-    </div>
+      </div>
+    {:else}
+      <div class="tree-list">
+        {#each favoritesStoreValue.favTrees as favTree (favTree.pinnedTree.treeID)}
+          <div class="tree-wrapper">
+            <FavoritesRow {favTree} {favoritesStore} {pinnedTreeStore} />
+          </div>
+        {/each}
+      </div>
+    {/if}
   {/if}
 </div>
