@@ -245,6 +245,107 @@ $border-color: $gray-light-border;
   }
 }
 
+.control-footer {
+  padding: 4px 10px;
+  color: $gray-600;
+  font-size: $font-d2;
+  line-height: 1;
+  border-top: 1px solid $gray-light-border;
+  width: 100%;
+
+  display: flex;
+  justify-content: space-between;
+}
+
+$secondary-color: hsl(0, 0%, 40%);
+$border-radius: 13px;
+$dot-background: $gray-500;
+
+@mixin toggle-button-label {
+  padding: 5px 0;
+  width: 50%;
+  display: flex;
+  justify-content: center;
+  position: absolute;
+  z-index: 2;
+  color: white;
+  transition: all 0.2s ease;
+}
+
+.toggle-wrapper {
+  display: flex;
+  width: 30px;
+}
+
+.toggle {
+  display: none;
+
+  &:checked + .toggle-button .dot {
+    left: 50%;
+  }
+}
+
+.toggle-button {
+  height: 13px;
+  outline: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  width: 100%;
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+
+  background: $brown-50;
+  border: 1px solid $gray-500;
+  border-radius: $border-radius;
+  transition: all 0.4s ease;
+
+  .left-label {
+    @include toggle-button-label;
+    left: 0;
+
+    &.select-mode {
+      color: $secondary-color;
+    }
+  }
+
+  .right-label {
+    @include toggle-button-label;
+    right: 0px;
+    color: $secondary-color;
+
+    &.select-mode {
+      color: white;
+    }
+  }
+
+  .dot {
+    position: absolute;
+    width: 50%;
+    height: 100%;
+    left: 0;
+    border-radius: $border-radius;
+    background: $dot-background;
+    transition: all 0.2s ease;
+  }
+
+  .icon-label {
+    margin-left: 5px;
+  }
+}
+
+:global(.toggle-wrapper .svg-icon) {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  :global(svg) {
+    width: 1.2em;
+    height: 1.2em;
+  }
+}
+
 @keyframes dash {
   to {
     stroke-dashoffset: -1000;
