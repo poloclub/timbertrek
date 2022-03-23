@@ -42,7 +42,7 @@ export class TreeWindow {
   get treeMetric(): number | null {
     const mapValue = this.treeMap.get(this.curTreeID);
     if (mapValue !== undefined) {
-      return round(mapValue[1], 4);
+      return round(mapValue[2], 4);
     } else {
       return null;
     }

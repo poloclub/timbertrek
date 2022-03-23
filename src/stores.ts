@@ -20,7 +20,7 @@ export interface SunburstStoreValue {
 
 export interface TreeWindowStoreValue {
   featureMap: Map<number, string[]>;
-  treeMap: Map<number, [TreeNode, number]>;
+  treeMap: Map<number, [TreeNode, number, number]>;
   treeID: number;
   ancestorFs: string[];
   show: boolean;

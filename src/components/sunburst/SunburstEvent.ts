@@ -439,7 +439,7 @@ export function leafArcClickHandler(
   ) {
     const pinnedTree: PinnedTree = {
       tree: treeTuple[0],
-      treeMetric: round(treeTuple[1], 4),
+      treeMetric: round(treeTuple[2], 4),
       treeID: treeID,
       x: endPoint.x,
       y: endPoint.y,
@@ -505,7 +505,7 @@ export function tempShowPinnedTree(this: Sunburst) {
 
     const pinnedTree: PinnedTree = {
       tree: treeTuple[0],
-      treeMetric: round(treeTuple[1], 4),
+      treeMetric: round(treeTuple[2], 4),
       treeID: treeID,
       x: endPoint.x,
       y: endPoint.y,
