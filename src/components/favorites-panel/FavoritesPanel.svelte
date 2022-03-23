@@ -9,6 +9,8 @@
   import type { PinnedTree, FavPinnedTree } from '../ForagerTypes';
   import type { Writable } from 'svelte/store';
   import { onMount } from 'svelte';
+  import { flip } from 'svelte/animate';
+  import { fade } from 'svelte/transition';
   import closeIcon from '../../imgs/icon-close.svg?raw';
   import downloadIcon from '../../imgs/icon-download.svg?raw';
   import heartDemoIcon from '../../imgs/icon-heart-circle.svg?raw';
@@ -91,7 +93,11 @@
     {:else}
       <div class="tree-list">
         {#each favoritesStoreValue.favTrees as favTree (favTree.pinnedTree.treeID)}
-          <div class="tree-wrapper">
+          <div
+            class="tree-wrapper"
+            animate:flip={{ duration: 300 }}
+            out:fade={{ duration: 200 }}
+          >
             <FavoritesRow {favTree} {favoritesStore} {pinnedTreeStore} />
           </div>
         {/each}
