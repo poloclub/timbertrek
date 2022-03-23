@@ -17,9 +17,9 @@ def transform_trie(trie):
     """
 
     # Hit the terminal node
-    if 'objective' in trie:
+    if "objective" in trie:
         # Only keep one metric from the tree
-        return {'acc': round(trie['objective'], 5)}
+        return {"acc": round(trie["objective"], 5)}
 
     sub_dict = {}
     for k in trie:
@@ -28,7 +28,7 @@ def transform_trie(trie):
     return sub_dict
 
 
-def get_flat_metrics(trie, metrics, metric_name='objective'):
+def get_flat_metrics(trie, metrics, metric_name="objective"):
     """Get a flat list of terminal nodes.
 
     Args:
@@ -45,7 +45,7 @@ def get_flat_metrics(trie, metrics, metric_name='objective'):
         get_flat_metrics(trie[k], metrics, metric_name)
 
 
-def get_tree_depths(trie, tree_depth=0, metric_name='objective'):
+def get_tree_depths(trie, tree_depth=0, metric_name="objective"):
     """Get a flat list of terminal nodes.
 
     Args:
@@ -64,17 +64,13 @@ def get_tree_depths(trie, tree_depth=0, metric_name='objective'):
 
     for k in trie:
         tree_depths.extend(
-            get_tree_depths(
-                trie[k],
-                tree_depth=tree_depth + 1,
-                metric_name=metric_name
-            )
+            get_tree_depths(trie[k], tree_depth=tree_depth + 1, metric_name=metric_name)
         )
 
     return tree_depths
 
 
-def get_hierarchy_dict(trie, metric='objective'):
+def get_hierarchy_dict(trie, metric="objective"):
     """Get the hierarchy dictionary form the original trie.
 
     Args:
@@ -86,10 +82,7 @@ def get_hierarchy_dict(trie, metric='objective'):
         dict: Transformed trie in a strict hierarchy structure
     """
 
-    value_map = {
-        '-2': 1,
-        '-1': -1
-    }
+    value_map = {"-2": 1, "-1": -1}
 
     def get_sub_trie(subtrie, feature, direction):
 
@@ -97,18 +90,15 @@ def get_hierarchy_dict(trie, metric='objective'):
         if metric in subtrie:
             return {
                 # Leaf node
-                'f': '_',
-                'd': direction,
-                's': round(subtrie[metric], 5)
+                "f": "_",
+                "d": direction,
+                "s": round(subtrie[metric], 5),
             }
 
-        sub_dict = {
-            'f': feature,
-            'c': []
-        }
+        sub_dict = {"f": feature, "c": []}
 
         for k in subtrie:
-            cur_name = k.split(' ')
+            cur_name = k.split(" ")
 
             # Aggregate the direction based on k
             # -1: negative, 0: split, 1: positive
@@ -125,40 +115,33 @@ def get_hierarchy_dict(trie, metric='objective'):
                     temp_feature_list.append(cur_name[i])
 
             # Convert the feature list to a flat string
-            new_feature = ' '.join(temp_feature_list)
+            new_feature = " ".join(temp_feature_list)
 
-            sub_dict['c'].append(get_sub_trie(
-                subtrie[k], new_feature, new_direction))
+            sub_dict["c"].append(get_sub_trie(subtrie[k], new_feature, new_direction))
 
         # Here the feature name discards split position, so we need to combine
         # their leaves into the same 'c' list
-        new_sub_dict = {
-            'f': feature,
-            'c': []
-        }
+        new_sub_dict = {"f": feature, "c": []}
 
-        for k in sub_dict['c']:
+        for k in sub_dict["c"]:
             is_duplicate = False
-            for p in new_sub_dict['c']:
-                if k['f'] == p['f']:
-                    p['c'].extend(k['c'])
+            for p in new_sub_dict["c"]:
+                if k["f"] == p["f"]:
+                    p["c"].extend(k["c"])
                     is_duplicate = True
                     break
 
             if not is_duplicate:
-                new_sub_dict['c'].append(k)
+                new_sub_dict["c"].append(k)
 
         return new_sub_dict
 
-    subtrie = {
-        'f': 'root',
-        'c': []
-    }
+    subtrie = {"f": "root", "c": []}
     direction = []
 
     for k in trie:
         # For the first level, the key only contains the feature id
-        subtrie['c'].append(get_sub_trie(trie[k], k, direction))
+        subtrie["c"].append(get_sub_trie(trie[k], k, direction))
 
     return subtrie
 
@@ -181,28 +164,28 @@ def get_feature_map(feature_header, feature_description_map):
     feature_map = {}
 
     for (i, item) in enumerate(feature_header):
-        feature_name = re.sub(r'(.*):.*', r'\1', item)
-        feature_value = re.sub(r'.*:(.*)', r'\1', item)
+        feature_name = re.sub(r"(.*):.*", r"\1", item)
+        feature_value = re.sub(r".*:(.*)", r"\1", item)
 
         # Translate the feature name into a more readable format
-        feature_type = feature_description_map[feature_name]['type']
-        feature_short = feature_description_map[feature_name]['short']
-        feature_name = feature_description_map[feature_name]['info']
+        feature_type = feature_description_map[feature_name]["type"]
+        feature_short = feature_description_map[feature_name]["short"]
+        feature_name = feature_description_map[feature_name]["info"]
 
-        if feature_type == 'is':
-            feature_value = 'is ' + feature_value
+        if feature_type == "is":
+            feature_value = "is " + feature_value
             feature_map[i] = [feature_name, feature_value, feature_short]
-        elif feature_type == 'count':
-            feature_value = re.sub(r'([>=<])(.*)', r'\1 \2', feature_value)
+        elif feature_type == "count":
+            feature_value = re.sub(r"([>=<])(.*)", r"\1 \2", feature_value)
             feature_map[i] = [feature_name, feature_value, feature_short]
-        elif feature_type == 'yes':
-            feature_value = ''
+        elif feature_type == "yes":
+            feature_value = ""
             feature_map[i] = [feature_name, feature_value, feature_short]
 
     return feature_map
 
 
-def build_tree_map(trie, tree_map, tree_strings=[], objective='acc'):
+def build_tree_map(trie, tree_map, tree_strings=[], objective="acc"):
     """
     Map each tree to a unique number
 
@@ -216,9 +199,9 @@ def build_tree_map(trie, tree_map, tree_strings=[], objective='acc'):
     # Hit the terminal node
     if objective in trie:
         # Record this tree
-        new_count = tree_map['count'] + 1
-        tree_map['map'][new_count] = [tree_strings, trie[objective]]
-        tree_map['count'] = new_count
+        new_count = tree_map["count"] + 1
+        tree_map["map"][new_count] = [tree_strings, trie[objective]]
+        tree_map["count"] = new_count
         return
 
     for k in trie:
@@ -255,12 +238,11 @@ def get_decision_rules(tree_strings):
             # Case 1: there are two values
             for j, s in enumerate(cur_string_split):
                 formated_cur_feature = cur_feature
-                formated_cur_feature += 't' if j == 0 else 'f'
+                formated_cur_feature += "t" if j == 0 else "f"
                 cur_features = pre_features + [formated_cur_feature]
-                if s == '-1' or s == '-2':
+                if s == "-1" or s == "-2":
                     # We hit a decision node, add this decision rule chain
-                    decision_rules.add(
-                        (tuple(cur_features), '+' if s == '-2' else '-'))
+                    decision_rules.add((tuple(cur_features), "+" if s == "-2" else "-"))
                 else:
                     working_queue.append([s, cur_features])
 
@@ -270,12 +252,11 @@ def get_decision_rules(tree_strings):
             for j, s in enumerate(cur_string_split[:2]):
 
                 formated_cur_feature = cur_feature
-                formated_cur_feature += 't' if j == 0 else 'f'
+                formated_cur_feature += "t" if j == 0 else "f"
                 cur_features = pre_features + [formated_cur_feature]
 
-                if s == '-1' or s == '-2':
-                    decision_rules.add(
-                        (tuple(cur_features), '+' if s == '-2' else '-'))
+                if s == "-1" or s == "-2":
+                    decision_rules.add((tuple(cur_features), "+" if s == "-2" else "-"))
                 else:
                     working_queue.append([s, cur_features])
 
@@ -285,17 +266,16 @@ def get_decision_rules(tree_strings):
             for j, s in enumerate(cur_string_split[2:]):
 
                 formated_cur_feature = cur_feature
-                formated_cur_feature += 't' if j == 0 else 'f'
+                formated_cur_feature += "t" if j == 0 else "f"
                 cur_features = pre_features + [formated_cur_feature]
 
-                if s == '-1' or s == '-2':
-                    decision_rules.add(
-                        (tuple(cur_features), '+' if s == '-2' else '-'))
+                if s == "-1" or s == "-2":
+                    decision_rules.add((tuple(cur_features), "+" if s == "-2" else "-"))
                 else:
                     working_queue.append([s, cur_features])
 
         else:
-            print('Error: encounter string size either 2 or 4')
+            print("Error: encounter string size either 2 or 4")
 
         i += 1
 
@@ -334,49 +314,49 @@ def get_hierarchy_tree(tree_strings):
 
         if len(cur_string_split) == 2:
             # Case 1: there are two values
-            sub_tree['f'] = [cur_feature]
-            sub_tree['c'] = []
+            sub_tree["f"] = [cur_feature]
+            sub_tree["c"] = []
 
             for s in cur_string_split:
-                if s == '-1' or s == '-2':
+                if s == "-1" or s == "-2":
                     # We hit a decision node, add a leaf to this branch
-                    sub_tree['c'].append({'f': ['+'] if s == '-2' else ['-']})
+                    sub_tree["c"].append({"f": ["+"] if s == "-2" else ["-"]})
                 else:
                     new_sub_tree = {}
-                    sub_tree['c'].append(new_sub_tree)
+                    sub_tree["c"].append(new_sub_tree)
                     working_queue.append([s, new_sub_tree])
 
         elif len(cur_string_split) == 4:
             # Case 2: there are four values: the first two correspond to the cur item
             # and the last two correspond to the next item in the queue
-            sub_tree['f'] = [cur_feature]
-            sub_tree['c'] = []
+            sub_tree["f"] = [cur_feature]
+            sub_tree["c"] = []
 
             for s in cur_string_split[:2]:
-                if s == '-1' or s == '-2':
+                if s == "-1" or s == "-2":
                     # We hit a decision node, add a leaf to this branch
-                    sub_tree['c'].append({'f': ['+'] if s == '-2' else ['-']})
+                    sub_tree["c"].append({"f": ["+"] if s == "-2" else ["-"]})
                 else:
                     new_sub_tree = {}
-                    sub_tree['c'].append(new_sub_tree)
+                    sub_tree["c"].append(new_sub_tree)
                     working_queue.append([s, new_sub_tree])
 
             # Load the next item in the queue
             cur_feature, sub_tree = working_queue.popleft()
-            sub_tree['f'] = [cur_feature]
-            sub_tree['c'] = []
+            sub_tree["f"] = [cur_feature]
+            sub_tree["c"] = []
 
             for s in cur_string_split[2:]:
-                if s == '-1' or s == '-2':
+                if s == "-1" or s == "-2":
                     # We hit a decision node, add a leaf to this branch
-                    sub_tree['c'].append({'f': ['+'] if s == '-2' else ['-']})
+                    sub_tree["c"].append({"f": ["+"] if s == "-2" else ["-"]})
                 else:
                     new_sub_tree = {}
-                    sub_tree['c'].append(new_sub_tree)
+                    sub_tree["c"].append(new_sub_tree)
                     working_queue.append([s, new_sub_tree])
 
         else:
-            print('Error: encounter string size either 2 or 4')
+            print("Error: encounter string size either 2 or 4")
 
         i += 1
 
@@ -399,18 +379,18 @@ def get_decision_rule_hierarchy_dict(trie, keep_position=True):
     trie_copy = transform_trie(trie)
 
     # Step 1: build a dictionary to map tree ID to its string description
-    tree_map = {'count': 0, 'map': {}}
+    tree_map = {"count": 0, "map": {}}
     build_tree_map(trie_copy, tree_map)
 
     # Step 2: build a temporary dictionary to map string to tree ID
     string_to_id_map = {}
-    for k in tree_map['map']:
-        string_to_id_map[tuple(tree_map['map'][k][0])] = k
+    for k in tree_map["map"]:
+        string_to_id_map[tuple(tree_map["map"][k][0])] = k
 
-    decision_rule_hierarchy = {'f': 'root', 'c': []}
+    decision_rule_hierarchy = {"f": "root", "c": []}
 
-    for i in tree_map['map']:
-        cur_string = tree_map['map'][i][0]
+    for i in tree_map["map"]:
+        cur_string = tree_map["map"][i][0]
         all_rules = get_decision_rules(cur_string)
 
         # Iterate the set and build the hierarchy dict
@@ -418,34 +398,30 @@ def get_decision_rule_hierarchy_dict(trie, keep_position=True):
             cur_dict = decision_rule_hierarchy
 
             for f in rule[0]:
-                cur_feature = (f if keep_position else
-                               re.sub(r'(\d*)[tf]', r'\1', f))
+                cur_feature = f if keep_position else re.sub(r"(\d*)[tf]", r"\1", f)
 
                 is_exist = False
-                for item in cur_dict['c']:
-                    if item['f'] == cur_feature:
+                for item in cur_dict["c"]:
+                    if item["f"] == cur_feature:
                         cur_dict = item
                         is_exist = True
                         break
 
                 if not is_exist:
-                    new_item = {'f': cur_feature, 'c': []}
-                    cur_dict['c'].append(new_item)
+                    new_item = {"f": cur_feature, "c": []}
+                    cur_dict["c"].append(new_item)
                     cur_dict = new_item
                     is_exist = True
 
             # Hit the end of the rule, add this tree to the children list
             # If keep_position = False, need to avoid adding duplicate trees
             existing_trees = set()
-            for c in cur_dict['c']:
-                if c['f'] == '_':
-                    existing_trees.add(c['t'])
+            for c in cur_dict["c"]:
+                if c["f"] == "_":
+                    existing_trees.add(c["t"])
 
             if i not in existing_trees:
-                cur_dict['c'].append({
-                    'f': '_',
-                    't': i
-                })
+                cur_dict["c"].append({"f": "_", "t": i})
 
     return decision_rule_hierarchy, tree_map
 
@@ -460,12 +436,12 @@ def get_all_tree_ids(node):
         [int]: All tree IDs
     """
 
-    if node['f'] == '_':
-        return [node['t']]
+    if node["f"] == "_":
+        return [node["t"]]
 
     cur_tree_ids = []
 
-    for c in node['c']:
+    for c in node["c"]:
         cur_tree_ids.extend(get_all_tree_ids(c))
 
     return cur_tree_ids
@@ -481,10 +457,87 @@ def get_tree_map_hierarchy(tree_map):
         dict: Same format as the tree_map, but with string encodings replaced
             with hierarchy dict
     """
-    new_tree_map = {'count': tree_map['count'], 'map': {}}
+    new_tree_map = {"count": tree_map["count"], "map": {}}
 
-    for i in tree_map['map']:
-        tree_hierarchy = get_hierarchy_tree(tree_map['map'][i][0])
-        new_tree_map['map'][i] = [tree_hierarchy, tree_map['map'][i][1]]
+    for i in tree_map["map"]:
+        tree_hierarchy = get_hierarchy_tree(tree_map["map"][i][0])
+        new_tree_map["map"][i] = [tree_hierarchy, tree_map["map"][i][1]]
 
     return new_tree_map
+
+
+def count_leaf_samples(root, x_all, y_all):
+    """Count the number of samples and accuracy in each leaf node of the given
+        decision tree
+
+    Args:
+        root(dict): The root node of the tree
+        x_all(np.array): Data sample values
+        y_all(np.array): Data labels
+    """
+
+    y_pred = np.array([int(root["f"][0]) for _ in range(x_all.shape[0])])
+    total_correct_num = 0
+
+    # Use a queue for BFS
+    working_queue = deque()
+    working_queue.append(root)
+
+    while len(working_queue) > 0:
+        cur_node = working_queue.popleft()
+
+        # cur_labels = [label_for_true, label_for_false]
+        cur_labels = []
+        for child in cur_node["c"]:
+            # Need to change '+' and '-' to int because it's an np array
+            cur_label = child["f"][0] if child["f"][0] != "+" else -2
+            cur_label = cur_label if cur_label != "-" else -1
+            cur_labels.append(int(cur_label))
+
+            # Add the children to the queue if it not a leaf node
+            if child["f"][0] != "+" and child["f"][0] != "-":
+                working_queue.append(child)
+
+        # Iterate through all samples and to assign labels
+        cur_feature_index = int(cur_node["f"][0])
+
+        # True left (first), false right (second)
+        true_indexes = np.where(
+            np.logical_and(
+                x_all[:, cur_feature_index] == 1, y_pred == cur_feature_index
+            )
+        )[0]
+        y_pred[list(true_indexes)] = cur_labels[0]
+
+        false_indexes = np.where(
+            np.logical_and(
+                x_all[:, cur_feature_index] == 0, y_pred == cur_feature_index
+            )
+        )[0]
+        y_pred[list(false_indexes)] = cur_labels[1]
+
+        # Update the sample # in the original tree if hitting a leaf node
+        # Also compute the # of correctly classified samples
+        if cur_labels[0] == -2 or cur_labels[0] == -1:
+            cur_node["c"][0]["f"].append(len(true_indexes))
+
+            # Compute the # of correctly classified samples
+            cur_pred = 1 if cur_labels[0] == -2 else 0
+            correct_num = int(np.sum(y_all[true_indexes] == cur_pred))
+            cur_node["c"][0]["f"].append(correct_num)
+
+            # Accumulate the number for total accuracy
+            total_correct_num += correct_num
+
+        if cur_labels[1] == -2 or cur_labels[1] == -1:
+            cur_node["c"][1]["f"].append(len(false_indexes))
+
+            cur_pred = 1 if cur_labels[1] == -2 else 0
+            correct_num = int(np.sum(y_all[false_indexes] == cur_pred))
+            cur_node["c"][1]["f"].append(correct_num)
+
+            # Accumulate the number for total accuracy
+            total_correct_num += correct_num
+
+    # Return the accuracy of this tree
+    return round(total_correct_num / len(y_all), 5)
