@@ -444,6 +444,7 @@ export class PinnedTreeWindow {
   heartClicked = async (e: MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    this.#bringWindowToTop();
 
     this.pinnedTree.isFav = !this.pinnedTree.isFav;
     this.pinnedTreeWindowUpdated();
@@ -518,6 +519,7 @@ export class PinnedTreeWindow {
   noteClicked = (e: MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    this.#bringWindowToTop();
 
     const window = d3.select(this.node).select('.note-window');
 

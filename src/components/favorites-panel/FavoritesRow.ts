@@ -205,6 +205,38 @@ export class FavoritesRow {
   deleteClicked = (e: MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+
+    // Find the current fav tree in the pinned tree window array
+    let tid = -1;
+    for (let i = 0; i < this.pinnedTreeStoreValue.pinnedTrees.length; i++) {
+      const curPinnedTree = this.pinnedTreeStoreValue.pinnedTrees[i];
+      if (curPinnedTree.treeID === this.favTree.pinnedTree.treeID) {
+        tid = i;
+        break;
+      }
+    }
+
+    const curPinnedTree = this.pinnedTreeStoreValue.pinnedTrees[tid];
+
+    // If it is pinned, just remove it from the fav list
+    if (curPinnedTree.isPinned) {
+      curPinnedTree.isFav = false;
+    } else {
+      // If it is not pinned, remove it from the array entirely
+      this.pinnedTreeStoreValue.pinnedTrees.splice(tid, 1);
+    }
+
+    this.pinnedTreeStore.set(this.pinnedTreeStoreValue);
+
+    // Remove this tree from the fav tree store
+    const curFavTreeIDs = [
+      ...this.favoritesStoreValue.favTrees.map(d => d.pinnedTree.treeID)
+    ];
+    const curIndex = curFavTreeIDs.indexOf(this.favTree.pinnedTree.treeID);
+    if (curIndex > -1) {
+      this.favoritesStoreValue.favTrees.splice(curIndex, 1);
+    }
+    this.favoritesStore.set(this.favoritesStoreValue);
   };
 
   /**

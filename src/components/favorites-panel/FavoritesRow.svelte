@@ -78,7 +78,7 @@
       </div>
 
       <div class="tree-info-right">
-        <div class="svg-icon">
+        <div class="svg-icon" on:click={e => favoriteRow?.deleteClicked(e)}>
           {@html deleteIcon}
         </div>
       </div>
