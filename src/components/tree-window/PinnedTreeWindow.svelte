@@ -172,30 +172,11 @@
   <div class="control-footer">
     <div class="metrics">
       <!-- <span class="metric-left">Balanced Acc:</span> -->
+      6021 samples
     </div>
 
-    <div class="toggle-wrapper" bind:this={component}>
-      <input
-        class="toggle"
-        id={`toggle-switch-${pinnedTreeWindow?.pinnedTree.treeID}`}
-        type="checkbox"
-        on:change={() => {}}
-      />
-
-      <label
-        for={`toggle-switch-${pinnedTreeWindow?.pinnedTree.treeID}`}
-        class="toggle-button"
-      >
-        <div class="left-label" class:select-mode={true}>
-          <div class="svg-icon" id="toggle-button-move" />
-        </div>
-
-        <div class="right-label" class:select-mode={false}>
-          <div class="svg-icon" id="toggle-button-select" />
-        </div>
-
-        <div class="dot" />
-      </label>
+    <div class="button" on:click={e => pinnedTreeWindow?.alterLayout()}>
+      weighted
     </div>
   </div>
 </div>

@@ -221,7 +221,21 @@ $border-color: $gray-light-border;
   }
 
   :global(.node rect) {
+    transition: stroke 400ms cubic-bezier(0.645, 0.045, 0.355, 1);
+  }
+
+  :global(.node .leaf-rect) {
     fill: $gray-light-background;
+    stroke: $gray-700;
+    stroke-width: 1px;
+  }
+
+  :global(.node .node-rect) {
+    stroke: $gray-light-background;
+    stroke-width: 1px;
+  }
+
+  :global(.node .node-rect.sankey) {
     stroke: $gray-700;
     stroke-width: 1px;
   }
@@ -246,7 +260,7 @@ $border-color: $gray-light-border;
 }
 
 .control-footer {
-  padding: 4px 10px;
+  padding: 4px 7px;
   color: $gray-600;
   font-size: $font-d2;
   line-height: 1;
@@ -255,94 +269,34 @@ $border-color: $gray-light-border;
 
   display: flex;
   justify-content: space-between;
-}
-
-$secondary-color: hsl(0, 0%, 40%);
-$border-radius: 13px;
-$dot-background: $gray-500;
-
-@mixin toggle-button-label {
-  padding: 5px 0;
-  width: 50%;
-  display: flex;
-  justify-content: center;
-  position: absolute;
-  z-index: 2;
-  color: white;
-  transition: all 0.2s ease;
-}
-
-.toggle-wrapper {
-  display: flex;
-  width: 30px;
-}
-
-.toggle {
-  display: none;
-
-  &:checked + .toggle-button .dot {
-    left: 50%;
-  }
-}
-
-.toggle-button {
-  height: 13px;
-  outline: 0;
-  display: flex;
   align-items: center;
-  justify-content: space-around;
-  width: 100%;
-  position: relative;
-  cursor: pointer;
+}
+
+.button {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  gap: 3px;
+
+  border-radius: 5px;
+  padding: 1px 6px;
   user-select: none;
+  -webkit-user-select: none;
+  cursor: default;
 
-  background: $brown-50;
-  border: 1px solid $gray-500;
-  border-radius: $border-radius;
-  transition: all 0.4s ease;
+  color: $gray-700;
+  border: 1px solid $gray-300;
+  background-color: $gray-50;
 
-  .left-label {
-    @include toggle-button-label;
-    left: 0;
+  transition: background-color 100ms ease-in-out, fill 100ms ease-in-out,
+    color 100ms ease-in-out;
 
-    &.select-mode {
-      color: $secondary-color;
-    }
+  &:hover {
+    background-color: adjust-color($color: white, $lightness: -7%);
   }
 
-  .right-label {
-    @include toggle-button-label;
-    right: 0px;
-    color: $secondary-color;
-
-    &.select-mode {
-      color: white;
-    }
-  }
-
-  .dot {
-    position: absolute;
-    width: 50%;
-    height: 100%;
-    left: 0;
-    border-radius: $border-radius;
-    background: $dot-background;
-    transition: all 0.2s ease;
-  }
-
-  .icon-label {
-    margin-left: 5px;
-  }
-}
-
-:global(.toggle-wrapper .svg-icon) {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  :global(svg) {
-    width: 1.2em;
-    height: 1.2em;
+  &:active {
+    background-color: adjust-color($color: white, $lightness: -12%);
   }
 }
 

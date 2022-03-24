@@ -32,6 +32,8 @@ export class PinnedTreeWindow {
   favoritesStoreValue: FavoritesStoreValue;
   favoritesStoreUnsubscriber: Unsubscriber;
 
+  sankey = false;
+
   // FLIP animation
   hidden = true;
   endPos: Position;
@@ -108,8 +110,8 @@ export class PinnedTreeWindow {
     this.height = height - this.padding.top - this.padding.bottom;
 
     // Draw the tree
-    // this.#drawCurTree();
-    this.#drawCurSankeyTree();
+    this.#drawCurTree();
+    // this.#drawCurSankeyTree();
 
     // FLIP animation to show the window
     // Step 1: Register the end position (we know start position)
@@ -229,8 +231,14 @@ export class PinnedTreeWindow {
     const decisionSet = new Set(['-', '+']);
     nodes
       .filter(d => !decisionSet.has(d.data.f[0]))
-      .append('circle')
-      .attr('r', nodeR)
+      .append('rect')
+      .attr('class', 'node-rect')
+      .attr('x', -rectR)
+      .attr('y', -rectR)
+      .attr('rx', nodeR)
+      .attr('ry', nodeR)
+      .attr('width', 2 * rectR)
+      .attr('height', 2 * rectR)
       .style('fill', d => {
         if (this.pinnedTreeStoreValue.getFeatureColor) {
           return this.pinnedTreeStoreValue.getFeatureColor(d.data.f[0]);
@@ -243,6 +251,7 @@ export class PinnedTreeWindow {
     nodes
       .filter(d => decisionSet.has(d.data.f[0]))
       .append('rect')
+      .attr('class', 'leaf-rect')
       .attr('x', -rectR)
       .attr('y', -rectR)
       .attr('rx', 2)
@@ -371,6 +380,8 @@ export class PinnedTreeWindow {
     nodes
       .filter(d => !decisionSet.has(d.data.f[0]))
       .append('rect')
+      .attr('class', 'node-rect sankey')
+      .attr('x', 0)
       .attr('y', -rectR)
       .attr('width', d => d.width)
       .attr('height', 2 * rectR)
@@ -388,6 +399,8 @@ export class PinnedTreeWindow {
     nodes
       .filter(d => decisionSet.has(d.data.f[0]))
       .append('rect')
+      .attr('class', 'leaf-rect')
+      .attr('x', 0)
       .attr('y', -rectR)
       .attr('rx', d => (d.width < 16 ? 1 : 2))
       .attr('ry', d => (d.width < 16 ? 1 : 2))
@@ -400,7 +413,7 @@ export class PinnedTreeWindow {
       .attr('x', d => d.width / 2)
       .attr('dy', 0.5)
       .text(d => d.data.f[0])
-      .style('display', d => (d.width < 16 ? 'none' : 'unset'));
+      .style('opacity', d => (d.width < 16 ? 0 : 1));
 
     // Step 3: Draw the links
     linkGroup
@@ -429,12 +442,247 @@ export class PinnedTreeWindow {
   }
 
   /**
+   * Update the tree with this.curTreeID
+   */
+  #changeSankeyToStandard() {
+    const content = this.svg.select('g.content');
+
+    const root = d3.hierarchy(this.pinnedTree.tree, d => d.c);
+    const nodeR = 7;
+    const rectR = nodeR * 1;
+
+    const treeRoot = d3.tree().size([this.width, this.height])(
+      root
+    ) as d3.HierarchyPointNode<TreeNode>;
+
+    const trans = d3
+      .transition()
+      .duration(400)
+      .ease(d3.easeCubicInOut) as unknown as d3.Transition<
+      d3.BaseType,
+      unknown,
+      d3.BaseType,
+      unknown
+    >;
+
+    // Update the links
+    const linkGroup = content.select('.link-group');
+    linkGroup
+      .selectAll('path.link')
+      .data(treeRoot.links())
+      .join('path')
+      .transition(trans)
+      .attr('d', d => {
+        return d3.line()([
+          [d.source.x, d.source.y],
+          [d.target.x, d.target.y]
+        ]);
+      });
+
+    // Update the nodes
+    const nodeGroup = content.select('.node-group');
+    const nodes = nodeGroup
+      .selectAll('g.node')
+      .data(treeRoot.descendants())
+      .join('g');
+
+    nodes.transition(trans).attr('transform', d => `translate(${d.x}, ${d.y})`);
+
+    // Update decision points as a circle
+    const decisionSet = new Set(['-', '+']);
+    nodes
+      .filter(d => !decisionSet.has(d.data.f[0]))
+      .select('rect.node-rect')
+      .classed('sankey', false)
+      .transition(trans)
+      .attr('x', -rectR)
+      .attr('y', -rectR)
+      .attr('rx', nodeR)
+      .attr('ry', nodeR)
+      .attr('width', 2 * rectR)
+      .attr('height', 2 * rectR);
+
+    // Update decisions as a rectangle with a symbol
+    nodes
+      .filter(d => decisionSet.has(d.data.f[0]))
+      .select('rect.leaf-rect')
+      .attr('class', 'leaf-rect')
+      .transition(trans)
+      .attr('x', -rectR)
+      .attr('y', -rectR)
+      .attr('rx', 2)
+      .attr('ry', 2)
+      .attr('width', 2 * rectR)
+      .attr('height', 2 * rectR);
+
+    nodes
+      .filter(d => decisionSet.has(d.data.f[0]))
+      .select('text')
+      .transition(trans)
+      .attr('x', 0)
+      .attr('dy', 0.5)
+      .style('opacity', 1);
+
+    // Add true/false label on the first split point
+    content
+      .select('.label-group')
+      .style('display', 'unset')
+      .style('opacity', 0)
+      .transition(trans)
+      .style('opacity', 1);
+  }
+
+  /**
+   * Update the tree with this.curTreeID in the sankey tree style
+   */
+  #changeStandardToSankey() {
+    const content = this.svg.select('.content');
+
+    // Step 1: Set up the tree layout
+    const root = d3.hierarchy(this.pinnedTree.tree, d => d.c);
+    const nodeR = 7;
+    const rectR = nodeR * 1;
+
+    const treeRoot = d3.tree().size([this.width, this.height])(
+      root
+    ) as d3.HierarchyPointNode<TreeNode>;
+
+    const linkGroup = content.select('.link-group');
+
+    // Step 2: Update the nodes
+    const nodeGroup = content.select('.node-group');
+
+    // Configure the width scale for nodes
+    const localPadding = {
+      top: this.padding.top,
+      bottom: this.padding.bottom,
+      left: 20,
+      right: 20
+    };
+
+    const totalSampleNum = treeRoot.data.f[1];
+    const nodeWidthScale = d3
+      .scaleLinear()
+      .domain([0, totalSampleNum])
+      .range([
+        0,
+        this.width +
+          this.padding.left +
+          this.padding.right -
+          localPadding.left -
+          localPadding.right
+      ]);
+
+    // Calculate the x and width for each node
+    const sankeyNodes: SankeyHierarchyPointNode[] = [];
+
+    let nextStartX = 0;
+    let curDepth = -1;
+
+    // This is a BFS
+    treeRoot.descendants().forEach(d => {
+      const curNode = Object.assign(d) as SankeyHierarchyPointNode;
+
+      if (curNode.depth !== curDepth) {
+        nextStartX =
+          curNode.parent === null ? localPadding.left : curNode.parent.x;
+        curDepth = curNode.depth;
+      }
+
+      curNode.x = nextStartX;
+      curNode.width = nodeWidthScale(curNode.data.f[1]);
+      nextStartX += curNode.width;
+
+      sankeyNodes.push(curNode);
+    });
+
+    const trans = d3
+      .transition()
+      .duration(400)
+      .ease(d3.easeCubicInOut) as unknown as d3.Transition<
+      d3.BaseType,
+      unknown,
+      d3.BaseType,
+      unknown
+    >;
+
+    const nodes = nodeGroup.selectAll('g.node').data(sankeyNodes).join('g');
+    nodes.transition(trans).attr('transform', d => `translate(${d.x}, ${d.y})`);
+
+    // Update decision points as a circle
+    const decisionSet = new Set(['-', '+']);
+    nodes
+      .filter(d => !decisionSet.has(d.data.f[0]))
+      .select('rect.node-rect')
+      .classed('sankey', true)
+      .transition(trans)
+      .attr('x', 0)
+      .attr('y', -rectR)
+      .attr('width', d => d.width)
+      .attr('height', 2 * rectR)
+      .attr('rx', d => (d.width < 16 ? 1 : 2))
+      .attr('ry', d => (d.width < 16 ? 1 : 2));
+
+    // Update decisions as a rectangle with a symbol
+    nodes
+      .filter(d => decisionSet.has(d.data.f[0]))
+      .select('rect.leaf-rect')
+      .transition(trans)
+      .attr('x', 0)
+      .attr('y', -rectR)
+      .attr('rx', d => (d.width < 16 ? 1 : 2))
+      .attr('ry', d => (d.width < 16 ? 1 : 2))
+      .attr('width', d => d.width)
+      .attr('height', 2 * rectR);
+
+    nodes
+      .filter(d => decisionSet.has(d.data.f[0]))
+      .select('text')
+      .transition(trans)
+      .attr('x', d => d.width / 2)
+      .attr('dy', 0.5)
+      .text(d => d.data.f[0])
+      .style('opacity', d => (d.width < 16 ? 0 : 1));
+
+    // Update 3: Update the links
+    linkGroup
+      .selectAll('path.link')
+      .data(treeRoot.links())
+      .join('path')
+      .transition(trans)
+      .attr('d', d => {
+        const source = d.source as SankeyHierarchyPointNode;
+        const target = d.target as SankeyHierarchyPointNode;
+
+        return d3.line()([
+          [source.x + source.width / 2, source.y],
+          [target.x + target.width / 2, target.y - rectR]
+        ]);
+      });
+
+    content.select('.label-group').transition(trans).style('opacity', 0);
+  }
+
+  /**
    * Get the current style string
    */
   getStyle = () => {
     return `
       left: ${this.pinnedTree.x}px;\
       top: ${this.pinnedTree.y}px;`;
+  };
+
+  /**
+   * Alternate the tree layout
+   */
+  alterLayout = () => {
+    if (this.sankey) {
+      this.#changeSankeyToStandard();
+      this.sankey = false;
+    } else {
+      this.#changeStandardToSankey();
+      this.sankey = true;
+    }
   };
 
   /**
