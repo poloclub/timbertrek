@@ -260,7 +260,7 @@ $border-color: $gray-light-border;
 }
 
 .control-footer {
-  padding: 4px 7px;
+  padding: 5px 7px;
   color: $gray-600;
   font-size: $font-d2;
   line-height: 1;
@@ -268,35 +268,58 @@ $border-color: $gray-light-border;
   width: 100%;
 
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
 }
 
-.button {
+.switch {
   display: flex;
-  flex-direction: row;
-  align-items: flex-end;
-  gap: 3px;
+  align-items: flex-start;
+  gap: 8px;
 
-  border-radius: 5px;
-  padding: 1px 6px;
-  user-select: none;
-  -webkit-user-select: none;
-  cursor: default;
+  padding: 0;
+  margin: 0;
 
-  color: $gray-700;
-  border: 1px solid $gray-300;
-  background-color: $gray-50;
+  font-size: $font-d2;
+  background-color: transparent;
+  color: $gray-500;
+  border: none;
 
-  transition: background-color 100ms ease-in-out, fill 100ms ease-in-out,
-    color 100ms ease-in-out;
+  .switch-track {
+    cursor: pointer;
+    background-color: $gray-500;
+    transition: 400ms cubic-bezier(0.645, 0.045, 0.355, 1);
+    border-radius: 34px;
+    height: 15px;
+    width: 32px;
+    position: relative;
+    margin-top: 1px;
 
-  &:hover {
-    background-color: adjust-color($color: white, $lightness: -7%);
+    &::before {
+      content: '';
+      position: absolute;
+      height: 10px;
+      width: 10px;
+      margin: 0px 3px;
+      left: 0px;
+
+      top: 50%;
+      transform: translateY(-50%);
+
+      background-color: $gray-light-background;
+      transition: 400ms cubic-bezier(0.645, 0.045, 0.355, 1);
+      border-radius: 50%;
+    }
   }
+}
 
-  &:active {
-    background-color: adjust-color($color: white, $lightness: -12%);
+:global(.pinned-tree-window .switch[aria-checked='true']) {
+  .switch-track {
+    background-color: $green-700;
+
+    &:before {
+      left: 16px;
+    }
   }
 }
 

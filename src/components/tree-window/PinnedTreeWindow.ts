@@ -899,4 +899,21 @@ export class PinnedTreeWindow {
   contentMousedownHandler = (e: MouseEvent) => {
     this.#bringWindowToTop();
   };
+
+  /**
+   * Handler for the clicking event on the bottom toggle switch
+   * @param e Mouse event
+   */
+  switchToggled = (e: MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+
+    const switchSelect = d3.select(e.currentTarget as HTMLElement);
+    switchSelect.attr(
+      'aria-checked',
+      switchSelect.attr('aria-checked') === 'true' ? 'false' : true
+    );
+
+    this.alterLayout();
+  };
 }

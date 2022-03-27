@@ -170,13 +170,21 @@
   </div>
 
   <div class="control-footer">
-    <div class="metrics">
-      <!-- <span class="metric-left">Balanced Acc:</span> -->
-      6021 samples
-    </div>
-
-    <div class="button" on:click={e => pinnedTreeWindow?.alterLayout()}>
-      weighted
-    </div>
+    <button
+      class="switch"
+      aria-checked="false"
+      title="Toggle to visualize sample size as node width"
+      on:click={e => pinnedTreeWindow?.switchToggled(e)}
+    >
+      <label
+        class="switch-label"
+        for={`switch-${pinnedTreeWindow?.pinnedTree.treeID}`}
+        >Display Sample Size
+      </label>
+      <div
+        class="switch-track"
+        id={`switch-${pinnedTreeWindow?.pinnedTree.treeID}`}
+      />
+    </button>
   </div>
 </div>
