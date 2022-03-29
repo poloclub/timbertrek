@@ -1,5 +1,5 @@
 import type { FavoritesStoreValue } from '../../stores';
-import type { FavPinnedTree } from '../ForagerTypes';
+import type { FavPinnedTree } from '../TimberTypes';
 import { downloadJSON } from '../../utils/utils';
 
 export const downloadClicked = (

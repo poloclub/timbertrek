@@ -30,7 +30,7 @@ import {
   getTreeWindowPos,
   tempShowPinnedTree
 } from './SunburstEvent';
-import { FeaturePosition, FeatureValuePairType } from '../ForagerTypes';
+import { FeaturePosition, FeatureValuePairType } from '../TimberTypes';
 import type {
   ArcDomain,
   ArcDomainData,
@@ -40,7 +40,7 @@ import type {
   HierarchyNode,
   Padding,
   RuleNode
-} from '../ForagerTypes';
+} from '../TimberTypes';
 
 const ZOOM_DURATION = 800;
 

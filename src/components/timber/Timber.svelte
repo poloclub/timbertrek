@@ -15,7 +15,7 @@
   import PinnedTreeWindow from '../tree-window/PinnedTreeWindow.svelte';
   import FavoritesPanel from '../favorites-panel/FavoritesPanel.svelte';
   import d3 from '../../utils/d3-import';
-  import type { HierarchyJSON, PinnedTree } from '../ForagerTypes';
+  import type { HierarchyJSON, PinnedTree } from '../TimberTypes';
 
   let component: HTMLElement | null = null;
 
@@ -48,21 +48,21 @@
   });
 
   onMount(() => {
-    console.log('Forager mounted!');
+    console.log('TimberTrek mounted!');
   });
 </script>
 
 <style lang="scss">
-  @import './Forager.scss';
+  @import './Timber.scss';
 </style>
 
-<div class="forager-page" bind:this={component}>
-  <div class="forager">
+<div class="timbertrek-page" bind:this={component}>
+  <div class="timbertrek">
     <div class="header">
       <div class="logo">
-        <div class="logo-icon">Forager</div>
+        <div class="logo-icon">TimberTrek</div>
         <div class="logo-tag">
-          Identifying accurate decision trees that align with human knowledge
+          Identifying decision trees that align with human knowledge
         </div>
       </div>
     </div>

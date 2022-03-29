@@ -1,7 +1,7 @@
 import d3 from '../../utils/d3-import';
 import { round } from '../../utils/utils';
 import type { Writable } from 'svelte/store';
-import type { TreeNode, Point, Padding } from '../ForagerTypes';
+import type { TreeNode, Point, Padding } from '../TimberTypes';
 import type { TreeWindowStoreValue } from '../../stores';
 import { getTreeWindowStoreDefaultValue } from '../../stores';
 

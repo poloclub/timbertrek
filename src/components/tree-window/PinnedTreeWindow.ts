@@ -8,7 +8,7 @@ import type {
   PinnedTree,
   Position,
   SankeyHierarchyPointNode
-} from '../ForagerTypes';
+} from '../TimberTypes';
 import type { PinnedTreeStoreValue, FavoritesStoreValue } from '../../stores';
 import {
   getPinnedTreeStoreDefaultValue,

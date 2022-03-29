@@ -3,7 +3,7 @@
   import { PinnedTreeWindow } from './PinnedTreeWindow';
   import type { Writable } from 'svelte/store';
   import type { PinnedTreeStoreValue, FavoritesStoreValue } from '../../stores';
-  import type { HierarchyJSON, PinnedTree } from '../ForagerTypes';
+  import type { HierarchyJSON, PinnedTree } from '../TimberTypes';
   import iconCloseCircle from '../../imgs/icon-close-circle.svg?raw';
   import iconHeartCircle from '../../imgs/icon-heart-circle.svg?raw';
   import iconNoteCircle from '../../imgs/icon-note-circle.svg?raw';

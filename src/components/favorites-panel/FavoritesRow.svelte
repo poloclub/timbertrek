@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { PinnedTree, FavPinnedTree } from '../ForagerTypes';
+  import type { PinnedTree, FavPinnedTree } from '../TimberTypes';
   import type { Writable } from 'svelte/store';
   import type { FavoritesStoreValue, PinnedTreeStoreValue } from '../../stores';
   import { FavoritesRow } from './FavoritesRow';

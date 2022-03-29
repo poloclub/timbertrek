@@ -4,7 +4,7 @@ import type {
   FavPinnedTree,
   TreeNode,
   Position
-} from '../ForagerTypes';
+} from '../TimberTypes';
 import type { Writable, Unsubscriber } from 'svelte/store';
 import { tick } from 'svelte';
 import type { FavoritesStoreValue, PinnedTreeStoreValue } from '../../stores';

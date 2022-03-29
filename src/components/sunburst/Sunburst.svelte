@@ -8,7 +8,7 @@
     TreeWindowStoreValue,
     PinnedTreeStoreValue
   } from '../../stores';
-  import type { HierarchyJSON } from '../ForagerTypes';
+  import type { HierarchyJSON } from '../TimberTypes';
 
   // Component variables
   export let data: HierarchyJSON | null = null;

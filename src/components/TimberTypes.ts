@@ -1,5 +1,5 @@
 /**
- * Custom types for Forager
+ * Custom types for TimberTrek
  */
 
 export interface Position {

@@ -4,14 +4,14 @@
 
 import { config } from '../../config';
 import type { Sunburst } from './Sunburst';
-import type { Point } from '../ForagerTypes';
+import type { Point } from '../TimberTypes';
 import type {
   HierarchyNode,
   ArcDomain,
   ArcDomainData,
   PinnedTree,
   Position
-} from '../ForagerTypes';
+} from '../TimberTypes';
 import { round } from '../../utils/utils';
 import d3 from '../../utils/d3-import';
 
@@ -325,9 +325,9 @@ export function getTreeWindowPos(this: Sunburst, d: HierarchyNode): Point {
   };
 
   let containerHeight = window.innerHeight;
-  if (d3.select('.forager-page').size() > 0) {
+  if (d3.select('.timbertrek-page').size() > 0) {
     containerHeight = (
-      d3.select('.forager-page').node() as HTMLElement
+      d3.select('.timbertrek-page').node() as HTMLElement
     ).getBoundingClientRect().height;
   }
 

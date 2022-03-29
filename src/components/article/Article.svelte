@@ -1,21 +1,20 @@
-<script lang='ts'>
-  import {onMount} from 'svelte';
-  import Forager from '../forager/Forager.svelte';
+<script lang="ts">
+  import { onMount } from 'svelte';
+  import TimberTrek from '../timber/Timber.svelte';
 
   let component: HTMLElement | null = null;
 
   onMount(() => {
     // console.log('mounted!');
   });
-
 </script>
 
-<style lang='scss'>
+<style lang="scss">
   @import './Article.scss';
 </style>
 
-<div class='article-page'>
-  <div class='main-app' bind:this={component}>
-    <Forager />
+<div class="article-page">
+  <div class="main-app" bind:this={component}>
+    <TimberTrek />
   </div>
 </div>

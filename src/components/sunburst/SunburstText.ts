@@ -3,8 +3,8 @@
  */
 
 import type { Sunburst } from './Sunburst';
-import { TextArcMode } from '../ForagerTypes';
-import type { HierarchyNode } from '../ForagerTypes';
+import { TextArcMode } from '../TimberTypes';
+import type { HierarchyNode } from '../TimberTypes';
 import d3 from '../../utils/d3-import';
 import { getLatoTextWidth } from '../../utils/text-width';
 import { getContrastRatio } from '../../utils/utils';

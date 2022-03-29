@@ -3,7 +3,7 @@
   import { TreeWindow } from './TreeWindow';
   import type { Writable } from 'svelte/store';
   import type { TreeWindowStoreValue } from '../../stores';
-  import type { HierarchyJSON, TreeNode } from '../ForagerTypes';
+  import type { HierarchyJSON, TreeNode } from '../TimberTypes';
   import iconClick from '../../imgs/icon-click.svg?raw';
 
   // Component variables

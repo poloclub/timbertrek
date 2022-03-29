@@ -3,7 +3,7 @@ import type {
   PinnedTree,
   TreeNode,
   FavPinnedTree
-} from './components/ForagerTypes';
+} from './components/TimberTypes';
 
 export interface FavoritesStoreValue {
   shown: boolean;
