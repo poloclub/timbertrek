@@ -296,6 +296,9 @@ export class PinnedTreeWindow {
       .attr('x', d => d.x)
       .attr('y', d => d.y)
       .text((d, i) => (i === 0 ? 'true' : 'false'));
+
+    // Add node text
+    // content.append('text').attr('class', 'split-label').text('Age < 21');
   }
 
   /**

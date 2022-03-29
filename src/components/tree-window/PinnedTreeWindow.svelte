@@ -179,7 +179,7 @@
       <label
         class="switch-label"
         for={`switch-${pinnedTreeWindow?.pinnedTree.treeID}`}
-        >Display Sample Size
+        >Scaled by sample size
       </label>
       <div
         class="switch-track"
