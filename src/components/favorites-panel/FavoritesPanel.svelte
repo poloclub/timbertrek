@@ -74,13 +74,11 @@
 
   {#if initialized}
     {#if favoritesStoreValue.favTrees.length === 0}
-      <div class="tree-placeholder-container">
-        <div class="tree-placeholder">
-          <div class="tree-placeholder-text">
-            Click the heart button <span class="svg-icon"
-              >{@html heartDemoIcon}</span
-            > on tree windows to add favorite trees.
-          </div>
+      <div class="tree-placeholder">
+        <div class="tree-placeholder-text">
+          Click the heart button <span class="svg-icon"
+            >{@html heartDemoIcon}</span
+          > on tree windows to add favorite trees.
         </div>
       </div>
     {:else}
