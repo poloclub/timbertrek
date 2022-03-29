@@ -2,11 +2,7 @@
   import FavoritesRow from './FavoritesRow.svelte';
   import { downloadClicked } from './FavoritesPanel';
   import type { FavoritesStoreValue, PinnedTreeStoreValue } from '../../stores';
-  import {
-    getFavoritesStoreDefaultValue,
-    getPinnedTreeStoreDefaultValue
-  } from '../../stores';
-  import type { PinnedTree, FavPinnedTree } from '../ForagerTypes';
+  import { getFavoritesStoreDefaultValue } from '../../stores';
   import type { Writable } from 'svelte/store';
   import { onMount } from 'svelte';
   import { flip } from 'svelte/animate';
@@ -24,7 +20,6 @@
   let initialized = false;
 
   let favoritesStoreValue = getFavoritesStoreDefaultValue();
-  let pinnedTreeStoreValue = getPinnedTreeStoreDefaultValue();
 
   onMount(() => {
     mounted = true;
@@ -34,10 +29,6 @@
     if (favoritesStore && pinnedTreeStore) {
       favoritesStore.subscribe(value => {
         favoritesStoreValue = value;
-      });
-
-      pinnedTreeStore.subscribe(value => {
-        pinnedTreeStoreValue = value;
       });
     }
 
@@ -83,11 +74,13 @@
 
   {#if initialized}
     {#if favoritesStoreValue.favTrees.length === 0}
-      <div class="tree-placeholder">
-        <div class="tree-placeholder-text">
-          Click the heart button <span class="svg-icon"
-            >{@html heartDemoIcon}</span
-          > on tree windows to add favorite trees.
+      <div class="tree-placeholder-container">
+        <div class="tree-placeholder">
+          <div class="tree-placeholder-text">
+            Click the heart button <span class="svg-icon"
+              >{@html heartDemoIcon}</span
+            > on tree windows to add favorite trees.
+          </div>
         </div>
       </div>
     {:else}
