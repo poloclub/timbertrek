@@ -2,7 +2,11 @@
   import { onMount } from 'svelte';
   import { ToolbarEventHandler } from './Toolbar';
   import type { Writable } from 'svelte/store';
-  import type { FavoritesStoreValue, SunburstStoreValue } from 'src/stores';
+  import type {
+    FavoritesStoreValue,
+    SunburstStoreValue,
+    SearchStoreValue
+  } from 'src/stores';
 
   import iconSearch from '../../imgs/icon-search.svg?raw';
   import iconHeart from '../../imgs/icon-heart.svg?raw';
@@ -12,6 +16,7 @@
   // export let data: object | null = null;
   export let favoritesStore: Writable<FavoritesStoreValue> | null = null;
   export let sunburstStore: Writable<SunburstStoreValue> | null = null;
+  export let searchStore: Writable<SearchStoreValue> | null = null;
 
   let component: HTMLElement | null = null;
   let mounted = false;
@@ -31,16 +36,17 @@
   };
 
   const initView = () => {
-    if (favoritesStore && sunburstStore) {
+    if (favoritesStore && sunburstStore && searchStore) {
       handler = new ToolbarEventHandler(
         handlerUpdated,
         favoritesStore,
-        sunburstStore
+        sunburstStore,
+        searchStore
       );
     }
   };
 
-  $: favoritesStore && sunburstStore && initView();
+  $: favoritesStore && sunburstStore && searchStore && initView();
 </script>
 
 <style lang="scss">
@@ -78,19 +84,6 @@
   </div>
 
   <div class="tools">
-    <!-- <div
-      class="tool-button"
-      on:click={() => {
-        handler?.favoritesClicked();
-      }}
-      class:shown={handler?.favoritesStoreValue.shown}
-    >
-      <span class="svg-icon">
-        {@html iconBrush}
-      </span>
-      <span class="tool-name"> Favorites </span>
-    </div> -->
-
     <div
       class="tool-button"
       on:click={() => {
@@ -107,7 +100,13 @@
       <span class="tool-name"> My Favorites </span>
     </div>
 
-    <div class="tool-button">
+    <div
+      class="tool-button"
+      on:click={() => {
+        handler?.searchClicked();
+      }}
+      class:shown={handler?.searchStoreValue.shown}
+    >
       <span class="svg-icon">
         {@html iconSearch}
       </span>

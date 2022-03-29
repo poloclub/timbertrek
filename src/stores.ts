@@ -10,6 +10,10 @@ export interface FavoritesStoreValue {
   favTrees: FavPinnedTree[];
 }
 
+export interface SearchStoreValue {
+  shown: boolean;
+}
+
 export interface SunburstStoreValue {
   depthMax: number;
   depthLow: number;
@@ -66,13 +70,19 @@ export const getSunburstStoreDefaultValue = (): SunburstStoreValue => {
 export const getTreeWindowStoreDefaultValue = (): TreeWindowStoreValue => {
   return {
     featureMap: new Map<number, string[]>(),
-    treeMap: new Map<number, [TreeNode, number]>(),
+    treeMap: new Map<number, [TreeNode, number, number]>(),
     treeID: 0,
     ancestorFs: [],
     show: false,
     x: 20,
     y: 20,
     getFeatureColor: null
+  };
+};
+
+export const getSearchStoreDefaultValue = (): SearchStoreValue => {
+  return {
+    shown: false
   };
 };
 
@@ -102,4 +112,8 @@ export const getTreeWindowStore = () => {
 
 export const getPinnedTreeStore = () => {
   return writable(getPinnedTreeStoreDefaultValue());
+};
+
+export const getSearchStore = () => {
+  return writable(getSearchStoreDefaultValue());
 };

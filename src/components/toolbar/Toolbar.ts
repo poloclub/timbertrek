@@ -2,10 +2,15 @@ import type { Writable } from 'svelte/store';
 import d3 from '../../utils/d3-import';
 // import { config } from '../../config';
 import { getContrastRatio } from '../../utils/utils';
-import type { FavoritesStoreValue, SunburstStoreValue } from '../../stores';
+import type {
+  FavoritesStoreValue,
+  SunburstStoreValue,
+  SearchStoreValue
+} from '../../stores';
 import {
   getFavoritesStoreDefaultValue,
-  getSunburstStoreDefaultValue
+  getSunburstStoreDefaultValue,
+  getSearchStoreDefaultValue
 } from '../../stores';
 import { SunburstAction } from '../../stores';
 
@@ -16,6 +21,9 @@ export class ToolbarEventHandler {
   favoritesStore: Writable<FavoritesStoreValue>;
   favoritesStoreValue: FavoritesStoreValue;
 
+  searchStore: Writable<SearchStoreValue>;
+  searchStoreValue: SearchStoreValue;
+
   sunburstStore: Writable<SunburstStoreValue>;
   sunburstStoreValue: SunburstStoreValue;
 
@@ -24,13 +32,14 @@ export class ToolbarEventHandler {
   constructor(
     handlerUpdated: () => void,
     favoritesStore: Writable<FavoritesStoreValue>,
-    sunburstStore: Writable<SunburstStoreValue>
+    sunburstStore: Writable<SunburstStoreValue>,
+    searchStore: Writable<SearchStoreValue>
   ) {
     // We need to use this function to tell the component that the handler
     // object is updated
     this.handlerUpdated = handlerUpdated;
 
-    // Favorites button store bonding
+    // Favorites button store binding
     this.favoritesStore = favoritesStore;
     this.favoritesStoreValue = getFavoritesStoreDefaultValue();
     this.favoritesStore.subscribe(value => {
@@ -38,11 +47,19 @@ export class ToolbarEventHandler {
       this.handlerUpdated();
     });
 
-    // Sunburst store bonding
+    // Sunburst store binding
     this.sunburstStore = sunburstStore;
     this.sunburstStoreValue = getSunburstStoreDefaultValue();
     this.sunburstStore.subscribe(value => {
       this.sunburstStoreValue = value;
+      this.handlerUpdated();
+    });
+
+    // Search store binding
+    this.searchStore = searchStore;
+    this.searchStoreValue = getSearchStoreDefaultValue();
+    this.searchStore.subscribe(value => {
+      this.searchStoreValue = value;
       this.handlerUpdated();
     });
   }
@@ -53,6 +70,14 @@ export class ToolbarEventHandler {
   favoritesClicked = () => {
     this.favoritesStoreValue.shown = !this.favoritesStoreValue.shown;
     this.favoritesStore.set(this.favoritesStoreValue);
+  };
+
+  /**
+   * Handler for favorites button clicking event
+   */
+  searchClicked = () => {
+    this.searchStoreValue.shown = !this.searchStoreValue.shown;
+    this.searchStore.set(this.searchStoreValue);
   };
 
   /**

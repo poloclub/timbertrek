@@ -7,13 +7,15 @@
     getSunburstStore,
     getTreeWindowStore,
     getPinnedTreeStore,
-    getPinnedTreeStoreDefaultValue
+    getPinnedTreeStoreDefaultValue,
+    getSearchStore
   } from '../../stores';
   import Toolbar from '../toolbar/Toolbar.svelte';
   import Sunburst from '../sunburst/Sunburst.svelte';
   import TreeWindow from '../tree-window/TreeWindow.svelte';
   import PinnedTreeWindow from '../tree-window/PinnedTreeWindow.svelte';
   import FavoritesPanel from '../favorites-panel/FavoritesPanel.svelte';
+  import SearchPanel from '../search-panel/SearchPanel.svelte';
   import d3 from '../../utils/d3-import';
   import type { HierarchyJSON, PinnedTree } from '../TimberTypes';
 
@@ -40,6 +42,7 @@
   const sunburstStore = getSunburstStore();
   const treeWindowStore = getTreeWindowStore();
   const pinnedTreeStore = getPinnedTreeStore();
+  const searchStore = getSearchStore();
 
   // Initialize the store
   let pinnedTreeStoreValue = getPinnedTreeStoreDefaultValue();
@@ -69,7 +72,7 @@
 
     <div class="content">
       <div class="toolbar">
-        <Toolbar {favoritesStore} {sunburstStore} />
+        <Toolbar {favoritesStore} {sunburstStore} {searchStore} />
       </div>
 
       <div class="sunburst">
@@ -79,6 +82,10 @@
 
     <div class="sidebar">
       <FavoritesPanel {favoritesStore} {pinnedTreeStore} />
+    </div>
+
+    <div class="sidebar">
+      <SearchPanel {searchStore} />
     </div>
   </div>
 
