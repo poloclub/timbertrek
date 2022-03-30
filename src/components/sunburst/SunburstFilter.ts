@@ -72,6 +72,13 @@ export function updateSunburst(this: Sunburst) {
   // Update the arcs, here we are sure there is no entry and exit
   this.removeText();
 
+  // Need to handle the domain shift if the current head is not root
+  this.arcDomainStack.forEach(d => {
+    d.x0 = d.node.x0;
+    d.x1 = d.node.x1;
+  });
+  this.xScale.domain([this.curHeadNode.x0, this.curHeadNode.x1]);
+
   content
     .select('.arc-group')
     .selectAll('g.arc')
@@ -103,4 +110,6 @@ export function updateSunburst(this: Sunburst) {
     this.drawCenterText();
     this.drawText();
   }, 500);
+
+  this.sunburstUpdated();
 }
