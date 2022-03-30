@@ -76,7 +76,13 @@
       </div>
 
       <div class="sunburst">
-        <Sunburst {data} {sunburstStore} {treeWindowStore} {pinnedTreeStore} />
+        <Sunburst
+          {data}
+          {sunburstStore}
+          {treeWindowStore}
+          {pinnedTreeStore}
+          {searchStore}
+        />
       </div>
     </div>
 

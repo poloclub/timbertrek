@@ -12,6 +12,8 @@ export interface FavoritesStoreValue {
 
 export interface SearchStoreValue {
   shown: boolean;
+  curAccuracyLow: number;
+  curAccuracyHigh: number;
 }
 
 export interface SunburstStoreValue {
@@ -82,7 +84,9 @@ export const getTreeWindowStoreDefaultValue = (): TreeWindowStoreValue => {
 
 export const getSearchStoreDefaultValue = (): SearchStoreValue => {
   return {
-    shown: false
+    shown: false,
+    curAccuracyLow: 0,
+    curAccuracyHigh: 1
   };
 };
 

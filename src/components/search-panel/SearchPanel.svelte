@@ -22,7 +22,7 @@
 
   let searchStoreValue = getSearchStoreDefaultValue();
 
-  const formatter = d3.format(',.3~f');
+  const formatter = d3.format(',.3f');
 
   onMount(() => {
     mounted = true;

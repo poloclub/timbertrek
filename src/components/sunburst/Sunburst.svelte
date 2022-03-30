@@ -6,7 +6,8 @@
   import type {
     SunburstStoreValue,
     TreeWindowStoreValue,
-    PinnedTreeStoreValue
+    PinnedTreeStoreValue,
+    SearchStoreValue
   } from '../../stores';
   import type { HierarchyJSON } from '../TimberTypes';
 
@@ -15,6 +16,7 @@
   export let sunburstStore: Writable<SunburstStoreValue> | null = null;
   export let treeWindowStore: Writable<TreeWindowStoreValue> | null = null;
   export let pinnedTreeStore: Writable<PinnedTreeStoreValue> | null = null;
+  export let searchStore: Writable<SearchStoreValue> | null = null;
 
   let component: HTMLElement | null = null;
   let mounted = false;
@@ -41,6 +43,7 @@
       data &&
       sunburstStore &&
       treeWindowStore &&
+      searchStore &&
       pinnedTreeStore
     ) {
       sunburst = new Sunburst({
@@ -49,6 +52,7 @@
         sunburstStore,
         treeWindowStore,
         pinnedTreeStore,
+        searchStore,
         sunburstUpdated,
         width,
         height
@@ -60,6 +64,7 @@
     sunburstStore &&
     treeWindowStore &&
     pinnedTreeStore &&
+    searchStore &&
     mounted &&
     component &&
     initView();

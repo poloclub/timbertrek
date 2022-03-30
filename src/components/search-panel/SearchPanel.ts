@@ -379,12 +379,14 @@ export class SearchPanel {
       case 'slider-left-thumb':
         xPos -= THUMB_WIDTH;
         this.curAccuracyLow = value;
+        this.searchStoreValue.curAccuracyLow = this.curAccuracyLow;
         // updateRangeAnnotation(component, state);
         // syncFeature(state);
         break;
 
       case 'slider-right-thumb':
         this.curAccuracyHigh = value;
+        this.searchStoreValue.curAccuracyHigh = this.curAccuracyHigh;
         // updateRangeAnnotation(component, state);
         // syncFeature(state);
         break;
@@ -393,6 +395,8 @@ export class SearchPanel {
         console.warn('Unknown thumb type in moveThumb()');
         break;
     }
+
+    this.searchStore.set(this.searchStoreValue);
 
     // syncTooltips(component, state);
     thumb.style('left', `${xPos}px`);
@@ -418,11 +422,6 @@ export class SearchPanel {
     const trackWidth = track.getBoundingClientRect().width;
     thumb.focus();
 
-    const localHideAnnotation = () => {};
-
-    // showAnnotation(component, state, 'range');
-    // localHideAnnotation = () => hideAnnotation(component, state, 'range');
-
     const mouseMoveHandler = (e: MouseEvent) => {
       e.preventDefault();
       e.stopPropagation();
@@ -440,7 +439,6 @@ export class SearchPanel {
       document.removeEventListener('mouseup', mouseUpHandler);
       document.body.style.cursor = 'default';
       thumb.blur();
-      localHideAnnotation();
     };
 
     // Listen to mouse move on the whole page (users can drag outside of the

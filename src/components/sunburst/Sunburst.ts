@@ -5,12 +5,14 @@ import { SunburstAction } from '../../stores';
 import type {
   SunburstStoreValue,
   TreeWindowStoreValue,
-  PinnedTreeStoreValue
+  PinnedTreeStoreValue,
+  SearchStoreValue
 } from '../../stores';
 import {
   getSunburstStoreDefaultValue,
   getTreeWindowStoreDefaultValue,
-  getPinnedTreeStoreDefaultValue
+  getPinnedTreeStoreDefaultValue,
+  getSearchStoreDefaultValue
 } from '../../stores';
 import {
   textArc,
@@ -30,6 +32,7 @@ import {
   getTreeWindowPos,
   tempShowPinnedTree
 } from './SunburstEvent';
+import { syncAccuracyRange } from './SunburstFilter';
 import { FeaturePosition, FeatureValuePairType } from '../TimberTypes';
 import type {
   ArcDomain,
@@ -58,6 +61,9 @@ export class Sunburst {
   pinnedTreeStore: Writable<PinnedTreeStoreValue>;
   pinnedTreeStoreValue: PinnedTreeStoreValue;
 
+  searchStore: Writable<SearchStoreValue>;
+  searchStoreValue: SearchStoreValue;
+
   sunburstUpdated: () => void;
 
   padding: Padding;
@@ -80,6 +86,11 @@ export class Sunburst {
   colorScale: d3.ScaleOrdinal<string, string, never>;
   arcDomainStack: ArcDomainData[];
   curHeadNode: HierarchyNode;
+
+  // Properties for tree filtering
+  localAccuracyLow: number;
+  localAccuracyHigh: number;
+  viewInitialized = false;
 
   // ===== Methods implemented in another file ====
   /**
@@ -148,8 +159,10 @@ export class Sunburst {
   leafArcMouseleaveHandler = leafArcMouseleaveHandler;
 
   getTreeWindowPos = getTreeWindowPos;
-
   tempShowPinnedTree = tempShowPinnedTree;
+
+  // ===== Methods implemented in SunburstFilter.ts ====
+  syncAccuracyRange = syncAccuracyRange;
 
   /**
    * The radius is determined by the number of levels to show.
@@ -179,6 +192,7 @@ export class Sunburst {
     sunburstStore,
     treeWindowStore,
     pinnedTreeStore,
+    searchStore,
     sunburstUpdated,
     width = config.layout.sunburstWidth,
     height = config.layout.sunburstWidth
@@ -188,6 +202,7 @@ export class Sunburst {
     sunburstStore: Writable<SunburstStoreValue>;
     treeWindowStore: Writable<TreeWindowStoreValue>;
     pinnedTreeStore: Writable<PinnedTreeStoreValue>;
+    searchStore: Writable<SearchStoreValue>;
     sunburstUpdated: () => void;
     width?: number;
     height?: number;
@@ -248,6 +263,12 @@ export class Sunburst {
     this.pinnedTreeStoreValue = getPinnedTreeStoreDefaultValue();
     this.#initPinnedTreeStore();
 
+    this.searchStore = searchStore;
+    this.searchStoreValue = getSearchStoreDefaultValue();
+    this.localAccuracyLow = this.searchStoreValue.curAccuracyLow;
+    this.localAccuracyHigh = this.searchStoreValue.curAccuracyHigh;
+    this.#initSearchStore();
+
     this.sunburstUpdated = sunburstUpdated;
 
     // Create scales
@@ -300,6 +321,7 @@ export class Sunburst {
     // Draw the initial view
     console.time('Draw sunburst');
     this.#initView();
+    this.viewInitialized = true;
     console.timeEnd('Draw sunburst');
 
     if (this.pinnedTreeStoreValue.pinnedTrees.length < 1) {
@@ -678,6 +700,30 @@ export class Sunburst {
     // Pass the color scale to tree window store
     this.pinnedTreeStoreValue.getFeatureColor = this.getFeatureColor;
     this.pinnedTreeStore.set(this.pinnedTreeStoreValue);
+  }
+
+  /**
+   * Initialize the search store
+   */
+  #initSearchStore() {
+    this.searchStore.subscribe(value => {
+      this.searchStoreValue = value;
+
+      // Need to update the view if user changes the accuracy range
+      if (
+        this.viewInitialized &&
+        this.searchStoreValue.shown &&
+        (this.searchStoreValue.curAccuracyHigh !== this.localAccuracyHigh ||
+          this.searchStoreValue.curAccuracyLow !== this.localAccuracyLow)
+      ) {
+        this.localAccuracyHigh = this.searchStoreValue.curAccuracyHigh;
+        this.localAccuracyLow = this.searchStoreValue.curAccuracyLow;
+        this.syncAccuracyRange();
+      } else {
+        this.localAccuracyHigh = this.searchStoreValue.curAccuracyHigh;
+        this.localAccuracyLow = this.searchStoreValue.curAccuracyLow;
+      }
+    });
   }
 
   /**
