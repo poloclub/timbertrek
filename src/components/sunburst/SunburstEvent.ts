@@ -147,7 +147,7 @@ export function arcMouseenterHandler(
   // Highlight all this node's ancestors
   const ancestors = d.ancestors().filter(d => d.depth > 0);
   ancestors.forEach(node => {
-    const curPath = this.svg.select(`path#arc-${node.nid}`);
+    const curPath = this.svg.select(`path#arc-${node.data.nid}`);
     d3.select((curPath.node() as HTMLElement).parentElement).raise();
     curPath.classed('highlighted', true);
   });
@@ -169,7 +169,7 @@ export function arcMouseleaveHandler(
   // Dehighlight all this node's ancestors
   const ancestors = d.ancestors().filter(d => d.depth > 0);
   ancestors.forEach(node => {
-    this.svg.select(`path#arc-${node.nid}`).classed('highlighted', false);
+    this.svg.select(`path#arc-${node.data.nid}`).classed('highlighted', false);
   });
 }
 

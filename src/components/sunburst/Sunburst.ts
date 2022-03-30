@@ -32,7 +32,7 @@ import {
   getTreeWindowPos,
   tempShowPinnedTree
 } from './SunburstEvent';
-import { syncAccuracyRange } from './SunburstFilter';
+import { syncAccuracyRange, updateSunburst } from './SunburstFilter';
 import { FeaturePosition, FeatureValuePairType } from '../TimberTypes';
 import type {
   ArcDomain,
@@ -42,7 +42,8 @@ import type {
   HierarchyJSON,
   HierarchyNode,
   Padding,
-  RuleNode
+  RuleNode,
+  TreeNode
 } from '../TimberTypes';
 
 const ZOOM_DURATION = 800;
@@ -76,6 +77,8 @@ export class Sunburst {
   textFontScale: d3.ScaleLinear<number, number, never>;
 
   data: RuleNode;
+  dataRoot: d3.HierarchyNode<RuleNode>;
+  treeMapMap: Map<number, [TreeNode, number, number]>;
   partition: HierarchyNode;
 
   featureCount: Map<string, number>;
@@ -163,6 +166,7 @@ export class Sunburst {
 
   // ===== Methods implemented in SunburstFilter.ts ====
   syncAccuracyRange = syncAccuracyRange;
+  updateSunburst = updateSunburst;
 
   /**
    * The radius is determined by the number of levels to show.
@@ -233,6 +237,12 @@ export class Sunburst {
     // Transform the data
     this.data = data.trie;
 
+    // Convert treeMap into a real Map
+    this.treeMapMap = new Map<number, [TreeNode, number, number]>();
+    Object.keys(data.treeMap).forEach(k => {
+      this.treeMapMap.set(+k, data.treeMap[+k] as [TreeNode, number, number]);
+    });
+
     // Get the feature map
     this.featureMap = new Map<number, string[]>();
     for (const [k, v] of Object.entries(data.featureMap)) {
@@ -243,6 +253,11 @@ export class Sunburst {
     this.featureCount = new Map<string, number>();
     this.featureValueCount = new Map<string, Map<string, number>>();
     this.colorScale = d3.scaleOrdinal();
+
+    this.dataRoot = d3
+      .hierarchy(this.data, d => d.c)
+      // Count the leaves (trees)
+      .sum(d => (d.f === '_' ? 1 : 0));
     this.partition = this.#partitionData();
 
     // The initial head node is the root
@@ -320,7 +335,7 @@ export class Sunburst {
 
     // Draw the initial view
     console.time('Draw sunburst');
-    this.#initView();
+    this.initView();
     this.viewInitialized = true;
     console.timeEnd('Draw sunburst');
 
@@ -415,17 +430,25 @@ export class Sunburst {
    */
   #partitionData() {
     /**
-     * Step 1: Construct d3 hierarchy
+     * Step 1: Initialize the `u` and `nid` properties
+     *
+     * `u` is only for leaf nodes (all true, as there is no filter at
+     * the beginning.)
+     *
+     * `nid` is an unique ID for all nodes
      */
-    let root = d3
-      .hierarchy(this.data, d => d.c)
-      // Count the leaves (trees)
-      .sum(d => (d.f === '_' ? 1 : 0));
+    let curID = 0;
+    this.dataRoot.eachBefore(d => {
+      if (d.data.f === '_') {
+        d.data.u = true;
+      }
+      d.data.nid = curID++;
+    });
 
     /**
      * Step 2: Figure out the feature order (based on first split frequency)
      */
-    root.children!.forEach(d => {
+    this.dataRoot.children!.forEach(d => {
       const [featureName, featureValue] = this.getFeatureNameValue(
         d.data.f
       ) as string[];
@@ -469,7 +492,7 @@ export class Sunburst {
      * One hack is to sort the sectors by the color's lightness, because we have
      * already sorted the lightness mapping in #getColorScale()
      */
-    root = root.sort((a, b) => {
+    this.dataRoot = this.dataRoot.sort((a, b) => {
       const aName = this.getFeatureInfo(a.data.f).name;
       const bName = this.getFeatureInfo(b.data.f).name;
       const aFeatureCount = this.featureCount.get(aName);
@@ -490,13 +513,7 @@ export class Sunburst {
      * Step 3: Convert the hierarchy data into a partition
      * It gives [x0, y0, x1, y1] of each node
      */
-    const partition = d3.partition()(root) as HierarchyNode;
-
-    // Give a unique id to each node in the partition tree
-    let curID = 0;
-    partition.each(d => {
-      d.nid = curID++;
-    });
+    const partition = d3.partition()(this.dataRoot) as HierarchyNode;
 
     /**
      * Step 4: Store number of unique trees in descendants for each node
@@ -729,7 +746,7 @@ export class Sunburst {
   /**
    * Draw the initial view.
    */
-  #initView() {
+  protected initView() {
     const content = this.svg
       .append('g')
       .attr('class', 'content-group')
@@ -751,9 +768,12 @@ export class Sunburst {
 
     const arcGroups = arcGroup
       .selectAll('g.arc')
-      .data(this.partition.descendants().slice(1))
+      .data(
+        this.partition.descendants().slice(1),
+        d => (d as HierarchyNode).data.nid!
+      )
       .join('g')
-      .attr('class', d => `arc-${d.depth}`)
+      .attr('class', d => `arc arc-${d.depth}`)
       .classed('leaf', d => d.data.f === '_');
 
     // Draw the background paths
@@ -761,7 +781,7 @@ export class Sunburst {
       .append('path')
       .attr('class', 'arc')
       .classed('leaf', d => d.data.f === '_')
-      .attr('id', d => `arc-${d.nid}`)
+      .attr('id', d => `arc-${d.data.nid}`)
       // @ts-ignore
       .attr('d', d => this.arc(d))
       .on('click', (e, d) => this.arcClicked(e as MouseEvent, d))

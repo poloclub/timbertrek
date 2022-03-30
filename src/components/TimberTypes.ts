@@ -83,10 +83,28 @@ export interface RuleNode {
   c: RuleNode[];
 
   /**
+   * Unique id for each node
+   *
+   * This property does not come from the JSON file, need to be initialized
+   */
+  nid?: number;
+
+  /**
    * Tree ID
    * Only leaf node has this property
    */
   t?: number;
+
+  /**
+   * If this leaf node is used. It is false if the corresponding tree is out of
+   * user's selected range
+   *
+   * This property does not come from the JSON file, need to be initialized
+   * when initializing the sunburst chart
+   *
+   * Only leaf node has this property
+   */
+  u?: boolean;
 }
 
 // Define the arc path generator
@@ -99,8 +117,6 @@ export interface ArcPartition extends d3.DefaultArcObject {
 
 export interface HierarchyNode extends d3.HierarchyRectangularNode<unknown> {
   current?: d3.HierarchyRectangularNode<unknown>;
-  /** Unique number ID for each node */
-  nid: number;
   /** Number of unique trees in the descendants */
   treeNum: number;
   /** Temporary data of tree ides in the descendants, will be all null */
