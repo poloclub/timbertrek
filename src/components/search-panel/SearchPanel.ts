@@ -1,15 +1,21 @@
 import type { Writable } from 'svelte/store';
 import d3 from '../../utils/d3-import';
+import { round } from '../../utils/utils';
 import { config } from '../../config';
 import type { SearchStoreValue } from '../../stores';
 import { getSearchStoreDefaultValue } from '../../stores';
 import type { HierarchyJSON, Point } from '../TimberTypes';
 
+const formatter = d3.format(',.3~f');
 const LEFT_THUMB_ID = 'slider-left-thumb';
 const RIGHT_THUMB_ID = 'slider-right-thumb';
 const PANEL_WIDTH = 268;
 const PANEL_H_GAP = 16;
 const THUMB_WIDTH = 8;
+const TICK_HEIGHTS = {
+  default: 6,
+  original: 6 * 1.8
+};
 
 /**
  * Class to handle events in the toolbar
@@ -17,7 +23,8 @@ const THUMB_WIDTH = 8;
 export class SearchPanel {
   component: HTMLElement;
   accuracyRow: d3.Selection<d3.BaseType, unknown, null, undefined>;
-  accuracySVG: d3.Selection<d3.BaseType, unknown, null, undefined>;
+  accuracySVG: d3.Selection<d3.BaseType, unknown, null, undefined> | null =
+    null;
 
   data: HierarchyJSON;
   accuracyDensities: Point[];
@@ -120,8 +127,8 @@ export class SearchPanel {
     });
 
     // Update the accuracy min and max
-    this.curAccuracyLow = accuracyDensities[0].x - densityGap;
-    this.curAccuracyHigh = accuracyDensities.slice(-1)[0].x + densityGap;
+    this.curAccuracyLow = accuracyDensities[0].x;
+    this.curAccuracyHigh = accuracyDensities.slice(-1)[0].x;
     this.accuracyLow = this.curAccuracyLow;
     this.accuracyHigh = this.curAccuracyHigh;
 
@@ -168,9 +175,10 @@ export class SearchPanel {
    */
   #initAccuracySVG() {
     const width = PANEL_WIDTH - PANEL_H_GAP * 2;
+    const tickHeight = 30;
     const histHeight = 55;
     const vGap = 15;
-    const height = histHeight + vGap;
+    const height = histHeight + vGap + tickHeight;
 
     const accuracySVG = this.accuracyRow
       .select('.svg-accuracy')
@@ -251,6 +259,62 @@ export class SearchPanel {
 
     upperArea.attr('clip-path', 'url(#accuracy-density-clip)');
 
+    // Initialize the ticks below the slider
+    const tickGroup = accuracySVG
+      .append('g')
+      .attr('class', 'tick-group')
+      .attr('transform', `translate(${THUMB_WIDTH}, ${histHeight + vGap})`);
+
+    const tickBackGroup = tickGroup
+      .append('g')
+      .attr('class', 'tick-back-group');
+
+    const tickTopGroup = tickGroup.append('g').attr('class', 'tick-top-group');
+
+    const tickCount = 30;
+    const tickArray = [];
+    for (let i = 0; i <= tickCount; i++) {
+      tickArray.push(
+        this.accuracyLow +
+          ((this.accuracyHigh - this.accuracyLow) * i) / tickCount
+      );
+    }
+
+    tickTopGroup
+      .selectAll('g.tick')
+      .data(tickArray)
+      .join('g')
+      .attr('class', 'tick')
+      .attr('transform', d => `translate(${this.accuracyXScale(d)}, 0)`)
+      .append('line')
+      .attr('y2', TICK_HEIGHTS.default);
+
+    // Initialize the style
+    this.#syncTicks();
+
+    // Add labels for the min and max value
+    tickBackGroup
+      .append('text')
+      .attr('class', 'label-min-value')
+      .attr('x', -4)
+      .attr('y', TICK_HEIGHTS.default * 2.2)
+      .style('text-anchor', 'start')
+      .style('dominant-baseline', 'hanging')
+      .style('font-size', '0.9em')
+      .style('fill', config.colors['gray-500'])
+      .text(formatter(this.accuracyLow));
+
+    tickBackGroup
+      .append('text')
+      .attr('class', 'label-max-value')
+      .attr('x', totalWidth + 4)
+      .attr('y', TICK_HEIGHTS.default * 2.2)
+      .style('text-anchor', 'end')
+      .style('dominant-baseline', 'hanging')
+      .style('font-size', '0.9em')
+      .style('fill', config.colors['gray-500'])
+      .text(formatter(this.accuracyHigh));
+
     return accuracySVG;
   }
 
@@ -281,6 +345,7 @@ export class SearchPanel {
   #moveThumb(thumbID: string, value: number) {
     // Make sure we are only moving within the range of the state.feature value
     value = Math.min(Math.max(value, this.accuracyLow), this.accuracyHigh);
+    value = round(value, 3);
 
     // Special rules based on the thumb type
     switch (thumbID) {
@@ -332,7 +397,8 @@ export class SearchPanel {
     // syncTooltips(component, state);
     thumb.style('left', `${xPos}px`);
     this.#syncRangeTrack();
-    // state.stateUpdated(stateChangeKey);
+    this.#syncTicks();
+    this.searchUpdated();
   }
 
   /**
@@ -409,6 +475,37 @@ export class SearchPanel {
           this.accuracyXScale(this.curAccuracyHigh) -
             this.accuracyXScale(this.curAccuracyLow)
         );
+    }
+  }
+
+  /**
+   * Sync up ticks with the current min & max range
+   */
+  #syncTicks() {
+    if (this.accuracySVG === null) return;
+
+    const topTicks = this.accuracySVG
+      .select('g.tick-top-group')
+      .selectAll('g.tick') as d3.Selection<
+      SVGGElement,
+      number,
+      SVGGElement,
+      unknown
+    >;
+
+    topTicks
+      .filter(d => d >= this.curAccuracyLow && d <= this.curAccuracyHigh)
+      .classed('out-range', false);
+
+    topTicks
+      .filter(d => d < this.curAccuracyLow || d > this.curAccuracyHigh)
+      .classed('out-range', true);
+
+    if (this.curAccuracyHigh === this.curAccuracyLow) {
+      this.accuracySVG
+        .select('g.tick-top-group')
+        .selectAll('g.tick')
+        .classed('out-range', true);
     }
   }
 }

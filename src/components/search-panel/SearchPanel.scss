@@ -94,6 +94,7 @@ $panel-h-padding: 16px;
 
   width: 100%;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 5px $panel-h-padding;
 
   font-size: $font-d1;
@@ -158,6 +159,7 @@ $base-circle-radius: 5px;
     margin: 0px;
     bottom: -11px;
 
+    color: $green-600;
     fill: $green-600;
     cursor: grab;
 
@@ -254,5 +256,18 @@ $base-circle-radius: 5px;
 
   :global(.area-path.selected) {
     fill: $green-600;
+  }
+
+  :global(.tick line) {
+    stroke: $green-100;
+    -webkit-backface-visibility: hidden;
+    -webkit-transform: translateZ(0);
+    transform: scaleY(1.8);
+    transition: transform 300ms ease-in-out;
+  }
+
+  :global(.tick.out-range line) {
+    stroke: $gray-200;
+    transform: scaleY(1);
   }
 }

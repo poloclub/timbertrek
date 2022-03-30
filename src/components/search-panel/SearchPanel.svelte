@@ -22,7 +22,7 @@
 
   let searchStoreValue = getSearchStoreDefaultValue();
 
-  const formatter = d3.format(',.2~f');
+  const formatter = d3.format(',.3~f');
 
   onMount(() => {
     mounted = true;
@@ -81,7 +81,7 @@
 
   <div class="search-list">
     <div class="row accuracy-row">
-      <div class="row-title">Accuracy</div>
+      <div class="row-title">Tree Accuracy</div>
       <div class="accuracy-content">
         <div
           class="feature-slider"
@@ -100,7 +100,9 @@
             >
               {@html thumbLeftIcon}
               <div class="thumb-label thumb-label-left">
-                <span class="thumb-label-span">{formatter(0)}</span>
+                <span class="thumb-label-span"
+                  >{formatter(searchPanel?.curAccuracyLow)}</span
+                >
               </div>
             </div>
             <div
@@ -111,7 +113,9 @@
             >
               {@html thumbRightIcon}
               <div class="thumb-label thumb-label-right">
-                <span class="thumb-label-span">{formatter(1)}</span>
+                <span class="thumb-label-span"
+                  >{formatter(searchPanel?.curAccuracyHigh)}</span
+                >
               </div>
             </div>
           </div>
