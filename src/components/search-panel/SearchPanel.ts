@@ -105,14 +105,13 @@ export class SearchPanel {
     this.#moveThumb(LEFT_THUMB_ID, this.curAccuracyLow);
     this.#moveThumb(RIGHT_THUMB_ID, this.curAccuracyHigh);
 
-    // // Register event listeners
-    // d3.select(component)
-    //   .select(`#${leftThumbID}`)
-    //   .on('mousedown', e => mouseDownHandler(e, component, state));
-
-    // d3.select(component)
-    //   .select(`#${rightThumbID}`)
-    //   .on('mousedown', e => mouseDownHandler(e, component, state));
+    // Register event listeners
+    this.accuracyRow
+      .select(`#${LEFT_THUMB_ID}`)
+      .on('mousedown', e => this.#mouseDownHandler(e as MouseEvent));
+    this.accuracyRow
+      .select(`#${RIGHT_THUMB_ID}`)
+      .on('mousedown', e => this.#mouseDownHandler(e as MouseEvent));
 
     this.#syncRangeTrack();
   }
@@ -175,6 +174,53 @@ export class SearchPanel {
     thumb.style('left', `${xPos}px`);
     this.#syncRangeTrack();
     // state.stateUpdated(stateChangeKey);
+  }
+
+  /**
+   * Handling the mousedown event for thumbs on the slider.
+   * @param e Event
+   */
+  #mouseDownHandler(e: MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const thumb = e.target as HTMLElement;
+    if (thumb === null || !thumb.id.includes('thumb')) {
+      return;
+    }
+
+    const track = thumb.parentNode as HTMLElement;
+    const trackWidth = track.getBoundingClientRect().width;
+    thumb.focus();
+
+    const localHideAnnotation = () => {};
+
+    // showAnnotation(component, state, 'range');
+    // localHideAnnotation = () => hideAnnotation(component, state, 'range');
+
+    const mouseMoveHandler = (e: MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const deltaX = e.pageX - track.getBoundingClientRect().x;
+      const newValue = deltaX / trackWidth;
+
+      this.#moveThumb(thumb.id, newValue);
+    };
+
+    const mouseUpHandler = () => {
+      document.removeEventListener('mousemove', mouseMoveHandler);
+      document.removeEventListener('mouseup', mouseUpHandler);
+      document.body.style.cursor = 'default';
+      thumb.blur();
+      localHideAnnotation();
+    };
+
+    // Listen to mouse move on the whole page (users can drag outside of the
+    // thumb, track, or even TimberTrek!)
+    document.addEventListener('mousemove', mouseMoveHandler);
+    document.addEventListener('mouseup', mouseUpHandler);
+    document.body.style.cursor = 'grabbing';
   }
 
   /**

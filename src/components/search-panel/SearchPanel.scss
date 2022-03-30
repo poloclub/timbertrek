@@ -211,31 +211,6 @@ $base-circle-radius: 5px;
       transform: translateX(-50%) translateY(100%) scale(1);
     }
   }
-
-  .svg-icon.icon-range-thumb-middle {
-    fill: $gray-400;
-    color: $gray-400;
-    stroke: $gray-100;
-    stroke-width: 10;
-    top: -10px;
-
-    :global(svg) {
-      width: 1.5rem;
-      height: 1.5rem;
-    }
-  }
-
-  :global(.svg-icon.icon-range-thumb-middle.user) {
-    fill: $blue-400;
-    color: $blue-400;
-    stroke: $blue-100;
-  }
-
-  :global(.svg-icon.icon-range-thumb-middle.coach) {
-    fill: $green-500;
-    color: $green-500;
-    stroke: $green-100;
-  }
 }
 
 .thumb-label {
@@ -261,10 +236,6 @@ $base-circle-radius: 5px;
   justify-content: center;
   padding: 0.25rem;
 
-  &.thumb-label-middle {
-    top: 12px;
-  }
-
   &::before {
     position: absolute;
     content: '';
@@ -275,10 +246,4 @@ $base-circle-radius: 5px;
     transform: translate(-50%, -220%) rotate(45deg);
     background-color: inherit;
   }
-}
-
-.feature-ticks {
-  margin: 0 0 10px 0;
-  height: 40px;
-  box-sizing: border-box;
 }
