@@ -17,7 +17,7 @@ import { lch, hsl, color } from 'd3-color';
 
 import { quantize, interpolate } from 'd3-interpolate';
 
-import { max, maxIndex, min, minIndex, extent, sum } from 'd3-array';
+import { max, maxIndex, min, minIndex, extent, sum, bin } from 'd3-array';
 
 import { timeout } from 'd3-timer';
 
@@ -81,6 +81,7 @@ export default {
   minIndex,
   extent,
   sum,
+  bin,
   timeout,
   transition,
   easeLinear,

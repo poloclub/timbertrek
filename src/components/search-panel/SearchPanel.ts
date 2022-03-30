@@ -3,6 +3,7 @@ import d3 from '../../utils/d3-import';
 import { config } from '../../config';
 import type { SearchStoreValue } from '../../stores';
 import { getSearchStoreDefaultValue } from '../../stores';
+import type { HierarchyJSON, Point } from '../TimberTypes';
 
 const LEFT_THUMB_ID = 'slider-left-thumb';
 const RIGHT_THUMB_ID = 'slider-right-thumb';
@@ -18,6 +19,10 @@ export class SearchPanel {
   accuracyRow: d3.Selection<d3.BaseType, unknown, null, undefined>;
   accuracySVG: d3.Selection<d3.BaseType, unknown, null, undefined>;
 
+  data: HierarchyJSON;
+  accuracyDensities: Point[];
+  heightDensities: Point[];
+
   searchStore: Writable<SearchStoreValue>;
   searchStoreValue: SearchStoreValue;
 
@@ -28,6 +33,7 @@ export class SearchPanel {
 
   constructor(
     component: HTMLElement,
+    data: HierarchyJSON,
     searchUpdated: () => void,
     searchStore: Writable<SearchStoreValue>
   ) {
@@ -48,12 +54,83 @@ export class SearchPanel {
     // Bind different sub elements as D3 selections
     this.accuracyRow = d3.select(component).select('.accuracy-row');
 
+    // Process the input data
+    this.data = data;
+    const result = this.#processData();
+    this.accuracyDensities = result.accuracyDensities;
+    this.heightDensities = result.heightDensities;
+
+    console.log(this.accuracyDensities, this.heightDensities);
+
     // Initialize the accuracy row
     this.curAccuracyLow = 0;
     this.curAccuracyHigh = 1;
 
     this.accuracySVG = this.#initAccuracySVG();
     this.#initSlider();
+  }
+
+  /**
+   * Process the raw data
+   * (1) Create accuracy distribution
+   * (2) Create tree height distribution
+   */
+  #processData() {
+    // (1) Identify the accuracy distribution
+    const accuracies: number[] = [];
+    for (const treeID in this.data.treeMap) {
+      accuracies.push(this.data.treeMap[treeID][2]);
+    }
+
+    const count = accuracies.length;
+    const binNum = 30;
+    const bins = d3.bin().thresholds(binNum)(accuracies);
+
+    // Compute the density in each bin
+    const accuracyDensities: Point[] = [];
+    bins.forEach(b => {
+      accuracyDensities.push({
+        x: b.x0 === undefined ? 0 : b.x0,
+        y: b.length / count
+      });
+    });
+
+    // (2) Identify tree heights
+    const treeHeightMap = new Map<number, number>();
+    const ruleRoot = d3.hierarchy(this.data.trie, d => d.c);
+    ruleRoot.eachBefore(d => {
+      if (d.data.t !== undefined) {
+        const treeID = d.data.t;
+        if (!treeHeightMap.has(treeID)) {
+          treeHeightMap.set(treeID, d.depth);
+        } else {
+          treeHeightMap.set(
+            treeID,
+            Math.max(treeHeightMap.get(treeID)!, d.depth)
+          );
+        }
+      }
+    });
+
+    const heightCountMap = new Map<number, number>();
+    Array.from(treeHeightMap.values()).forEach(h => {
+      if (heightCountMap.has(h)) {
+        heightCountMap.set(h, heightCountMap.get(h)! + 1);
+      } else {
+        heightCountMap.set(h, 1);
+      }
+    });
+
+    // Compute the density for each height value
+    const heightDensities: Point[] = [];
+    heightCountMap.forEach((v, k) => {
+      heightDensities.push({
+        x: k,
+        y: v / count
+      });
+    });
+
+    return { accuracyDensities, heightDensities };
   }
 
   /**

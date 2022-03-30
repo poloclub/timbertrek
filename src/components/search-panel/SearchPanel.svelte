@@ -5,11 +5,14 @@
   import type { Writable } from 'svelte/store';
   import { onMount } from 'svelte';
   import { SearchPanel } from './SearchPanel';
+  import type { HierarchyJSON } from '../TimberTypes';
+
   import closeIcon from '../../imgs/icon-close.svg?raw';
   import thumbLeftIcon from '../../imgs/icon-range-thumb-left.svg?raw';
   import thumbRightIcon from '../../imgs/icon-range-thumb-right.svg?raw';
 
   // Component variables
+  export let data: HierarchyJSON | null = null;
   export let searchStore: Writable<SearchStoreValue> | null = null;
 
   let component: HTMLElement | null = null;
@@ -29,17 +32,6 @@
     searchPanel = searchPanel;
   };
 
-  const initView = () => {
-    initialized = true;
-
-    if (searchStore && component) {
-      searchStore.subscribe(value => {
-        searchStoreValue = value;
-      });
-      searchPanel = new SearchPanel(component, searchUpdated, searchStore);
-    }
-  };
-
   const closeClicked = (e: MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
@@ -48,7 +40,23 @@
     searchStore?.set(searchStoreValue);
   };
 
-  $: searchStore && mounted && !initialized && component && initView();
+  const initView = () => {
+    initialized = true;
+
+    if (searchStore && component && data) {
+      searchStore.subscribe(value => {
+        searchStoreValue = value;
+      });
+      searchPanel = new SearchPanel(
+        component,
+        data,
+        searchUpdated,
+        searchStore
+      );
+    }
+  };
+
+  $: data && searchStore && mounted && !initialized && component && initView();
 </script>
 
 <style lang="scss">

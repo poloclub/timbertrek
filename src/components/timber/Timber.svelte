@@ -85,7 +85,7 @@
     </div>
 
     <div class="sidebar">
-      <SearchPanel {searchStore} />
+      <SearchPanel {data} {searchStore} />
     </div>
   </div>
 
