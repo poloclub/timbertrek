@@ -8,7 +8,8 @@ import {
   scalePoint,
   scaleBand,
   scalePow,
-  scaleOrdinal
+  scaleOrdinal,
+  scaleLog
 } from 'd3-scale';
 
 import { schemeTableau10, interpolateRainbow } from 'd3-scale-chromatic';
@@ -67,6 +68,8 @@ export default {
   scalePoint,
   scaleBand,
   scalePow,
+  scaleOrdinal,
+  scaleLog,
   schemeTableau10,
   interpolateRainbow,
   lch,
@@ -74,7 +77,6 @@ export default {
   color,
   quantize,
   interpolate,
-  scaleOrdinal,
   max,
   maxIndex,
   min,

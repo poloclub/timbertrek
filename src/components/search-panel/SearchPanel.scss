@@ -128,7 +128,7 @@ $base-circle-radius: 5px;
 
 .feature-slider {
   position: absolute;
-  top: 93px;
+  top: 60px;
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -148,7 +148,7 @@ $base-circle-radius: 5px;
     .range-track {
       position: absolute;
       height: 6px;
-      background-color: $orange-100;
+      background-color: $green-100;
     }
   }
 
@@ -158,8 +158,7 @@ $base-circle-radius: 5px;
     margin: 0px;
     bottom: -11px;
 
-    color: $orange-300;
-    fill: $orange-300;
+    fill: $green-600;
     cursor: grab;
 
     :global(svg) {
@@ -245,5 +244,15 @@ $base-circle-radius: 5px;
     left: 50%;
     transform: translate(-50%, -220%) rotate(45deg);
     background-color: inherit;
+  }
+}
+
+.svg-accuracy {
+  :global(.area-path) {
+    fill: $gray-300;
+  }
+
+  :global(.area-path.selected) {
+    fill: $green-600;
   }
 }

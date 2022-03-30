@@ -23,11 +23,17 @@ export class SearchPanel {
   accuracyDensities: Point[];
   heightDensities: Point[];
 
+  accuracyXScale: d3.ScaleLinear<number, number, never>;
+  accuracyYScale: d3.ScaleLinear<number, number, never>;
+  densityClip: d3.Selection<SVGRectElement, unknown, null, undefined> | null;
+
   searchStore: Writable<SearchStoreValue>;
   searchStoreValue: SearchStoreValue;
 
   curAccuracyLow: number;
   curAccuracyHigh: number;
+  accuracyLow: number;
+  accuracyHigh: number;
 
   searchUpdated: () => void;
 
@@ -54,6 +60,12 @@ export class SearchPanel {
     // Bind different sub elements as D3 selections
     this.accuracyRow = d3.select(component).select('.accuracy-row');
 
+    // Initialize the accuracy row (will be updated in processData())
+    this.curAccuracyLow = 0;
+    this.curAccuracyHigh = 1;
+    this.accuracyLow = 0;
+    this.accuracyHigh = 1;
+
     // Process the input data
     this.data = data;
     const result = this.#processData();
@@ -62,9 +74,10 @@ export class SearchPanel {
 
     console.log(this.accuracyDensities, this.heightDensities);
 
-    // Initialize the accuracy row
-    this.curAccuracyLow = 0;
-    this.curAccuracyHigh = 1;
+    // Put placeholder in the scales
+    this.accuracyXScale = d3.scaleLinear();
+    this.accuracyYScale = d3.scaleLinear();
+    this.densityClip = null;
 
     this.accuracySVG = this.#initAccuracySVG();
     this.#initSlider();
@@ -83,7 +96,7 @@ export class SearchPanel {
     }
 
     const count = accuracies.length;
-    const binNum = 30;
+    const binNum = 50;
     const bins = d3.bin().thresholds(binNum)(accuracies);
 
     // Compute the density in each bin
@@ -94,6 +107,23 @@ export class SearchPanel {
         y: b.length / count
       });
     });
+
+    // Add start and end to make sure the path starts and ends at 0
+    const densityGap = accuracyDensities[1].x - accuracyDensities[0].x;
+    accuracyDensities.unshift({
+      x: accuracyDensities[0].x - densityGap,
+      y: 0
+    });
+    accuracyDensities.push({
+      x: accuracyDensities.slice(-1)[0].x + densityGap,
+      y: 0
+    });
+
+    // Update the accuracy min and max
+    this.curAccuracyLow = accuracyDensities[0].x - densityGap;
+    this.curAccuracyHigh = accuracyDensities.slice(-1)[0].x + densityGap;
+    this.accuracyLow = this.curAccuracyLow;
+    this.accuracyHigh = this.curAccuracyHigh;
 
     // (2) Identify tree heights
     const treeHeightMap = new Map<number, number>();
@@ -138,7 +168,7 @@ export class SearchPanel {
    */
   #initAccuracySVG() {
     const width = PANEL_WIDTH - PANEL_H_GAP * 2;
-    const histHeight = 90;
+    const histHeight = 55;
     const vGap = 15;
     const height = histHeight + vGap;
 
@@ -148,17 +178,15 @@ export class SearchPanel {
       .attr('height', height);
 
     // Offset the range thumb to align with the track
-    const thumbWidth = (
-      this.accuracyRow.select('#slider-left-thumb').node() as HTMLElement
-    ).offsetWidth;
-
     const padding = {
       top: 0,
-      left: thumbWidth,
-      right: thumbWidth,
+      left: THUMB_WIDTH,
+      right: THUMB_WIDTH,
       bottom: 0,
       histTop: 2
     };
+
+    const totalWidth = width - padding.left - padding.right;
 
     // Draw a bounding box for this density plot
     accuracySVG
@@ -169,7 +197,59 @@ export class SearchPanel {
       .attr('width', width)
       .attr('height', histHeight - padding.top)
       .style('fill', 'none')
-      .style('stroke', config.colors['gray-200']);
+      .style('stroke', config.colors['gray-300']);
+
+    // Add density plot
+    const histGroup = accuracySVG
+      .append('g')
+      .attr('class', 'hist-group')
+      .attr('transform', `translate(${THUMB_WIDTH}, ${padding.top})`);
+
+    // Create the axis scales
+    this.accuracyXScale = d3
+      .scaleLinear()
+      .domain([
+        this.accuracyDensities[0].x,
+        this.accuracyDensities.slice(-1)[0].x
+      ])
+      .range([0, totalWidth]);
+
+    const maxDensity = Math.max(...this.accuracyDensities.map(d => d.y));
+    this.accuracyYScale = d3
+      .scaleLinear()
+      .domain([0, maxDensity])
+      .range([histHeight - padding.bottom - padding.top, padding.histTop]);
+
+    const curve = d3
+      .line<Point>()
+      .curve(d3.curveBasis)
+      .x(d => this.accuracyXScale(d.x))
+      .y(d => this.accuracyYScale(d.y));
+
+    // Draw the area curve
+    const underArea = histGroup
+      .append('path')
+      .attr('class', 'area-path')
+      .datum(this.accuracyDensities)
+      .attr('d', curve);
+
+    const upperArea = underArea.clone(true).classed('selected', true);
+
+    // Create a clip path
+    this.densityClip = histGroup
+      .append('clipPath')
+      .attr('id', 'accuracy-density-clip')
+      .append('rect')
+      .style('fill', 'hsla(100, 50%, 50%, 0.1)')
+      .attr('x', this.accuracyXScale(this.curAccuracyLow))
+      .attr(
+        'width',
+        this.accuracyXScale(this.curAccuracyHigh) -
+          this.accuracyXScale(this.curAccuracyLow)
+      )
+      .attr('height', histHeight);
+
+    upperArea.attr('clip-path', 'url(#accuracy-density-clip)');
 
     return accuracySVG;
   }
@@ -200,7 +280,7 @@ export class SearchPanel {
    */
   #moveThumb(thumbID: string, value: number) {
     // Make sure we are only moving within the range of the state.feature value
-    value = Math.min(Math.max(value, 0), 1);
+    value = Math.min(Math.max(value, this.accuracyLow), this.accuracyHigh);
 
     // Special rules based on the thumb type
     switch (thumbID) {
@@ -224,7 +304,9 @@ export class SearchPanel {
 
     // Compute the position to move the thumb to
     const trackWidth = PANEL_WIDTH - 2 * PANEL_H_GAP - 2 * THUMB_WIDTH;
-    let xPos = value * trackWidth;
+    let xPos =
+      ((value - this.accuracyLow) / (this.accuracyHigh - this.accuracyLow)) *
+      trackWidth;
 
     // Need to offset the xPos based on the thumb type
     // Also register different values based on the thumb type
@@ -280,7 +362,9 @@ export class SearchPanel {
       e.stopPropagation();
 
       const deltaX = e.pageX - track.getBoundingClientRect().x;
-      const newValue = deltaX / trackWidth;
+      const newValue =
+        this.accuracyLow +
+        ((this.accuracyHigh - this.accuracyLow) * deltaX) / trackWidth;
 
       this.#moveThumb(thumb.id, newValue);
     };
@@ -317,14 +401,14 @@ export class SearchPanel {
       .style('width', `${rangeWidth}px`);
 
     // Move the clip in the density plot
-    // if (state.densityClip !== null) {
-    //   state.densityClip
-    //     .attr('x', state.tickXScale(state.feature.curMin))
-    //     .attr(
-    //       'width',
-    //       state.tickXScale(state.feature.curMax) -
-    //         state.tickXScale(state.feature.curMin)
-    //     );
-    // }
+    if (this.densityClip !== null) {
+      this.densityClip
+        .attr('x', this.accuracyXScale(this.curAccuracyLow))
+        .attr(
+          'width',
+          this.accuracyXScale(this.curAccuracyHigh) -
+            this.accuracyXScale(this.curAccuracyLow)
+        );
+    }
   }
 }
