@@ -114,7 +114,7 @@ export class SearchPanel {
     //   .select(`#${rightThumbID}`)
     //   .on('mousedown', e => mouseDownHandler(e, component, state));
 
-    // syncRangeTrack(component, state);
+    this.#syncRangeTrack();
   }
 
   /**
@@ -156,16 +156,12 @@ export class SearchPanel {
       case 'slider-left-thumb':
         xPos -= THUMB_WIDTH;
         this.curAccuracyLow = value;
-        // syncTicks(state);
-        // syncRangeTrack(component, state);
         // updateRangeAnnotation(component, state);
         // syncFeature(state);
         break;
 
       case 'slider-right-thumb':
         this.curAccuracyHigh = value;
-        // syncTicks(state);
-        // syncRangeTrack(component, state);
         // updateRangeAnnotation(component, state);
         // syncFeature(state);
         break;
@@ -177,6 +173,35 @@ export class SearchPanel {
 
     // syncTooltips(component, state);
     thumb.style('left', `${xPos}px`);
+    this.#syncRangeTrack();
     // state.stateUpdated(stateChangeKey);
+  }
+
+  /**
+   * Sync the background range track with the current min & max range
+   */
+  #syncRangeTrack() {
+    const leftThumb = this.accuracyRow.select('#slider-left-thumb');
+    const rightThumb = this.accuracyRow.select('#slider-right-thumb');
+
+    const leftThumbLeft = parseFloat(leftThumb.style('left'));
+    const rightThumbLeft = parseFloat(rightThumb.style('left'));
+    const rangeWidth = rightThumbLeft - leftThumbLeft;
+
+    this.accuracyRow
+      .select('.track .range-track')
+      .style('left', `${leftThumbLeft + THUMB_WIDTH}px`)
+      .style('width', `${rangeWidth}px`);
+
+    // Move the clip in the density plot
+    // if (state.densityClip !== null) {
+    //   state.densityClip
+    //     .attr('x', state.tickXScale(state.feature.curMin))
+    //     .attr(
+    //       'width',
+    //       state.tickXScale(state.feature.curMax) -
+    //         state.tickXScale(state.feature.curMin)
+    //     );
+    // }
   }
 }

@@ -87,6 +87,7 @@
             <div
               id="slider-left-thumb"
               tabindex="-1"
+              style="left: 0px"
               class="svg-icon icon-range-thumb-left thumb"
             >
               {@html thumbLeftIcon}
@@ -97,6 +98,7 @@
             <div
               id="slider-right-thumb"
               tabindex="-1"
+              style="left: 0px"
               class="svg-icon icon-range-thumb-right thumb"
             >
               {@html thumbRightIcon}
