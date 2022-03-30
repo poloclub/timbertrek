@@ -1,11 +1,13 @@
 @import '../../define';
 
+$panel-h-padding: 16px;
+
 .favorites-panel {
   display: none;
   flex-direction: column;
   align-items: center;
 
-  width: 260px;
+  width: 268px;
   min-height: 300px;
   max-height: 615px;
 
@@ -27,7 +29,7 @@
   border-top-right-radius: $border-radius;
   color: $gray-light-background;
 
-  padding: 0px 12px;
+  padding: 0px $panel-h-padding;
   display: flex;
   align-items: center;
   justify-content: flex-start;

@@ -1,11 +1,13 @@
 @import '../../define';
 
+$panel-h-padding: 16px;
+
 .tree {
   display: flex;
   justify-content: flex-start;
-  gap: 6px;
+  gap: 8px;
 
-  padding: 12px 12px 0px 12px;
+  padding: $panel-h-padding $panel-h-padding 0px $panel-h-padding;
   font-size: 14px;
 
   user-select: none;

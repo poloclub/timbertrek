@@ -1,11 +1,13 @@
 @import '../../define';
 
+$panel-h-padding: 16px;
+
 .search-panel {
   display: none;
   flex-direction: column;
   align-items: center;
 
-  width: 260px;
+  width: 268px;
   min-height: 300px;
   max-height: 615px;
 
@@ -27,7 +29,7 @@
   border-top-right-radius: $border-radius;
   color: $gray-light-background;
 
-  padding: 0px 12px;
+  padding: 0px $panel-h-padding;
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -92,12 +94,12 @@
 
   width: 100%;
   overflow-y: auto;
-  padding-top: 5px;
+  padding: 5px $panel-h-padding;
 
   font-size: $font-d1;
 
   .row {
-    padding: 0 12px;
+    position: relative;
 
     .row-title {
       font-weight: 600;
@@ -109,4 +111,174 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+
+  .accuracy-content {
+    width: 100%;
+    position: relative;
+  }
+}
+
+$range-thumb-width: 8px;
+$base-circle-radius: 5px;
+
+.feature-hist {
+  position: relative;
+  width: 100%;
+}
+
+.feature-slider {
+  position: absolute;
+  top: 93px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  z-index: 1;
+
+  .track {
+    width: calc(100% - #{2 * $range-thumb-width});
+    background-color: $gray-200;
+    // Only use top and bottom border here to avoid offsetting the left and right
+    // with artifacts => cause misalignment with svg dimension
+    border-top: 1px solid white;
+    border-bottom: 1px solid white;
+    position: absolute;
+    left: $range-thumb-width;
+    height: 8px;
+
+    .range-track {
+      position: absolute;
+      height: 6px;
+      background-color: $orange-100;
+    }
+  }
+
+  .svg-icon.thumb {
+    position: absolute;
+    padding: 0;
+    margin: 0px;
+    bottom: -11px;
+
+    color: $orange-300;
+    fill: $orange-300;
+    cursor: grab;
+
+    :global(svg) {
+      width: 8px;
+    }
+
+    &::before {
+      content: '';
+      display: inline-block;
+      position: absolute;
+      z-index: 1;
+      width: $base-circle-radius;
+      height: $base-circle-radius;
+      border-radius: 50%;
+      background: currentColor;
+      opacity: 0.2;
+      // Center the background circle
+      left: 50%;
+      top: 50%;
+      margin-top: -($base-circle-radius / 2);
+      margin-left: -($base-circle-radius / 2);
+      -webkit-backface-visibility: hidden;
+      -webkit-transform: translateZ(0);
+      transform: scale(0.1);
+      transition: transform 300ms ease-in-out;
+    }
+  }
+
+  .svg-icon.thumb:hover {
+    &::before {
+      transform: scale(5);
+    }
+
+    .thumb-label {
+      transition-delay: 200ms;
+      transform: translateX(-50%) translateY(100%) scale(1);
+    }
+  }
+
+  .svg-icon.thumb:focus {
+    cursor: grabbing;
+    outline: none;
+
+    &::before {
+      transform: scale(7);
+    }
+
+    .thumb-label {
+      transform: translateX(-50%) translateY(100%) scale(1);
+    }
+  }
+
+  .svg-icon.icon-range-thumb-middle {
+    fill: $gray-400;
+    color: $gray-400;
+    stroke: $gray-100;
+    stroke-width: 10;
+    top: -10px;
+
+    :global(svg) {
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+  }
+
+  :global(.svg-icon.icon-range-thumb-middle.user) {
+    fill: $blue-400;
+    color: $blue-400;
+    stroke: $blue-100;
+  }
+
+  :global(.svg-icon.icon-range-thumb-middle.coach) {
+    fill: $green-500;
+    color: $green-500;
+    stroke: $green-100;
+  }
+}
+
+.thumb-label {
+  position: absolute;
+  top: 5px;
+  left: 50%;
+
+  font-size: 0.8rem;
+  border-radius: 2px;
+  line-height: 1.2;
+  white-space: nowrap;
+  background-color: $gray-500;
+  color: white;
+
+  -webkit-backface-visibility: hidden;
+  -webkit-transform: translateZ(0);
+  transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  transform-origin: top center;
+  transform: translateX(-50%) translateY(100%) scale(0);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem;
+
+  &.thumb-label-middle {
+    top: 12px;
+  }
+
+  &::before {
+    position: absolute;
+    content: '';
+    width: 8px;
+    height: 8px;
+    bottom: 0;
+    left: 50%;
+    transform: translate(-50%, -220%) rotate(45deg);
+    background-color: inherit;
+  }
+}
+
+.feature-ticks {
+  margin: 0 0 10px 0;
+  height: 40px;
+  box-sizing: border-box;
 }
