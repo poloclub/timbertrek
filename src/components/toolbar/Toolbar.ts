@@ -70,6 +70,12 @@ export class ToolbarEventHandler {
   favoritesClicked = () => {
     this.favoritesStoreValue.shown = !this.favoritesStoreValue.shown;
     this.favoritesStore.set(this.favoritesStoreValue);
+
+    // Hide the search panel if it is shown
+    if (this.favoritesStoreValue.shown && this.searchStoreValue.shown) {
+      this.searchStoreValue.shown = false;
+      this.searchStore.set(this.searchStoreValue);
+    }
   };
 
   /**
@@ -78,6 +84,12 @@ export class ToolbarEventHandler {
   searchClicked = () => {
     this.searchStoreValue.shown = !this.searchStoreValue.shown;
     this.searchStore.set(this.searchStoreValue);
+
+    // Hide the fav panel if it is shown
+    if (this.searchStoreValue.shown && this.favoritesStoreValue.shown) {
+      this.favoritesStoreValue.shown = false;
+      this.favoritesStore.set(this.favoritesStoreValue);
+    }
   };
 
   /**

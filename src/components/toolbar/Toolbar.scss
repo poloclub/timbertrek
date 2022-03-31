@@ -126,8 +126,7 @@ $depth-box-width: 24px;
     border: 1px solid $gray-300;
     background-color: $gray-50;
 
-    transition: background-color 100ms ease-in-out, fill 100ms ease-in-out,
-      color 100ms ease-in-out;
+    transition: background-color 100ms linear;
 
     &.shown {
       background-color: adjust-color($color: white, $lightness: -12%);
