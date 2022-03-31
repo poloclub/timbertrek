@@ -227,6 +227,8 @@ $border-color: $gray-light-border;
   :global(.node .leaf-rect) {
     fill: $gray-light-background;
     stroke: $gray-700;
+    // fill: $gray-400;
+    // stroke: $gray-light-background;
     stroke-width: 1px;
   }
 
@@ -241,6 +243,7 @@ $border-color: $gray-light-border;
   }
 
   :global(.node text) {
+    fill: $gray-light-background;
     fill: $gray-700;
     dominant-baseline: middle;
     text-anchor: middle;

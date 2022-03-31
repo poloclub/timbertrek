@@ -2,7 +2,8 @@ import { writable } from 'svelte/store';
 import type {
   PinnedTree,
   TreeNode,
-  FavPinnedTree
+  FavPinnedTree,
+  FeatureInfo
 } from './components/TimberTypes';
 
 export interface FavoritesStoreValue {
@@ -42,6 +43,7 @@ export interface PinnedTreeStoreValue {
    */
   lastActiveTreeID: number | null;
   getFeatureColor: null | ((f: string) => string);
+  getFeatureInfo: null | ((f: string) => FeatureInfo);
 }
 
 /**
@@ -94,7 +96,8 @@ export const getPinnedTreeStoreDefaultValue = (): PinnedTreeStoreValue => {
   return {
     pinnedTrees: [],
     lastActiveTreeID: null,
-    getFeatureColor: null
+    getFeatureColor: null,
+    getFeatureInfo: null
   };
 };
 

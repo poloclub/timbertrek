@@ -716,6 +716,9 @@ export class Sunburst {
 
     // Pass the color scale to tree window store
     this.pinnedTreeStoreValue.getFeatureColor = this.getFeatureColor;
+    this.pinnedTreeStoreValue.getFeatureInfo = (f: string) => {
+      return this.getFeatureInfo(f);
+    };
     this.pinnedTreeStore.set(this.pinnedTreeStoreValue);
   }
 

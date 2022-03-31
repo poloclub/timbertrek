@@ -247,6 +247,18 @@ export class PinnedTreeWindow {
         }
       });
 
+    nodes
+      .filter(d => !decisionSet.has(d.data.f[0]))
+      .append('title')
+      .text(d => {
+        if (this.pinnedTreeStoreValue.getFeatureInfo) {
+          return this.pinnedTreeStoreValue.getFeatureInfo(d.data.f[0])
+            .nameValue;
+        } else {
+          return '';
+        }
+      });
+
     // Draw decisions as a rectangle with a symbol
     nodes
       .filter(d => decisionSet.has(d.data.f[0]))
