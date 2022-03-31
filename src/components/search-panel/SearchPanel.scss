@@ -1,6 +1,11 @@
 @import '../../define';
 
 $panel-h-padding: 16px;
+$range-thumb-width: 8px;
+$base-circle-radius: 5px;
+
+$color-chart-primary: $green-600;
+$color-chart-secondary: $green-100;
 
 .search-panel {
   display: none;
@@ -119,9 +124,6 @@ $panel-h-padding: 16px;
   }
 }
 
-$range-thumb-width: 8px;
-$base-circle-radius: 5px;
-
 .feature-hist {
   position: relative;
   width: 100%;
@@ -149,7 +151,7 @@ $base-circle-radius: 5px;
     .range-track {
       position: absolute;
       height: 6px;
-      background-color: $green-100;
+      background-color: $color-chart-secondary;
     }
   }
 
@@ -159,8 +161,8 @@ $base-circle-radius: 5px;
     margin: 0px;
     bottom: -11px;
 
-    color: $green-600;
-    fill: $green-600;
+    color: $color-chart-primary;
+    fill: $color-chart-primary;
     cursor: grab;
 
     :global(svg) {
@@ -256,11 +258,11 @@ $base-circle-radius: 5px;
   }
 
   :global(.area-path.selected) {
-    fill: $green-600;
+    fill: $color-chart-primary;
   }
 
   :global(.tick line) {
-    stroke: $green-100;
+    stroke: $color-chart-secondary;
     -webkit-backface-visibility: hidden;
     -webkit-transform: translateZ(0);
     transform: scaleY(1.8);
@@ -270,5 +272,32 @@ $base-circle-radius: 5px;
   :global(.tick.out-range line) {
     stroke: $gray-200;
     transform: scaleY(1);
+  }
+}
+
+.svg-height {
+  :global(.bar rect) {
+    fill: $gray-300;
+  }
+
+  :global(.bar.selected rect) {
+    fill: $color-chart-primary;
+  }
+
+  :global(.bar text) {
+    font-size: 11px;
+    text-anchor: middle;
+    fill: $gray-600;
+    user-select: none;
+    -webkit-user-select: none;
+    font-variant: font-variant-numeric;
+  }
+
+  :global(.bar.selected text) {
+    fill: $green-400;
+  }
+
+  :global(.bar.selected .text-height) {
+    font-weight: 800;
   }
 }

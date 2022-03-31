@@ -26,6 +26,9 @@ export class SearchPanel {
   accuracySVG: d3.Selection<d3.BaseType, unknown, null, undefined> | null =
     null;
 
+  heightRow: d3.Selection<d3.BaseType, unknown, null, undefined>;
+  heightSVG: d3.Selection<d3.BaseType, unknown, null, undefined> | null = null;
+
   data: HierarchyJSON;
   accuracyDensities: Point[];
   heightDensities: Point[];
@@ -33,6 +36,9 @@ export class SearchPanel {
   accuracyXScale: d3.ScaleLinear<number, number, never>;
   accuracyYScale: d3.ScaleLinear<number, number, never>;
   densityClip: d3.Selection<SVGRectElement, unknown, null, undefined> | null;
+
+  heightXScale: d3.ScaleBand<number>;
+  heightYScale: d3.ScaleLinear<number, number, never>;
 
   searchStore: Writable<SearchStoreValue>;
   searchStoreValue: SearchStoreValue;
@@ -66,6 +72,7 @@ export class SearchPanel {
 
     // Bind different sub elements as D3 selections
     this.accuracyRow = d3.select(component).select('.accuracy-row');
+    this.heightRow = d3.select(component).select('.height-row');
 
     // Initialize the accuracy row (will be updated in processData())
     this.curAccuracyLow = 0;
@@ -79,15 +86,21 @@ export class SearchPanel {
     this.accuracyDensities = result.accuracyDensities;
     this.heightDensities = result.heightDensities;
 
-    console.log(this.accuracyDensities, this.heightDensities);
-
     // Put placeholder in the scales
     this.accuracyXScale = d3.scaleLinear();
     this.accuracyYScale = d3.scaleLinear();
     this.densityClip = null;
 
+    // Initialize the accuracy svg
     this.accuracySVG = this.#initAccuracySVG();
     this.#initSlider();
+
+    // Put placeholder in the scales
+    this.heightXScale = d3.scaleBand<number>();
+    this.heightYScale = d3.scaleLinear();
+
+    // Initialize the height svg
+    this.heightSVG = this.#initHeightSVG();
   }
 
   /**
@@ -166,6 +179,8 @@ export class SearchPanel {
         y: v / count
       });
     });
+
+    heightDensities.sort((a, b) => a.x - b.x);
 
     return { accuracyDensities, heightDensities };
   }
@@ -505,5 +520,96 @@ export class SearchPanel {
         .selectAll('g.tick')
         .classed('out-range', true);
     }
+  }
+
+  /**
+   * Draw the SVG for the height row
+   */
+  #initHeightSVG() {
+    const width = PANEL_WIDTH - PANEL_H_GAP * 2;
+    const tickHeight = 30;
+    const histHeight = 55;
+    const vGap = 15;
+    const height = histHeight + vGap + tickHeight;
+
+    const heightSVG = this.heightRow
+      .select('.svg-height')
+      .attr('width', width)
+      .attr('height', height);
+
+    // Offset the range thumb to align with the track
+    const padding = {
+      top: 0,
+      left: THUMB_WIDTH,
+      right: THUMB_WIDTH,
+      bottom: 0,
+      histTop: 20
+    };
+
+    const totalWidth = width - padding.left - padding.right;
+
+    // Draw a bounding box for this density plot
+    heightSVG
+      .append('g')
+      .attr('class', 'border-group')
+      .attr('transform', `translate(${0}, ${padding.top})`)
+      .append('rect')
+      .attr('width', width)
+      .attr('height', histHeight - padding.top)
+      .style('fill', 'none')
+      .style('stroke', config.colors['gray-300']);
+
+    // Add density plot
+    const histGroup = heightSVG
+      .append('g')
+      .attr('class', 'hist-group')
+      .attr('transform', `translate(${THUMB_WIDTH}, ${padding.top})`);
+
+    // Create the axis scales
+    this.heightXScale = d3
+      .scaleBand<number>()
+      .domain(this.heightDensities.map(d => d.x))
+      .range([0, totalWidth])
+      .paddingInner(0.35);
+
+    const maxDensity = Math.max(...this.heightDensities.map(d => d.y));
+    this.heightYScale = d3
+      .scaleLinear()
+      .domain([0, maxDensity])
+      .range([histHeight - padding.bottom - padding.top, padding.histTop]);
+
+    // Draw the area bars
+    const barGroups = histGroup
+      .selectAll('g.bar')
+      .data(this.heightDensities)
+      .join('g')
+      .attr('class', 'bar selected')
+      .attr('transform', d => `translate(${this.heightXScale(d.x)}, ${0})`);
+
+    barGroups
+      .append('rect')
+      .attr('x', 0)
+      .attr('y', d => this.heightYScale(d.y))
+      .attr('width', this.heightXScale.bandwidth())
+      .attr('height', d => this.heightYScale(0) - this.heightYScale(d.y));
+
+    // Add text on top of the bar
+    const texts = barGroups
+      .append('text')
+      .attr('x', this.heightXScale.bandwidth() / 2)
+      .attr('y', d => this.heightYScale(d.y) - 5);
+
+    texts
+      .append('tspan')
+      .attr('class', 'text-height')
+      .text(d => `${d.x}`);
+
+    texts.append('tspan').text(d => `(${d3.format('.0%')(d.y)})`);
+
+    barGroups
+      .append('title')
+      .text(d => `Height: ${d.x} (${d3.format('.4%')(d.y)})`);
+
+    return heightSVG;
   }
 }

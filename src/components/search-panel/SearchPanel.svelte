@@ -126,5 +126,14 @@
         </div>
       </div>
     </div>
+
+    <div class="row height-row">
+      <div class="row-title">Tree Height</div>
+      <div class="height-content">
+        <div class="feature-hist">
+          <svg class="svg-height" />
+        </div>
+      </div>
+    </div>
   </div>
 </div>
