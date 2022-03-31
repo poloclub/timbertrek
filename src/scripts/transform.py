@@ -476,54 +476,58 @@ def count_leaf_samples(root, x_all, y_all):
         y_all(np.array): Data labels
     """
 
-    y_pred = np.array([int(root["f"][0]) for _ in range(x_all.shape[0])])
+    y_pred = np.array([root["f"][0] + "l" + "0" for _ in range(x_all.shape[0])]).astype(
+        object
+    )
     total_correct_num = 0
 
     # Use a queue for BFS
     working_queue = deque()
-    working_queue.append(root)
+    working_queue.append([root, "l", 0])
 
     while len(working_queue) > 0:
-        cur_node = working_queue.popleft()
+        cur_node, cur_dir, cur_dep = working_queue.popleft()
 
-        # cur_labels = [label_for_true, label_for_false]
+        # cur_labels is [label_for_true, label_for_false]
         cur_labels = []
-        for child in cur_node["c"]:
-            # Need to change '+' and '-' to int because it's an np array
-            cur_label = child["f"][0] if child["f"][0] != "+" else -2
-            cur_label = cur_label if cur_label != "-" else -1
-            cur_labels.append(int(cur_label))
+        dirs = ["l", "r"]
+
+        for (i, child) in enumerate(cur_node["c"]):
+            cur_label = child["f"][0]
+            cur_labels.append(cur_label)
 
             # Add the children to the queue if it not a leaf node
             if child["f"][0] != "+" and child["f"][0] != "-":
-                working_queue.append(child)
+                working_queue.append([child, dirs[i], cur_dep + 1])
 
         # Iterate through all samples and to assign labels
-        cur_feature_index = int(cur_node["f"][0])
+        cur_feature_index = cur_node["f"][0]
 
         # True left (first), false right (second)
         true_indexes = np.where(
             np.logical_and(
-                x_all[:, cur_feature_index] == 1, y_pred == cur_feature_index
+                x_all[:, int(cur_feature_index)] == 1,
+                y_pred == cur_feature_index + cur_dir + str(cur_dep),
             )
         )[0]
-        y_pred[list(true_indexes)] = cur_labels[0]
+        y_pred[list(true_indexes)] = cur_labels[0] + "l" + str(cur_dep + 1)
 
         false_indexes = np.where(
             np.logical_and(
-                x_all[:, cur_feature_index] == 0, y_pred == cur_feature_index
+                x_all[:, int(cur_feature_index)] == 0,
+                y_pred == cur_feature_index + cur_dir + str(cur_dep),
             )
         )[0]
-        y_pred[list(false_indexes)] = cur_labels[1]
+        y_pred[list(false_indexes)] = cur_labels[1] + "r" + str(cur_dep + 1)
 
         cur_node["f"] = [cur_node["f"][0], len(true_indexes) + len(false_indexes), -1]
 
         # Update the sample # in the original tree on every node
         # Also compute the # of correctly classified samples on leaf node (
         # keep it as 0 for non-leaf nodes)
-        if cur_labels[0] == -2 or cur_labels[0] == -1:
+        if cur_labels[0] == "+" or cur_labels[0] == "-":
             # Compute the # of correctly classified samples
-            cur_pred = 1 if cur_labels[0] == -2 else 0
+            cur_pred = 1 if cur_labels[0] == "+" else 0
             correct_num = int(np.sum(y_all[true_indexes] == cur_pred))
 
             cur_node["c"][0]["f"] = [
@@ -535,8 +539,8 @@ def count_leaf_samples(root, x_all, y_all):
             # Accumulate the number for total accuracy
             total_correct_num += correct_num
 
-        if cur_labels[1] == -2 or cur_labels[1] == -1:
-            cur_pred = 1 if cur_labels[1] == -2 else 0
+        if cur_labels[1] == "+" or cur_labels[1] == "-":
+            cur_pred = 1 if cur_labels[1] == "+" else 0
             correct_num = int(np.sum(y_all[false_indexes] == cur_pred))
 
             cur_node["c"][1]["f"] = [
