@@ -36,6 +36,9 @@ $shadow-border-light: 0px 0px 5px hsla(0, 0%, 0%, 0.1),
 $shadow-border-card: 0px 0px 6px hsla(0, 0%, 0%, 0.07);
 $shadow-border-large: 0 8px 24px hsla(212, 9%, 59%, 0.2);
 
+// Ease functions
+$ease-cubic-in-out: cubic-bezier(0.645, 0.045, 0.355, 1);
+
 // Layouts
 $border-radius: 5px;
 $panel-h-padding: 16px;

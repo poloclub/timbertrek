@@ -308,6 +308,7 @@ $color-chart-secondary: $green-100;
 .svg-height {
   :global(.bar rect) {
     fill: $gray-300;
+    transition: fill 100ms $ease-cubic-in-out;
   }
 
   :global(.bar.selected rect) {
@@ -317,10 +318,11 @@ $color-chart-secondary: $green-100;
   :global(.bar text) {
     font-size: 11px;
     text-anchor: middle;
-    fill: $gray-600;
+    fill: $gray-400;
     user-select: none;
     -webkit-user-select: none;
     font-variant: font-variant-numeric;
+    transition: fill 100ms $ease-cubic-in-out;
   }
 
   :global(.bar.selected text) {

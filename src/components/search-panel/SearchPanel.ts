@@ -163,6 +163,10 @@ export class SearchPanel {
       }
     });
 
+    // Store the tree height map in the store
+    this.searchStoreValue.treeHeightMap = treeHeightMap;
+    this.searchStore.set(this.searchStoreValue);
+
     const heightCountMap = new Map<number, number>();
     Array.from(treeHeightMap.values()).forEach(h => {
       if (heightCountMap.has(h)) {
@@ -588,6 +592,7 @@ export class SearchPanel {
       .data(this.heightDensities)
       .join('g')
       .attr('class', 'bar selected')
+      .attr('id', d => `bar-${d.x}`)
       .attr('transform', d => `translate(${this.heightXScale(d.x)}, ${0})`);
 
     barGroups
@@ -609,6 +614,12 @@ export class SearchPanel {
       .append('title')
       .text(d => `Height: ${d.x} (${d3.format('.4%')(d.y)})`);
 
+    // Also update the search store
+    this.searchStoreValue.curHeightRange = new Set<number>(
+      this.heightXScale.domain()
+    );
+    this.searchStore.set(this.searchStoreValue);
+
     return heightSVG;
   }
 
@@ -618,8 +629,17 @@ export class SearchPanel {
   #heightCheckboxChanged(e: Event, x: number) {
     e.preventDefault();
 
+    // Change bar color
     const checkbox = e.target as HTMLInputElement;
-    console.log(checkbox.checked, x);
+    this.heightSVG?.select(`#bar-${x}`).classed('selected', checkbox.checked);
+
+    // Trigger filtering in sunburst
+    if (checkbox.checked) {
+      this.searchStoreValue.curHeightRange.add(x);
+    } else {
+      this.searchStoreValue.curHeightRange.delete(x);
+    }
+    this.searchStore.set(this.searchStoreValue);
   }
 
   /**

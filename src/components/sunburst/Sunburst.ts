@@ -32,7 +32,11 @@ import {
   getTreeWindowPos,
   tempShowPinnedTree
 } from './SunburstEvent';
-import { syncAccuracyRange, updateSunburst } from './SunburstFilter';
+import {
+  syncAccuracyRange,
+  syncHeightRange,
+  updateSunburst
+} from './SunburstFilter';
 import { FeaturePosition, FeatureValuePairType } from '../TimberTypes';
 import type {
   ArcDomain,
@@ -93,6 +97,7 @@ export class Sunburst {
   // Properties for tree filtering
   localAccuracyLow: number;
   localAccuracyHigh: number;
+  localHeightRange: Set<number>;
   viewInitialized = false;
 
   // ===== Methods implemented in another file ====
@@ -167,6 +172,7 @@ export class Sunburst {
   // ===== Methods implemented in SunburstFilter.ts ====
   syncAccuracyRange = syncAccuracyRange;
   updateSunburst = updateSunburst;
+  syncHeightRange = syncHeightRange;
 
   /**
    * The radius is determined by the number of levels to show.
@@ -282,6 +288,7 @@ export class Sunburst {
     this.searchStoreValue = getSearchStoreDefaultValue();
     this.localAccuracyLow = this.searchStoreValue.curAccuracyLow;
     this.localAccuracyHigh = this.searchStoreValue.curAccuracyHigh;
+    this.localHeightRange = new Set([...this.searchStoreValue.curHeightRange]);
     this.#initSearchStore();
 
     this.sunburstUpdated = sunburstUpdated;
@@ -308,7 +315,16 @@ export class Sunburst {
     this.arc = d3
       .arc()
       .startAngle(d => this.xScale((d as ArcPartition).x0))
-      .endAngle(d => this.xScale((d as ArcPartition).x1))
+      .endAngle(d => {
+        const da = d as ArcPartition;
+
+        // Set minimal angle to avoid animation artifact
+        let newX1 = da.x1;
+        if (da.x0 === da.x1) {
+          newX1 = da.x0 + 1e-5;
+        }
+        return this.xScale(newX1);
+      })
       .padAngle(d => {
         const dn = d as unknown as HierarchyNode;
         const sectorWidth =
@@ -742,6 +758,28 @@ export class Sunburst {
       } else {
         this.localAccuracyHigh = this.searchStoreValue.curAccuracyHigh;
         this.localAccuracyLow = this.searchStoreValue.curAccuracyLow;
+      }
+
+      // Need to update the view if user changes the height range
+      const isHeightRangeChanged =
+        [...this.localHeightRange].every(d =>
+          this.searchStoreValue.curHeightRange.has(d)
+        ) &&
+        this.localHeightRange.size ===
+          this.searchStoreValue.curHeightRange.size;
+      if (
+        this.viewInitialized &&
+        this.searchStoreValue.shown &&
+        !isHeightRangeChanged
+      ) {
+        this.localHeightRange = new Set([
+          ...this.searchStoreValue.curHeightRange
+        ]);
+        this.syncHeightRange();
+      } else {
+        this.localHeightRange = new Set([
+          ...this.searchStoreValue.curHeightRange
+        ]);
       }
     });
   }

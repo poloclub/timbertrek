@@ -66,8 +66,78 @@ export function syncAccuracyRange(this: Sunburst) {
   this.updateSunburst();
 }
 
+/**
+ * Sync the sunburst chart with the selected height range
+ * @param this Sunburst
+ */
+export function syncHeightRange(this: Sunburst) {
+  if (this.searchStoreValue.treeHeightMap === null) return;
+
+  // Step 1: traverse the tree map to find which trees meet the criteria
+  const selectedTreeIDs = new Set<number>();
+  this.searchStoreValue.treeHeightMap.forEach((h, t) => {
+    if (this.localHeightRange.has(h)) {
+      selectedTreeIDs.add(t);
+    }
+  });
+
+  // Step 2: Traverse the rule nodes to mark unused leaf
+  this.dataRoot.eachBefore(d => {
+    if (d.data.t !== undefined) {
+      if (selectedTreeIDs.has(d.data.t)) {
+        d.data.u = true;
+      } else {
+        d.data.u = false;
+      }
+    }
+  });
+
+  // Step 3: Update the node sum at each level (only count used leaves)
+  this.dataRoot = this.dataRoot.sum(d => (d.u !== undefined && d.u ? 1 : 0));
+
+  // Update the partition data
+  const partition = d3.partition()(this.dataRoot) as HierarchyNode;
+
+  // Update the tree count to filter out unselected trees
+  partition.eachAfter(d => {
+    if (d.data.u !== undefined && d.data.u) {
+      d.uniqueTreeIDs = new Set([d.data.t!]);
+    } else {
+      const curIDs = new Set<number>();
+      d.children?.forEach(c => {
+        c.uniqueTreeIDs?.forEach(id => {
+          curIDs.add(id);
+        });
+      });
+      d.uniqueTreeIDs = curIDs;
+    }
+  });
+
+  // Transfer the ID set to its length at each node
+  partition.each(d => {
+    d.treeNum = d.uniqueTreeIDs?.size || 0;
+    d.uniqueTreeIDs = null;
+  });
+
+  this.partition = partition;
+
+  console.time('testing animation');
+  this.updateSunburst();
+  console.timeEnd('testing animation');
+}
+
 export function updateSunburst(this: Sunburst) {
   const content = this.svg.select('.content-group');
+
+  const trans = d3
+    .transition()
+    .duration(500)
+    .ease(d3.easeLinear) as unknown as d3.Transition<
+    d3.BaseType,
+    unknown,
+    d3.BaseType,
+    unknown
+  >;
 
   // Update the arcs, here we are sure there is no entry and exit
   this.removeText();
@@ -87,6 +157,7 @@ export function updateSunburst(this: Sunburst) {
       d => (d as HierarchyNode).data.nid!
     )
     .select('path')
+    .transition(trans)
     // @ts-ignore
     .attr('d', d => this.arc(d))
     .style('display', d => {
