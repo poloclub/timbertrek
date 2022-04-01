@@ -19,6 +19,9 @@ $color-chart-secondary: $green-100;
   border-radius: $border-radius;
   background-color: $gray-light-background;
 
+  user-select: none;
+  -webkit-user-select: none;
+
   &.shown {
     display: flex;
   }
@@ -272,6 +275,33 @@ $color-chart-secondary: $green-100;
   :global(.tick.out-range line) {
     stroke: $gray-200;
     transform: scaleY(1);
+  }
+}
+
+.height-content {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+
+  .feature-hist {
+    display: flex;
+  }
+
+  .height-checkboxes {
+    width: 100%;
+    position: relative;
+
+    :global(.height-checkbox) {
+      position: absolute;
+      accent-color: $color-chart-primary;
+    }
+
+    :global(.height-checkbox-label) {
+      position: absolute;
+      font-size: 0.9em;
+      color: $gray-500;
+      line-height: 1;
+    }
   }
 }
 

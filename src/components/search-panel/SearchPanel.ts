@@ -101,6 +101,7 @@ export class SearchPanel {
 
     // Initialize the height svg
     this.heightSVG = this.#initHeightSVG();
+    this.#initCheckboxes();
   }
 
   /**
@@ -288,10 +289,13 @@ export class SearchPanel {
 
     const tickCount = 30;
     const tickArray = [];
+    const accuracyGap =
+      this.accuracyDensities[1].x - this.accuracyDensities[0].x;
+    const trueAccuracyLow = this.accuracyLow + accuracyGap;
+    const trueAccuracyHigh = this.accuracyHigh;
     for (let i = 0; i <= tickCount; i++) {
       tickArray.push(
-        this.accuracyLow +
-          ((this.accuracyHigh - this.accuracyLow) * i) / tickCount
+        trueAccuracyLow + ((trueAccuracyHigh - trueAccuracyLow) * i) / tickCount
       );
     }
 
@@ -527,9 +531,9 @@ export class SearchPanel {
    */
   #initHeightSVG() {
     const width = PANEL_WIDTH - PANEL_H_GAP * 2;
-    const tickHeight = 30;
+    const tickHeight = 0;
     const histHeight = 55;
-    const vGap = 15;
+    const vGap = 0;
     const height = histHeight + vGap + tickHeight;
 
     const heightSVG = this.heightRow
@@ -599,11 +603,6 @@ export class SearchPanel {
       .attr('x', this.heightXScale.bandwidth() / 2)
       .attr('y', d => this.heightYScale(d.y) - 5);
 
-    texts
-      .append('tspan')
-      .attr('class', 'text-height')
-      .text(d => `${d.x}`);
-
     texts.append('tspan').text(d => `(${d3.format('.0%')(d.y)})`);
 
     barGroups
@@ -611,5 +610,56 @@ export class SearchPanel {
       .text(d => `Height: ${d.x} (${d3.format('.4%')(d.y)})`);
 
     return heightSVG;
+  }
+
+  /**
+   * Event handler for height check boxes
+   */
+  #heightCheckboxChanged(e: Event, x: number) {
+    e.preventDefault();
+
+    const checkbox = e.target as HTMLInputElement;
+    console.log(checkbox.checked, x);
+  }
+
+  /**
+   * Initialize check boxes under the height svg
+   */
+  #initCheckboxes() {
+    const checkboxes = d3.select(this.component).select('.height-checkboxes');
+    const hGap = 6;
+
+    this.heightDensities.forEach(d => {
+      checkboxes
+        .append('label')
+        .attr('class', 'height-checkbox-label')
+        .attr('for', `height-checkbox-${d.x}`)
+        .text(d.x)
+        .style(
+          'left',
+          `${
+            this.heightXScale(d.x)! + this.heightXScale.bandwidth() / 2 - hGap
+          }px`
+        );
+
+      // Init checkbox
+      const curCheckbox = checkboxes
+        .append('input')
+        .attr('type', 'checkbox')
+        .attr('checked', true)
+        .attr('class', 'height-checkbox')
+        .attr('id', `height-checkbox-${d.x}`)
+        .style(
+          'left',
+          `${
+            this.heightXScale(d.x)! + this.heightXScale.bandwidth() / 2 + hGap
+          }px`
+        );
+
+      // Bind event listeners
+      curCheckbox.on('change', e =>
+        this.#heightCheckboxChanged(e as Event, d.x)
+      );
+    });
   }
 }

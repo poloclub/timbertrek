@@ -133,6 +133,7 @@
         <div class="feature-hist">
           <svg class="svg-height" />
         </div>
+        <div class="height-checkboxes" />
       </div>
     </div>
   </div>
