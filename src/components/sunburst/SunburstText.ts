@@ -494,7 +494,12 @@ export function drawSecondaryText(this: Sunburst, undrawnFs: Set<number>) {
       }
     });
 
+  // Only draw each text once
+  const drawnTexts = new Set<string>();
+
   secondaryTextPaths.text(d => {
+    if (drawnTexts.has(d.data.f)) return '';
+
     const featureInfo = this.getFeatureInfo(d.data.f);
     let text = featureInfo.nameValue;
 
@@ -531,6 +536,8 @@ export function drawSecondaryText(this: Sunburst, undrawnFs: Set<number>) {
         textWidth = getLatoTextWidth(text, 16 * curFontSize);
       }
     }
+
+    drawnTexts.add(d.data.f);
     return text;
   });
 }
