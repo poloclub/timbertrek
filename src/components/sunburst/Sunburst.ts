@@ -35,7 +35,8 @@ import {
 import {
   syncAccuracyRange,
   syncHeightRange,
-  updateSunburst
+  updateSunburst,
+  updateSunburstWithAnimation
 } from './SunburstFilter';
 import { FeaturePosition, FeatureValuePairType } from '../TimberTypes';
 import type {
@@ -172,6 +173,7 @@ export class Sunburst {
   // ===== Methods implemented in SunburstFilter.ts ====
   syncAccuracyRange = syncAccuracyRange;
   updateSunburst = updateSunburst;
+  updateSunburstWithAnimation = updateSunburstWithAnimation;
   syncHeightRange = syncHeightRange;
 
   /**

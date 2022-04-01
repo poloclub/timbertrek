@@ -3,11 +3,8 @@
  */
 
 import type { Sunburst } from './Sunburst';
-import { TextArcMode } from '../TimberTypes';
-import type { HierarchyNode } from '../TimberTypes';
+import type { HierarchyNode, ArcData } from '../TimberTypes';
 import d3 from '../../utils/d3-import';
-import { getLatoTextWidth } from '../../utils/text-width';
-import { getContrastRatio } from '../../utils/utils';
 
 let textUpdateTimer: number | null = null;
 
@@ -83,6 +80,10 @@ export function syncHeightRange(this: Sunburst) {
 
   // Step 2: Traverse the rule nodes to mark unused leaf
   this.dataRoot.eachBefore(d => {
+    // Store the current (x0, x1) before any changes
+    const dh = d as HierarchyNode;
+    dh.previous = { x0: dh.x0, x1: dh.x1, y0: dh.y0, y1: dh.y1, data: dh.data };
+
     if (d.data.t !== undefined) {
       if (selectedTreeIDs.has(d.data.t)) {
         d.data.u = true;
@@ -121,9 +122,94 @@ export function syncHeightRange(this: Sunburst) {
 
   this.partition = partition;
 
-  console.time('testing animation');
-  this.updateSunburst();
-  console.timeEnd('testing animation');
+  this.updateSunburstWithAnimation();
+}
+
+export function updateSunburstWithAnimation(this: Sunburst) {
+  const content = this.svg.select('.content-group');
+
+  const trans = d3
+    .transition()
+    .duration(500)
+    .ease(d3.easeLinear) as unknown as d3.Transition<
+    d3.BaseType,
+    unknown,
+    d3.BaseType,
+    unknown
+  >;
+
+  // Update the arcs, here we are sure there is no entry and exit
+  this.removeText();
+
+  // Need to handle the domain shift if the current head is not root
+  this.arcDomainStack.forEach(d => {
+    d.x0 = d.node.x0;
+    d.x1 = d.node.x1;
+  });
+  this.xScale.domain([this.curHeadNode.x0, this.curHeadNode.x1]);
+
+  const paths = content
+    .select('.arc-group')
+    .selectAll('g.arc')
+    .data(
+      this.partition.descendants().slice(1),
+      d => (d as HierarchyNode).data.nid!
+    )
+    .select('path');
+
+  paths
+    .transition(trans)
+    .tween('data', d => {
+      // Interpolate from the old (x0, x1) to the new (x0, x1)
+      const target: ArcData = {
+        x0: d.x0,
+        x1: d.x1,
+        y0: d.y0,
+        y1: d.y1,
+        data: d.data
+      };
+      const i = d3.interpolate(d.previous!, target);
+      return t => (d.previous = i(t));
+    })
+    .style('display', d => {
+      if (d.data.f === ';') {
+        return 'none';
+      } else if (d.depth > this.sunburstStoreValue.depthHigh + 1) {
+        return 'none';
+      } else if (d.value !== undefined && d.value === 0) {
+        return 'initial';
+      } else {
+        return 'initial';
+      }
+    })
+    // @ts-ignore
+    .attrTween('d', d => () => this.arc(d.previous!))
+    .on('end', (d, i, g) => {
+      const curPath = d3.select(g[i]);
+      let newStyle = 'initial';
+      if (d.data.f === ';') {
+        newStyle = 'none';
+      } else if (d.depth > this.sunburstStoreValue.depthHigh + 1) {
+        newStyle = 'none';
+      } else if (d.value !== undefined && d.value === 0) {
+        newStyle = 'none';
+      } else {
+        newStyle = 'initial';
+      }
+      curPath.style('display', newStyle);
+    });
+
+  // Update the text after a delay
+  if (textUpdateTimer !== null) {
+    window.clearTimeout(textUpdateTimer);
+    textUpdateTimer = null;
+  }
+  textUpdateTimer = window.setTimeout(() => {
+    this.drawCenterText();
+    this.drawText();
+  }, 700);
+
+  this.sunburstUpdated();
 }
 
 export function updateSunburst(this: Sunburst) {

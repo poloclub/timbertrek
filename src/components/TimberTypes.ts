@@ -115,8 +115,16 @@ export interface ArcPartition extends d3.DefaultArcObject {
   y1: number;
 }
 
+export interface ArcData {
+  x0: number;
+  x1: number;
+  y0: number;
+  y1: number;
+  data: RuleNode;
+}
+
 export interface HierarchyNode extends d3.HierarchyRectangularNode<unknown> {
-  current?: d3.HierarchyRectangularNode<unknown>;
+  previous?: ArcData;
   /** Number of unique trees in the descendants */
   treeNum: number;
   /** Temporary data of tree ides in the descendants, will be all null */
