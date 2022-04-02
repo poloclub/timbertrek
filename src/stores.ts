@@ -17,6 +17,9 @@ export interface SearchStoreValue {
   curAccuracyHigh: number;
   curHeightRange: Set<number>;
   treeHeightMap: Map<number, number> | null;
+  featureMap: Map<number, string[]>;
+  getFeatureColor: null | ((f: string) => string);
+  featureOrder: number[];
 }
 
 export interface SunburstStoreValue {
@@ -92,7 +95,10 @@ export const getSearchStoreDefaultValue = (): SearchStoreValue => {
     curAccuracyLow: 0,
     curAccuracyHigh: 1,
     curHeightRange: new Set<number>([]),
-    treeHeightMap: null
+    treeHeightMap: null,
+    featureMap: new Map<number, string[]>(),
+    getFeatureColor: null,
+    featureOrder: []
   };
 };
 

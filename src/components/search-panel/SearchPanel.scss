@@ -98,20 +98,61 @@ $color-chart-secondary: $green-100;
   display: flex;
   flex-direction: column;
   align-items: stretch;
+  gap: 10px;
   flex-grow: 1;
 
   width: 100%;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 5px $panel-h-padding;
+  padding: 5px 0;
 
   font-size: $font-d1;
 
   .row {
     position: relative;
+    padding: 0 $panel-h-padding;
+    border-bottom: 1px solid hsla(0, 0%, 0%, 0.08);
 
     .row-title {
       font-weight: 500;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      padding-bottom: 2px;
+    }
+
+    .title-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: $gray-400;
+      fill: $gray-400;
+      cursor: pointer;
+      pointer-events: fill;
+      transition: 100ms color, 100ms fill;
+
+      :global(svg) {
+        width: $font-d2;
+        height: $font-d2;
+      }
+
+      &:hover {
+        color: $gray-500;
+        fill: $gray-500;
+      }
+
+      &:active {
+        color: $gray-700;
+        fill: $gray-700;
+      }
+
+      &.refresh {
+        :global(svg) {
+          width: $font-u2;
+          height: $font-u2;
+        }
+      }
     }
   }
 }
@@ -289,6 +330,7 @@ $color-chart-secondary: $green-100;
 
   .height-checkboxes {
     width: 100%;
+    height: 25px;
     position: relative;
 
     :global(.height-checkbox) {
@@ -332,4 +374,45 @@ $color-chart-secondary: $green-100;
   :global(.bar.selected .text-height) {
     font-weight: 800;
   }
+}
+
+.level-summary {
+  font-size: $font-d2;
+  color: $gray-500;
+  line-height: 1;
+  padding-top: 2px;
+}
+
+.level-content {
+  display: flex;
+  flex-direction: row;
+  column-gap: 9px;
+  row-gap: 7px;
+  flex-wrap: wrap;
+  font-size: $font-d3;
+
+  padding: 10px 0;
+  // display: none;
+
+  &.shown {
+    display: flex;
+  }
+
+  :global(.depth-checkbox) {
+    margin: 0;
+  }
+
+  :global(.depth-checkbox-label) {
+    line-height: 1.2;
+  }
+
+  :global(.depth-checkbox-label span) {
+    padding-left: 4px;
+    line-height: 1;
+    color: $gray-700;
+  }
+
+  // :global(.depth-checkbox-label) {
+  //   display: flex;
+  // }
 }

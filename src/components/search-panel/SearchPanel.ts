@@ -101,7 +101,10 @@ export class SearchPanel {
 
     // Initialize the height svg
     this.heightSVG = this.#initHeightSVG();
-    this.#initCheckboxes();
+    this.#initHeightCheckboxes();
+
+    // Initialize the depth rows
+    this.#initDepthRows();
   }
 
   /**
@@ -645,9 +648,8 @@ export class SearchPanel {
   /**
    * Initialize check boxes under the height svg
    */
-  #initCheckboxes() {
+  #initHeightCheckboxes() {
     const checkboxes = d3.select(this.component).select('.height-checkboxes');
-    const hGap = 6;
 
     this.heightDensities.forEach(d => {
       checkboxes
@@ -658,7 +660,7 @@ export class SearchPanel {
         .style(
           'left',
           `${
-            this.heightXScale(d.x)! + this.heightXScale.bandwidth() / 2 - hGap
+            this.heightXScale(d.x)! + this.heightXScale.bandwidth() / 2 + 13
           }px`
         );
 
@@ -671,15 +673,68 @@ export class SearchPanel {
         .attr('id', `height-checkbox-${d.x}`)
         .style(
           'left',
-          `${
-            this.heightXScale(d.x)! + this.heightXScale.bandwidth() / 2 + hGap
-          }px`
+          `${this.heightXScale(d.x)! + this.heightXScale.bandwidth() / 2 - 4}px`
         );
 
       // Bind event listeners
       curCheckbox.on('change', e =>
         this.#heightCheckboxChanged(e as Event, d.x)
       );
+    });
+  }
+
+  /**
+   * Initialize depth rows
+   */
+  #initDepthRows() {
+    this.#initDepthCheckboxes();
+  }
+
+  /**
+   * Initialize check boxes for one depth row
+   */
+  #initDepthCheckboxes() {
+    const checkboxes = d3
+      .select(this.component)
+      .select('#level-row-1 .level-content');
+    const depth = 1;
+
+    this.searchStoreValue.featureOrder.forEach(f => {
+      const label = checkboxes
+        .append('label')
+        .attr('class', 'depth-checkbox-label')
+        .attr('id', `depth-check-box-label-${depth}-${f}`);
+
+      // Init checkbox
+      const checkbox = label
+        .append('input')
+        .attr('type', 'checkbox')
+        .attr('checked', true)
+        .attr('class', 'depth-checkbox');
+
+      // Add feature label
+      let featureInfo = this.searchStoreValue.featureMap.get(f);
+      if (featureInfo === undefined) {
+        featureInfo = ['', '', ''];
+        console.error(`Cannot find feature ${f} in featureMap`);
+      }
+
+      label.append('span').text(`${featureInfo[2]} ${featureInfo[1]}`);
+      label.attr('title', `${featureInfo[0]} ${featureInfo[1]}`);
+
+      // Change checkbox color
+      let boxColor = 'initial';
+      const featureColor = this.searchStoreValue.getFeatureColor?.(String(f));
+      if (featureColor !== undefined) {
+        boxColor = featureColor;
+      }
+
+      checkbox.style('accent-color', boxColor);
+
+      // Bind event listeners
+      // curCheckbox.on('change', e =>
+      //   this.#heightCheckboxChanged(e as Event, d.x)
+      // );
     });
   }
 }

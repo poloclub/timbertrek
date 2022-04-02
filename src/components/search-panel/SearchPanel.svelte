@@ -10,6 +10,8 @@
   import closeIcon from '../../imgs/icon-close.svg?raw';
   import thumbLeftIcon from '../../imgs/icon-range-thumb-left.svg?raw';
   import thumbRightIcon from '../../imgs/icon-range-thumb-right.svg?raw';
+  import downIcon from '../../imgs/icon-caret-down.svg?raw';
+  import refreshIcon from '../../imgs/icon-refresh.svg?raw';
 
   // Component variables
   export let data: HierarchyJSON | null = null;
@@ -81,7 +83,14 @@
 
   <div class="search-list">
     <div class="row accuracy-row">
-      <div class="row-title">Tree Accuracy</div>
+      <div class="row-title">
+        <span>Accuracy</span>
+        <div class="title-icons">
+          <span class="title-icon refresh" title="Reset the filter">
+            {@html refreshIcon}
+          </span>
+        </div>
+      </div>
       <div class="accuracy-content">
         <div
           class="feature-slider"
@@ -128,13 +137,46 @@
     </div>
 
     <div class="row height-row">
-      <div class="row-title">Tree Height</div>
+      <div class="row-title">
+        <span>Height</span>
+        <div class="title-icons">
+          <span class="title-icon refresh" title="Reset the filter">
+            {@html refreshIcon}
+          </span>
+        </div>
+      </div>
       <div class="height-content">
         <div class="feature-hist">
           <svg class="svg-height" />
         </div>
         <div class="height-checkboxes" />
       </div>
+    </div>
+
+    <div class="row level-row" id="level-row-1">
+      <div class="row-title">
+        <span>Depth 1</span>
+        <div class="title-icons">
+          <span class="title-icon refresh" title="Reset the filter">
+            {@html downIcon}
+          </span>
+        </div>
+      </div>
+      <div class="level-summary">Include all features</div>
+      <div class="level-content" />
+    </div>
+
+    <div class="row level-row">
+      <div class="row-title">
+        <span>Depth 2</span>
+        <div class="title-icons">
+          <span class="title-icon refresh" title="Reset the filter">
+            {@html downIcon}
+          </span>
+        </div>
+      </div>
+      <div class="level-summary">Include all features</div>
+      <div class="level-content" />
     </div>
   </div>
 </div>

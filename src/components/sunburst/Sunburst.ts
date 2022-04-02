@@ -88,6 +88,7 @@ export class Sunburst {
 
   featureCount: Map<string, number>;
   featureValueCount: Map<string, Map<string, number>>;
+  featureOrder: number[];
 
   arc: d3.Arc<unknown, d3.DefaultArcObject>;
   featureMap: Map<number, string[]>;
@@ -262,6 +263,7 @@ export class Sunburst {
     this.featureValueCount = new Map<string, Map<string, number>>();
     this.colorScale = d3.scaleOrdinal();
 
+    this.featureOrder = [];
     this.dataRoot = d3
       .hierarchy(this.data, d => d.c)
       // Count the leaves (trees)
@@ -527,6 +529,14 @@ export class Sunburst {
       }
     });
 
+    // Register the sorting order
+    this.featureOrder = this.dataRoot.children!.map(d => parseInt(d.data.f));
+    this.featureMap.forEach((v, k) => {
+      if (!this.featureOrder.includes(k)) {
+        this.featureOrder.push(k);
+      }
+    });
+
     /**
      * Step 3: Convert the hierarchy data into a partition
      * It gives [x0, y0, x1, y1] of each node
@@ -784,6 +794,12 @@ export class Sunburst {
         ]);
       }
     });
+
+    // Pass the color scale to search store
+    this.searchStoreValue.getFeatureColor = this.getFeatureColor;
+    this.searchStoreValue.featureMap = this.featureMap;
+    this.searchStoreValue.featureOrder = this.featureOrder;
+    this.searchStore.set(this.searchStoreValue);
   }
 
   /**
