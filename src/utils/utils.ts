@@ -197,3 +197,12 @@ export const haveContrast = (
     }
   }
 };
+
+/**
+ * Check if two sets are the same
+ * @param set1 Set 1
+ * @param set2 Set 2
+ */
+export const setsAreEqual = <T>(set1: Set<T>, set2: Set<T>): boolean => {
+  return set1.size === set2.size && [...set1].every(d => set2.has(d));
+};

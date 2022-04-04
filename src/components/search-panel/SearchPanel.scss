@@ -394,9 +394,9 @@ $color-chart-secondary: $green-100;
   padding: 10px 0;
   // display: none;
 
-  &.shown {
-    display: flex;
-  }
+  // &.shown {
+  //   display: flex;
+  // }
 
   :global(.depth-checkbox) {
     margin: 0;

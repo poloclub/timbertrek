@@ -166,10 +166,6 @@ export class SearchPanel {
       }
     });
 
-    // Store the tree height map in the store
-    this.searchStoreValue.treeHeightMap = treeHeightMap;
-    this.searchStore.set(this.searchStoreValue);
-
     const heightCountMap = new Map<number, number>();
     Array.from(treeHeightMap.values()).forEach(h => {
       if (heightCountMap.has(h)) {
@@ -189,6 +185,10 @@ export class SearchPanel {
     });
 
     heightDensities.sort((a, b) => a.x - b.x);
+
+    // Store the tree height map in the store
+    this.searchStoreValue.treeHeightMap = treeHeightMap;
+    this.searchStore.set(this.searchStoreValue);
 
     return { accuracyDensities, heightDensities };
   }
@@ -691,12 +691,38 @@ export class SearchPanel {
   }
 
   /**
+   * Event handler for height check boxes
+   */
+  #depthCheckboxChanged(e: Event, depth: number, f: number) {
+    e.preventDefault();
+
+    const checkbox = e.target as HTMLInputElement;
+
+    // Trigger filtering in sunburst
+    const curFeatureIDs = this.searchStoreValue.curDepthFeatures.get(depth);
+    if (curFeatureIDs === undefined) {
+      console.error(`Unknown depth ${depth}`);
+      return;
+    }
+
+    if (checkbox.checked) {
+      curFeatureIDs.add(f);
+    } else {
+      curFeatureIDs.delete(f);
+    }
+
+    this.searchStoreValue.curDepthFeatures.set(depth, curFeatureIDs);
+    this.searchStore.set(this.searchStoreValue);
+  }
+
+  /**
    * Initialize check boxes for one depth row
    */
   #initDepthCheckboxes() {
     const checkboxes = d3
       .select(this.component)
       .select('#level-row-1 .level-content');
+
     const depth = 1;
 
     this.searchStoreValue.featureOrder.forEach(f => {
@@ -728,13 +754,12 @@ export class SearchPanel {
       if (featureColor !== undefined) {
         boxColor = featureColor;
       }
-
       checkbox.style('accent-color', boxColor);
 
       // Bind event listeners
-      // curCheckbox.on('change', e =>
-      //   this.#heightCheckboxChanged(e as Event, d.x)
-      // );
+      checkbox.on('change', e =>
+        this.#depthCheckboxChanged(e as Event, depth, f)
+      );
     });
   }
 }

@@ -16,6 +16,10 @@ export interface SearchStoreValue {
   curAccuracyLow: number;
   curAccuracyHigh: number;
   curHeightRange: Set<number>;
+  /**
+   * Mapping from depth ID to a set of feature IDs
+   */
+  curDepthFeatures: Map<number, Set<number>>;
   treeHeightMap: Map<number, number> | null;
   featureMap: Map<number, string[]>;
   getFeatureColor: null | ((f: string) => string);
@@ -95,6 +99,7 @@ export const getSearchStoreDefaultValue = (): SearchStoreValue => {
     curAccuracyLow: 0,
     curAccuracyHigh: 1,
     curHeightRange: new Set<number>([]),
+    curDepthFeatures: new Map<number, Set<number>>(),
     treeHeightMap: null,
     featureMap: new Map<number, string[]>(),
     getFeatureColor: null,

@@ -1,4 +1,5 @@
 import d3 from '../../utils/d3-import';
+import { setsAreEqual } from '../../utils/utils';
 import { config } from '../../config';
 import type { Writable } from 'svelte/store';
 import { SunburstAction } from '../../stores';
@@ -35,6 +36,7 @@ import {
 import {
   syncAccuracyRange,
   syncHeightRange,
+  syncDepthFeatures,
   updateSunburst,
   updateSunburstWithAnimation
 } from './SunburstFilter';
@@ -100,6 +102,7 @@ export class Sunburst {
   localAccuracyLow: number;
   localAccuracyHigh: number;
   localHeightRange: Set<number>;
+  localDepthFeatures: Map<number, Set<number>>;
   viewInitialized = false;
 
   // ===== Methods implemented in another file ====
@@ -176,6 +179,7 @@ export class Sunburst {
   updateSunburst = updateSunburst;
   updateSunburstWithAnimation = updateSunburstWithAnimation;
   syncHeightRange = syncHeightRange;
+  syncDepthFeatures = syncDepthFeatures;
 
   /**
    * The radius is determined by the number of levels to show.
@@ -293,6 +297,9 @@ export class Sunburst {
     this.localAccuracyLow = this.searchStoreValue.curAccuracyLow;
     this.localAccuracyHigh = this.searchStoreValue.curAccuracyHigh;
     this.localHeightRange = new Set([...this.searchStoreValue.curHeightRange]);
+    this.localDepthFeatures = deepCopyDepthFeatures(
+      this.searchStoreValue.curDepthFeatures
+    );
     this.#initSearchStore();
 
     this.sunburstUpdated = sunburstUpdated;
@@ -773,7 +780,7 @@ export class Sunburst {
       }
 
       // Need to update the view if user changes the height range
-      const isHeightRangeChanged =
+      const heightRangeNotChanged =
         [...this.localHeightRange].every(d =>
           this.searchStoreValue.curHeightRange.has(d)
         ) &&
@@ -782,7 +789,7 @@ export class Sunburst {
       if (
         this.viewInitialized &&
         this.searchStoreValue.shown &&
-        !isHeightRangeChanged
+        !heightRangeNotChanged
       ) {
         this.localHeightRange = new Set([
           ...this.searchStoreValue.curHeightRange
@@ -793,12 +800,44 @@ export class Sunburst {
           ...this.searchStoreValue.curHeightRange
         ]);
       }
+
+      // Need to update the view if user changes any depth features
+      const depthFeaturesNotChanged = [
+        ...this.searchStoreValue.curDepthFeatures.entries()
+      ].every(pair => {
+        if (!this.localDepthFeatures.has(pair[0])) {
+          return false;
+        } else {
+          return setsAreEqual(this.localDepthFeatures.get(pair[0])!, pair[1]);
+        }
+      });
+      if (
+        this.viewInitialized &&
+        this.searchStoreValue.shown &&
+        !depthFeaturesNotChanged
+      ) {
+        this.localDepthFeatures = deepCopyDepthFeatures(
+          this.searchStoreValue.curDepthFeatures
+        );
+        this.syncDepthFeatures();
+      } else {
+        this.localDepthFeatures = deepCopyDepthFeatures(
+          this.searchStoreValue.curDepthFeatures
+        );
+      }
     });
 
     // Pass the color scale to search store
     this.searchStoreValue.getFeatureColor = this.getFeatureColor;
     this.searchStoreValue.featureMap = this.featureMap;
     this.searchStoreValue.featureOrder = this.featureOrder;
+
+    // Also initialize the depth feature (use all features at each depth)
+    // From 1 to height - 1 (to exclude the root and leaves)
+    for (let i = 1; i < this.partition.height; i++) {
+      const allFeatureIDs = new Set([...this.featureMap.keys()].map(k => k));
+      this.searchStoreValue.curDepthFeatures.set(i, allFeatureIDs);
+    }
     this.searchStore.set(this.searchStoreValue);
   }
 
@@ -1071,3 +1110,17 @@ export class Sunburst {
       );
   }
 }
+
+/**
+ * Deep copy the depthFeatures map
+ * @param depthFeatures Map depth number to a set of feature IDs
+ */
+const deepCopyDepthFeatures = (
+  depthFeatures: Map<number, Set<number>>
+): Map<number, Set<number>> => {
+  const newMap = new Map<number, Set<number>>();
+  depthFeatures.forEach((v, k) => {
+    newMap.set(k, new Set([...v]));
+  });
+  return newMap;
+};

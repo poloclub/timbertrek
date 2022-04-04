@@ -125,6 +125,14 @@ export function syncHeightRange(this: Sunburst) {
   this.updateSunburstWithAnimation();
 }
 
+/**
+ * Sync the sunburst chart with the selected depth features
+ * @param this Sunburst
+ */
+export function syncDepthFeatures(this: Sunburst) {
+  console.log('Updating due to feature change!');
+}
+
 export function updateSunburstWithAnimation(this: Sunburst) {
   const content = this.svg.select('.content-group');
 
