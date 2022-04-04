@@ -2,6 +2,18 @@
  * Custom types for TimberTrek
  */
 
+/**
+ * Sets of selected tree IDs under three different filters
+ */
+export interface SelectedTrees {
+  accuracy: Set<number>;
+  height: Set<number>;
+  depth: Set<number>;
+}
+
+/**
+ * Position of an object
+ */
 export interface Position {
   x: number;
   y: number;

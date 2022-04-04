@@ -14,12 +14,24 @@ let textUpdateTimer: number | null = null;
  */
 export function syncAccuracyRange(this: Sunburst) {
   // Step 1: traverse the tree map to find which trees meet the criteria
-  const selectedTreeIDs = new Set<number>();
   this.treeMapMap.forEach((v, k) => {
     if (v[2] >= this.localAccuracyLow && v[2] <= this.localAccuracyHigh) {
-      selectedTreeIDs.add(k);
+      this.selectedTrees.accuracy.add(k);
+    } else {
+      this.selectedTrees.accuracy.delete(k);
     }
   });
+
+  // The selected trees are the intersection of three filters
+  const selectedTreeIDs = new Set<number>();
+  for (const treeID of this.selectedTrees.accuracy) {
+    if (
+      this.selectedTrees.depth.has(treeID) &&
+      this.selectedTrees.height.has(treeID)
+    ) {
+      selectedTreeIDs.add(treeID);
+    }
+  }
 
   // Step 2: Traverse the rule nodes to mark unused leaf
   this.dataRoot.eachBefore(d => {
@@ -71,12 +83,24 @@ export function syncHeightRange(this: Sunburst) {
   if (this.searchStoreValue.treeHeightMap === null) return;
 
   // Step 1: traverse the tree map to find which trees meet the criteria
-  const selectedTreeIDs = new Set<number>();
   this.searchStoreValue.treeHeightMap.forEach((h, t) => {
     if (this.localHeightRange.has(h)) {
-      selectedTreeIDs.add(t);
+      this.selectedTrees.height.add(t);
+    } else {
+      this.selectedTrees.height.delete(t);
     }
   });
+
+  // The selected trees are the intersection of three filters
+  const selectedTreeIDs = new Set<number>();
+  for (const treeID of this.selectedTrees.accuracy) {
+    if (
+      this.selectedTrees.depth.has(treeID) &&
+      this.selectedTrees.height.has(treeID)
+    ) {
+      selectedTreeIDs.add(treeID);
+    }
+  }
 
   // Step 2: Traverse the rule nodes to mark unused leaf
   this.dataRoot.eachBefore(d => {
@@ -133,7 +157,6 @@ export function syncDepthFeatures(this: Sunburst) {
   if (this.searchStoreValue.treeDepthFeaturesMap === null) return;
 
   // Step 1: traverse the tree map to find which trees meet the criteria
-  const selectedTreeIDs = new Set<number>();
   for (const [treeID, depthFeatures] of this.searchStoreValue
     .treeDepthFeaturesMap) {
     let treeSelected = true;
@@ -147,7 +170,22 @@ export function syncDepthFeatures(this: Sunburst) {
       }
     }
 
-    if (treeSelected) selectedTreeIDs.add(treeID);
+    if (treeSelected) {
+      this.selectedTrees.depth.add(treeID);
+    } else {
+      this.selectedTrees.depth.delete(treeID);
+    }
+  }
+
+  // The selected trees are the intersection of three filters
+  const selectedTreeIDs = new Set<number>();
+  for (const treeID of this.selectedTrees.accuracy) {
+    if (
+      this.selectedTrees.depth.has(treeID) &&
+      this.selectedTrees.height.has(treeID)
+    ) {
+      selectedTreeIDs.add(treeID);
+    }
   }
 
   // Step 2: Traverse the rule nodes to mark unused leaf

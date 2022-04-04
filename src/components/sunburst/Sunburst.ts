@@ -50,7 +50,8 @@ import type {
   HierarchyNode,
   Padding,
   RuleNode,
-  TreeNode
+  TreeNode,
+  SelectedTrees
 } from '../TimberTypes';
 
 const ZOOM_DURATION = 800;
@@ -104,6 +105,7 @@ export class Sunburst {
   localHeightRange: Set<number>;
   localDepthFeatures: Map<number, Set<number>>;
   viewInitialized = false;
+  selectedTrees: SelectedTrees;
 
   // ===== Methods implemented in another file ====
   /**
@@ -300,6 +302,11 @@ export class Sunburst {
     this.localDepthFeatures = deepCopyDepthFeatures(
       this.searchStoreValue.curDepthFeatures
     );
+    this.selectedTrees = {
+      accuracy: new Set(this.treeMapMap.keys()),
+      height: new Set(this.treeMapMap.keys()),
+      depth: new Set(this.treeMapMap.keys())
+    };
     this.#initSearchStore();
 
     this.sunburstUpdated = sunburstUpdated;
