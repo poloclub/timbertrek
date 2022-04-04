@@ -4,7 +4,7 @@ import { round } from '../../utils/utils';
 import { config } from '../../config';
 import type { SearchStoreValue } from '../../stores';
 import { getSearchStoreDefaultValue } from '../../stores';
-import type { HierarchyJSON, Point } from '../TimberTypes';
+import type { HierarchyJSON, Point, TreeNode } from '../TimberTypes';
 
 const formatter = d3.format(',.3~f');
 const LEFT_THUMB_ID = 'slider-left-thumb';
@@ -30,6 +30,7 @@ export class SearchPanel {
   heightSVG: d3.Selection<d3.BaseType, unknown, null, undefined> | null = null;
 
   data: HierarchyJSON;
+  treeMapMap: Map<number, [TreeNode, number, number]>;
   accuracyDensities: Point[];
   heightDensities: Point[];
 
@@ -82,6 +83,13 @@ export class SearchPanel {
 
     // Process the input data
     this.data = data;
+
+    // Convert treeMap into a real Map
+    this.treeMapMap = new Map<number, [TreeNode, number, number]>();
+    Object.keys(data.treeMap).forEach(k => {
+      this.treeMapMap.set(+k, data.treeMap[+k] as [TreeNode, number, number]);
+    });
+
     const result = this.#processData();
     this.accuracyDensities = result.accuracyDensities;
     this.heightDensities = result.heightDensities;
@@ -166,6 +174,23 @@ export class SearchPanel {
       }
     });
 
+    // (3) Identify features used at each depth for each tree
+    const treeDepthFeaturesMap = new Map<number, Map<number, Set<number>>>();
+    for (const [treeID, v] of this.treeMapMap) {
+      const curDepthFeatures = new Map<number, Set<number>>();
+      const curTree = d3.hierarchy(v[0], d => d.c);
+      curTree.each(d => {
+        if (d.data.f[0] !== '+' && d.data.f[0] !== '-') {
+          if (!curDepthFeatures.has(d.depth + 1)) {
+            curDepthFeatures.set(d.depth + 1, new Set([parseInt(d.data.f[0])]));
+          } else {
+            curDepthFeatures.get(d.depth + 1)!.add(parseInt(d.data.f[0]));
+          }
+        }
+      });
+      treeDepthFeaturesMap.set(treeID, curDepthFeatures);
+    }
+
     const heightCountMap = new Map<number, number>();
     Array.from(treeHeightMap.values()).forEach(h => {
       if (heightCountMap.has(h)) {
@@ -188,6 +213,7 @@ export class SearchPanel {
 
     // Store the tree height map in the store
     this.searchStoreValue.treeHeightMap = treeHeightMap;
+    this.searchStoreValue.treeDepthFeaturesMap = treeDepthFeaturesMap;
     this.searchStore.set(this.searchStoreValue);
 
     return { accuracyDensities, heightDensities };
