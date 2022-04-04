@@ -132,59 +132,69 @@ export function syncHeightRange(this: Sunburst) {
 export function syncDepthFeatures(this: Sunburst) {
   if (this.searchStoreValue.treeDepthFeaturesMap === null) return;
 
-  // // Step 1: traverse the tree map to find which trees meet the criteria
-  // const selectedTreeIDs = new Set<number>();
-  // this.searchStoreValue.treeHeightMap.forEach((h, t) => {
-  //   if (this.localHeightRange.has(h)) {
-  //     selectedTreeIDs.add(t);
-  //   }
-  // });
+  // Step 1: traverse the tree map to find which trees meet the criteria
+  const selectedTreeIDs = new Set<number>();
+  for (const [treeID, depthFeatures] of this.searchStoreValue
+    .treeDepthFeaturesMap) {
+    let treeSelected = true;
 
-  // // Step 2: Traverse the rule nodes to mark unused leaf
-  // this.dataRoot.eachBefore(d => {
-  //   // Store the current (x0, x1) before any changes
-  //   const dh = d as HierarchyNode;
-  //   dh.previous = { x0: dh.x0, x1: dh.x1, y0: dh.y0, y1: dh.y1, data: dh.data };
+    oneTreeLoop: for (const [depth, featureIDs] of depthFeatures) {
+      for (const featureID of featureIDs) {
+        if (!this.localDepthFeatures.get(depth)!.has(featureID)) {
+          treeSelected = false;
+          break oneTreeLoop;
+        }
+      }
+    }
 
-  //   if (d.data.t !== undefined) {
-  //     if (selectedTreeIDs.has(d.data.t)) {
-  //       d.data.u = true;
-  //     } else {
-  //       d.data.u = false;
-  //     }
-  //   }
-  // });
+    if (treeSelected) selectedTreeIDs.add(treeID);
+  }
 
-  // // Step 3: Update the node sum at each level (only count used leaves)
-  // this.dataRoot = this.dataRoot.sum(d => (d.u !== undefined && d.u ? 1 : 0));
+  // Step 2: Traverse the rule nodes to mark unused leaf
+  this.dataRoot.eachBefore(d => {
+    // Store the current (x0, x1) before any changes
+    const dh = d as HierarchyNode;
+    dh.previous = { x0: dh.x0, x1: dh.x1, y0: dh.y0, y1: dh.y1, data: dh.data };
 
-  // // Update the partition data
-  // const partition = d3.partition()(this.dataRoot) as HierarchyNode;
+    if (d.data.t !== undefined) {
+      if (selectedTreeIDs.has(d.data.t)) {
+        d.data.u = true;
+      } else {
+        d.data.u = false;
+      }
+    }
+  });
 
-  // // Update the tree count to filter out unselected trees
-  // partition.eachAfter(d => {
-  //   if (d.data.u !== undefined && d.data.u) {
-  //     d.uniqueTreeIDs = new Set([d.data.t!]);
-  //   } else {
-  //     const curIDs = new Set<number>();
-  //     d.children?.forEach(c => {
-  //       c.uniqueTreeIDs?.forEach(id => {
-  //         curIDs.add(id);
-  //       });
-  //     });
-  //     d.uniqueTreeIDs = curIDs;
-  //   }
-  // });
+  // Step 3: Update the node sum at each level (only count used leaves)
+  this.dataRoot = this.dataRoot.sum(d => (d.u !== undefined && d.u ? 1 : 0));
 
-  // // Transfer the ID set to its length at each node
-  // partition.each(d => {
-  //   d.treeNum = d.uniqueTreeIDs?.size || 0;
-  //   d.uniqueTreeIDs = null;
-  // });
+  // Update the partition data
+  const partition = d3.partition()(this.dataRoot) as HierarchyNode;
 
-  // this.partition = partition;
+  // Update the tree count to filter out unselected trees
+  partition.eachAfter(d => {
+    if (d.data.u !== undefined && d.data.u) {
+      d.uniqueTreeIDs = new Set([d.data.t!]);
+    } else {
+      const curIDs = new Set<number>();
+      d.children?.forEach(c => {
+        c.uniqueTreeIDs?.forEach(id => {
+          curIDs.add(id);
+        });
+      });
+      d.uniqueTreeIDs = curIDs;
+    }
+  });
 
-  // this.updateSunburstWithAnimation();
+  // Transfer the ID set to its length at each node
+  partition.each(d => {
+    d.treeNum = d.uniqueTreeIDs?.size || 0;
+    d.uniqueTreeIDs = null;
+  });
+
+  this.partition = partition;
+
+  this.updateSunburstWithAnimation();
 }
 
 export function updateSunburstWithAnimation(this: Sunburst) {
