@@ -197,12 +197,17 @@ export function syncDepthFeatures(this: Sunburst) {
   this.updateSunburstWithAnimation();
 }
 
-export function updateSunburstWithAnimation(this: Sunburst) {
+/**
+ * Update the sunburst chart with animation
+ * @param this Sunburst
+ * @param duration Duration for the animation
+ */
+export function updateSunburstWithAnimation(this: Sunburst, duration = 500) {
   const content = this.svg.select('.content-group');
 
   const trans = d3
     .transition()
-    .duration(500)
+    .duration(duration)
     .ease(d3.easeLinear) as unknown as d3.Transition<
     d3.BaseType,
     unknown,
@@ -284,18 +289,12 @@ export function updateSunburstWithAnimation(this: Sunburst) {
   this.sunburstUpdated();
 }
 
+/**
+ * Update the sunburst chart
+ * @param this Sunburst
+ */
 export function updateSunburst(this: Sunburst) {
   const content = this.svg.select('.content-group');
-
-  const trans = d3
-    .transition()
-    .duration(500)
-    .ease(d3.easeLinear) as unknown as d3.Transition<
-    d3.BaseType,
-    unknown,
-    d3.BaseType,
-    unknown
-  >;
 
   // Update the arcs, here we are sure there is no entry and exit
   this.removeText();
@@ -315,7 +314,6 @@ export function updateSunburst(this: Sunburst) {
       d => (d as HierarchyNode).data.nid!
     )
     .select('path')
-    .transition(trans)
     // @ts-ignore
     .attr('d', d => this.arc(d))
     .style('display', d => {
