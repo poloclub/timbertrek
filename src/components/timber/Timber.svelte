@@ -81,14 +81,20 @@
         <a
           class="svg-icon paper-icon"
           title="Research paper"
+          target="_blank"
           href="https://arxiv.org/abs/1908.01755"
         >
           {@html paperIcon}
         </a>
 
-        <div class="svg-icon" title="Open-source code">
+        <a
+          class="svg-icon"
+          title="Open-source code"
+          target="_blank"
+          href="https://arxiv.org/abs/1908.01755"
+        >
           {@html githubIcon}
-        </div>
+        </a>
       </div>
     </div>
 
