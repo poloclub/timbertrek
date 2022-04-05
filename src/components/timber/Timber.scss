@@ -38,17 +38,78 @@
   padding: 0px $panel-h-padding;
   display: flex;
   flex-direction: row;
+  justify-content: space-between;
   align-items: center;
 
   background-color: $gray-800;
   border-top-left-radius: $border-radius;
   border-top-right-radius: $border-radius;
+
+  .right-icons {
+    display: flex;
+    align-items: center;
+    flex-direction: row-reverse;
+    gap: 5px;
+  }
+
+  .svg-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    fill: $gray-300;
+    color: $gray-300;
+    transition: fill 100ms $ease-cubic-in-out;
+    cursor: pointer;
+    pointer-events: fill;
+    margin-top: 2px;
+
+    :global(svg) {
+      width: 21px;
+      height: 21px;
+    }
+
+    &:hover {
+      fill: $gray-50;
+    }
+
+    &:active {
+      fill: white;
+    }
+
+    &.paper-icon {
+      :global(svg) {
+        height: 20px;
+      }
+    }
+  }
 }
 
 .logo {
   display: flex;
   flex-direction: row;
+  align-items: center;
+  gap: 4px;
+
+  .svg-icon {
+    margin: 0;
+    cursor: default;
+    fill: unset;
+
+    :global(svg) {
+      width: 24px;
+      height: 24px;
+    }
+  }
+}
+
+.logo-text {
+  display: flex;
+  flex-direction: row;
   align-items: baseline;
+  user-select: none;
+  -webkit-user-select: none;
+  gap: 5px;
 
   .logo-icon {
     font-size: 1.1rem;
@@ -60,7 +121,6 @@
     font-size: 1rem;
     font-weight: 300;
     color: $gray-300;
-    margin-left: 8px;
   }
 }
 

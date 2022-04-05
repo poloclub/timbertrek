@@ -1,4 +1,5 @@
 import type { Writable } from 'svelte/store';
+import { tick } from 'svelte';
 import d3 from '../../utils/d3-import';
 import { round } from '../../utils/utils';
 import { config } from '../../config';
@@ -712,8 +713,12 @@ export class SearchPanel {
   /**
    * Initialize depth rows
    */
-  #initDepthRows() {
-    this.#initDepthCheckboxes();
+  async #initDepthRows() {
+    await tick();
+
+    for (const depth of this.searchStoreValue.curDepthFeatures.keys()) {
+      this.#initDepthCheckboxes(depth);
+    }
   }
 
   /**
@@ -744,12 +749,10 @@ export class SearchPanel {
   /**
    * Initialize check boxes for one depth row
    */
-  #initDepthCheckboxes() {
+  #initDepthCheckboxes(depth: number) {
     const checkboxes = d3
       .select(this.component)
-      .select('#level-row-1 .level-content');
-
-    const depth = 1;
+      .select(`#level-row-${depth} .level-content`);
 
     this.searchStoreValue.featureOrder.forEach(f => {
       const label = checkboxes
@@ -772,7 +775,10 @@ export class SearchPanel {
       }
 
       label.append('span').text(`${featureInfo[2]} ${featureInfo[1]}`);
-      label.attr('title', `${featureInfo[0]} ${featureInfo[1]}`);
+      label.attr(
+        'title',
+        `Show/hide trees using ${featureInfo[0]} ${featureInfo[1]} at depth ${depth}`
+      );
 
       // Change checkbox color
       let boxColor = 'initial';

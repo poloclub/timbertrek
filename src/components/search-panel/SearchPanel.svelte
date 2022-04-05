@@ -23,6 +23,7 @@
   let searchPanel: SearchPanel | null = null;
 
   let searchStoreValue = getSearchStoreDefaultValue();
+  let depthWithDetails = new Set<number>();
 
   const formatter = d3.format(',.3f');
 
@@ -40,6 +41,23 @@
 
     searchStoreValue.shown = false;
     searchStore?.set(searchStoreValue);
+  };
+
+  const detailClicked = (e: MouseEvent, depth: number) => {
+    e.stopPropagation();
+    e.preventDefault();
+
+    const button = e.currentTarget as HTMLElement;
+    const preDetail = button.dataset.detail!;
+
+    if (preDetail === 'false') {
+      button.dataset.detail = 'true';
+      depthWithDetails.add(depth);
+    } else {
+      button.dataset.detail = 'false';
+      depthWithDetails.delete(depth);
+    }
+    depthWithDetails = depthWithDetails;
   };
 
   const initView = () => {
@@ -86,7 +104,7 @@
       <div class="row-title">
         <span>Accuracy</span>
         <div class="title-icons">
-          <span class="title-icon refresh" title="Reset the filter">
+          <span class="title-icon refresh-button" title="Reset the filter">
             {@html refreshIcon}
           </span>
         </div>
@@ -140,7 +158,7 @@
       <div class="row-title">
         <span>Height</span>
         <div class="title-icons">
-          <span class="title-icon refresh" title="Reset the filter">
+          <span class="title-icon refresh-button" title="Reset the filter">
             {@html refreshIcon}
           </span>
         </div>
@@ -153,30 +171,39 @@
       </div>
     </div>
 
-    <div class="row level-row" id="level-row-1">
-      <div class="row-title">
-        <span>Depth 1</span>
-        <div class="title-icons">
-          <span class="title-icon refresh" title="Reset the filter">
-            {@html downIcon}
-          </span>
-        </div>
-      </div>
-      <div class="level-summary">Include all features</div>
-      <div class="level-content" />
-    </div>
+    {#each [...searchStoreValue.curDepthFeatures.keys()] as depth}
+      <div
+        class="row level-row"
+        id={`level-row-${depth}`}
+        class:show-detail={depthWithDetails.has(depth)}
+      >
+        <div class="row-title">
+          <span>{`Depth ${depth}`}</span>
+          <div class="title-icons">
+            <span class="title-icon refresh-button" title="Reset the filter">
+              {@html refreshIcon}
+            </span>
 
-    <div class="row level-row">
-      <div class="row-title">
-        <span>Depth 2</span>
-        <div class="title-icons">
-          <span class="title-icon refresh" title="Reset the filter">
-            {@html downIcon}
-          </span>
+            <span
+              class="title-icon detail-button"
+              title="Show details"
+              data-detail="false"
+              on:click={e => detailClicked(e, depth)}
+            >
+              {@html downIcon}
+            </span>
+          </div>
         </div>
+        <div class="level-summary">
+          {searchStoreValue.curDepthFeatures.get(depth)?.size ===
+          Object.keys(data?.featureMap).length
+            ? 'Include all features'
+            : `Include ${
+                searchStoreValue.curDepthFeatures.get(depth)?.size
+              } out of ${Object.keys(data?.featureMap).length} features`}
+        </div>
+        <div class="level-content" />
       </div>
-      <div class="level-summary">Include all features</div>
-      <div class="level-content" />
-    </div>
+    {/each}
   </div>
 </div>

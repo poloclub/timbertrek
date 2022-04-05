@@ -122,6 +122,12 @@ $color-chart-secondary: $green-100;
       padding-bottom: 2px;
     }
 
+    .title-icons {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+
     .title-icon {
       display: flex;
       align-items: center;
@@ -130,7 +136,8 @@ $color-chart-secondary: $green-100;
       fill: $gray-400;
       cursor: pointer;
       pointer-events: fill;
-      transition: 100ms color, 100ms fill;
+      transition: color $ease-cubic-in-out 100ms, fill $ease-cubic-in-out 100ms,
+        transform $ease-cubic-in-out 100ms;
 
       :global(svg) {
         width: $font-d2;
@@ -147,12 +154,16 @@ $color-chart-secondary: $green-100;
         fill: $gray-700;
       }
 
-      &.refresh {
+      &.refresh-button {
         :global(svg) {
           width: $font-u2;
           height: $font-u2;
         }
       }
+    }
+
+    &:last-child {
+      border-bottom: none;
     }
   }
 }
@@ -376,43 +387,75 @@ $color-chart-secondary: $green-100;
   }
 }
 
-.level-summary {
-  font-size: $font-d2;
-  color: $gray-500;
-  line-height: 1;
-  padding-top: 2px;
+.level-row {
+  .level-summary {
+    font-size: $font-d2;
+    color: $gray-500;
+    line-height: 1;
+    padding: 2px 0 12px 0;
+    display: flex;
+  }
+
+  .level-content {
+    display: flex;
+    flex-direction: row;
+    column-gap: 9px;
+    row-gap: 7px;
+    flex-wrap: wrap;
+    font-size: $font-d3;
+
+    padding: 6px 0 12px 0;
+    display: none;
+
+    :global(.depth-checkbox) {
+      margin: 0;
+    }
+
+    :global(.depth-checkbox-label) {
+      line-height: 1.2;
+    }
+
+    :global(.depth-checkbox-label span) {
+      padding-left: 4px;
+      line-height: 1;
+      color: $gray-700;
+    }
+  }
+
+  .title-icon.refresh-button {
+    display: none;
+    animation: fade-in 100ms $ease-cubic-in-out;
+  }
+
+  .detail-button {
+    transform: rotate(0deg);
+  }
+
+  &.show-detail {
+    .level-summary {
+      display: none;
+    }
+
+    .level-content {
+      display: flex;
+    }
+
+    .detail-button {
+      transform: rotate(-180deg);
+    }
+
+    .refresh-button {
+      display: flex;
+    }
+  }
 }
 
-.level-content {
-  display: flex;
-  flex-direction: row;
-  column-gap: 9px;
-  row-gap: 7px;
-  flex-wrap: wrap;
-  font-size: $font-d3;
-
-  padding: 10px 0;
-  // display: none;
-
-  // &.shown {
-  //   display: flex;
-  // }
-
-  :global(.depth-checkbox) {
-    margin: 0;
+@keyframes fade-in {
+  from {
+    opacity: 0;
   }
 
-  :global(.depth-checkbox-label) {
-    line-height: 1.2;
+  to {
+    opacity: 1;
   }
-
-  :global(.depth-checkbox-label span) {
-    padding-left: 4px;
-    line-height: 1;
-    color: $gray-700;
-  }
-
-  // :global(.depth-checkbox-label) {
-  //   display: flex;
-  // }
 }

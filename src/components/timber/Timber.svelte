@@ -18,6 +18,9 @@
   import SearchPanel from '../search-panel/SearchPanel.svelte';
   import d3 from '../../utils/d3-import';
   import type { HierarchyJSON, PinnedTree } from '../TimberTypes';
+  import logoIcon from '../../imgs/timbertrek-logo.svg?raw';
+  import githubIcon from '../../imgs/icon-github-2.svg?raw';
+  import paperIcon from '../../imgs/icon-paper.svg?raw';
 
   let component: HTMLElement | null = null;
 
@@ -63,9 +66,28 @@
   <div class="timbertrek">
     <div class="header">
       <div class="logo">
-        <div class="logo-icon">TimberTrek</div>
-        <div class="logo-tag">
-          Identifying decision trees that align with human knowledge
+        <div class="svg-icon">
+          {@html logoIcon}
+        </div>
+        <div class="logo-text">
+          <div class="logo-icon">TimberTrek</div>
+          <div class="logo-tag">
+            Identifying decision trees that align with human knowledge
+          </div>
+        </div>
+      </div>
+
+      <div class="right-icons">
+        <a
+          class="svg-icon paper-icon"
+          title="Research paper"
+          href="https://arxiv.org/abs/1908.01755"
+        >
+          {@html paperIcon}
+        </a>
+
+        <div class="svg-icon" title="Open-source code">
+          {@html githubIcon}
         </div>
       </div>
     </div>
