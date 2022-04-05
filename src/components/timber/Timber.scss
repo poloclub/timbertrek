@@ -49,7 +49,7 @@
     display: flex;
     align-items: center;
     flex-direction: row-reverse;
-    gap: 6px;
+    gap: 8px;
   }
 
   .svg-icon {
@@ -57,21 +57,20 @@
     align-items: center;
     justify-content: center;
 
-    fill: $gray-300;
-    color: $gray-300;
+    fill: $gray-400;
+    color: $gray-400;
     transition: fill 100ms $ease-cubic-in-out;
     cursor: pointer;
     pointer-events: fill;
     margin-top: 2px;
 
     :global(svg) {
-      width: 19px;
       height: 19px;
     }
 
     &:hover {
-      fill: $gray-50;
-      color: $gray-50;
+      fill: $gray-100;
+      color: $gray-100;
     }
 
     &:active {
@@ -80,9 +79,9 @@
     }
 
     &.paper-icon {
+      margin-top: 1px;
       :global(svg) {
-        height: 18px;
-        width: 18px;
+        height: 15px;
       }
     }
   }

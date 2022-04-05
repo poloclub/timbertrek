@@ -25,6 +25,12 @@
   let searchStoreValue = getSearchStoreDefaultValue();
   let depthWithDetails = new Set<number>();
 
+  enum RefreshLocation {
+    Accuracy,
+    Height,
+    Depth
+  }
+
   const formatter = d3.format(',.3f');
 
   onMount(() => {
@@ -58,6 +64,39 @@
       depthWithDetails.delete(depth);
     }
     depthWithDetails = depthWithDetails;
+  };
+
+  const refreshClicked = (
+    e: MouseEvent,
+    location: RefreshLocation,
+    depth: number | null = null
+  ) => {
+    if (searchPanel === null) return;
+
+    e.preventDefault();
+
+    switch (location) {
+      case RefreshLocation.Accuracy: {
+        searchPanel.refreshAccuracy();
+        break;
+      }
+
+      case RefreshLocation.Depth: {
+        if (depth !== null) {
+          searchPanel.refreshDepth(depth);
+        }
+        break;
+      }
+
+      case RefreshLocation.Height: {
+        searchPanel.refreshHeight();
+        break;
+      }
+
+      default: {
+        console.warn('Unexpected case for refreshClicked()');
+      }
+    }
   };
 
   const initView = () => {
@@ -104,7 +143,11 @@
       <div class="row-title">
         <span>Accuracy</span>
         <div class="title-icons">
-          <span class="title-icon refresh-button" title="Reset the filter">
+          <span
+            class="title-icon refresh-button"
+            title="Reset the filter"
+            on:click={e => refreshClicked(e, RefreshLocation.Accuracy)}
+          >
             {@html refreshIcon}
           </span>
         </div>
@@ -158,7 +201,11 @@
       <div class="row-title">
         <span>Height</span>
         <div class="title-icons">
-          <span class="title-icon refresh-button" title="Reset the filter">
+          <span
+            class="title-icon refresh-button"
+            title="Reset the filter"
+            on:click={e => refreshClicked(e, RefreshLocation.Height)}
+          >
             {@html refreshIcon}
           </span>
         </div>
@@ -180,7 +227,11 @@
         <div class="row-title">
           <span>{`Depth ${depth}`}</span>
           <div class="title-icons">
-            <span class="title-icon refresh-button" title="Reset the filter">
+            <span
+              class="title-icon refresh-button"
+              title="Reset the filter"
+              on:click={e => refreshClicked(e, RefreshLocation.Depth, depth)}
+            >
               {@html refreshIcon}
             </span>
 

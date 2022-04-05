@@ -433,15 +433,11 @@ export class SearchPanel {
         xPos -= THUMB_WIDTH;
         this.curAccuracyLow = value;
         this.searchStoreValue.curAccuracyLow = this.curAccuracyLow;
-        // updateRangeAnnotation(component, state);
-        // syncFeature(state);
         break;
 
       case 'slider-right-thumb':
         this.curAccuracyHigh = value;
         this.searchStoreValue.curAccuracyHigh = this.curAccuracyHigh;
-        // updateRangeAnnotation(component, state);
-        // syncFeature(state);
         break;
 
       default:
@@ -561,6 +557,14 @@ export class SearchPanel {
   }
 
   /**
+   * Reset the filter for the accuracy row
+   */
+  refreshAccuracy = () => {
+    this.#moveThumb('slider-left-thumb', this.accuracyLow);
+    this.#moveThumb('slider-right-thumb', this.accuracyHigh);
+  };
+
+  /**
    * Draw the SVG for the height row
    */
   #initHeightSVG() {
@@ -654,25 +658,6 @@ export class SearchPanel {
   }
 
   /**
-   * Event handler for height check boxes
-   */
-  #heightCheckboxChanged(e: Event, x: number) {
-    e.preventDefault();
-
-    // Change bar color
-    const checkbox = e.target as HTMLInputElement;
-    this.heightSVG?.select(`#bar-${x}`).classed('selected', checkbox.checked);
-
-    // Trigger filtering in sunburst
-    if (checkbox.checked) {
-      this.searchStoreValue.curHeightRange.add(x);
-    } else {
-      this.searchStoreValue.curHeightRange.delete(x);
-    }
-    this.searchStore.set(this.searchStoreValue);
-  }
-
-  /**
    * Initialize check boxes under the height svg
    */
   #initHeightCheckboxes() {
@@ -695,7 +680,7 @@ export class SearchPanel {
       const curCheckbox = checkboxes
         .append('input')
         .attr('type', 'checkbox')
-        .attr('checked', true)
+        .property('checked', true)
         .attr('class', 'height-checkbox')
         .attr('id', `height-checkbox-${d.x}`)
         .style(
@@ -709,6 +694,47 @@ export class SearchPanel {
       );
     });
   }
+
+  /**
+   * Event handler for height check boxes
+   */
+  #heightCheckboxChanged(e: Event, x: number) {
+    e.preventDefault();
+
+    // Change bar color
+    const checkbox = e.target as HTMLInputElement;
+    this.heightSVG?.select(`#bar-${x}`).classed('selected', checkbox.checked);
+
+    // Trigger filtering in sunburst
+    if (checkbox.checked) {
+      this.searchStoreValue.curHeightRange.add(x);
+    } else {
+      this.searchStoreValue.curHeightRange.delete(x);
+    }
+    this.searchStore.set(this.searchStoreValue);
+  }
+
+  /**
+   * Reset the filter for the height row
+   */
+  refreshHeight = () => {
+    console.log('refreshing height');
+
+    for (const h of this.heightXScale.domain()) {
+      const curCheckbox = d3
+        .select(this.component)
+        .select(`#height-checkbox-${h}`);
+
+      // Check unchecked checkboxes
+      if (!curCheckbox.property('checked')) {
+        this.heightSVG?.select(`#bar-${h}`).classed('selected', true);
+        curCheckbox.property('checked', true);
+        this.searchStoreValue.curHeightRange.add(h);
+      }
+    }
+
+    this.searchStore.set(this.searchStoreValue);
+  };
 
   /**
    * Initialize depth rows
@@ -764,7 +790,7 @@ export class SearchPanel {
       const checkbox = label
         .append('input')
         .attr('type', 'checkbox')
-        .attr('checked', true)
+        .property('checked', true)
         .attr('class', 'depth-checkbox');
 
       // Add feature label
@@ -794,4 +820,11 @@ export class SearchPanel {
       );
     });
   }
+
+  /**
+   * Reset the filter for the depth row
+   */
+  refreshDepth = (depth: number) => {
+    console.log('refreshing depth', depth);
+  };
 }

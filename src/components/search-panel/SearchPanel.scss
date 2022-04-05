@@ -361,7 +361,7 @@ $color-chart-secondary: $green-100;
 .svg-height {
   :global(.bar rect) {
     fill: $gray-300;
-    transition: fill 100ms $ease-cubic-in-out;
+    transition: fill 100ms;
   }
 
   :global(.bar.selected rect) {
@@ -375,7 +375,7 @@ $color-chart-secondary: $green-100;
     user-select: none;
     -webkit-user-select: none;
     font-variant: font-variant-numeric;
-    transition: fill 100ms $ease-cubic-in-out;
+    transition: fill 100ms;
   }
 
   :global(.bar.selected text) {
@@ -441,7 +441,7 @@ $color-chart-secondary: $green-100;
     }
 
     .detail-button {
-      transform: rotate(-180deg);
+      transform: rotate(180deg);
     }
 
     .refresh-button {
