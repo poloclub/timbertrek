@@ -18,10 +18,12 @@
   import SearchPanel from '../search-panel/SearchPanel.svelte';
   import Dropzone from '../dropzone/Dropzone.svelte';
   import d3 from '../../utils/d3-import';
-  import type { HierarchyJSON, PinnedTree } from '../TimberTypes';
+  import type { HierarchyJSON, NotebookEvent } from '../TimberTypes';
   import logoIcon from '../../imgs/timbertrek-logo.svg?raw';
   import githubIcon from '../../imgs/icon-github-2.svg?raw';
   import paperIcon from '../../imgs/icon-paper.svg?raw';
+
+  export let notebookMode = false;
 
   let component: HTMLElement | null = null;
 
@@ -29,17 +31,28 @@
   let data: HierarchyJSON | null | undefined = null;
   let featureMap: Map<number, string[]> | null = null;
 
+  let sunburstWidth = notebookMode ? 500 : 650;
   const devMode = false;
-  const sunburstWidth = 650;
 
-  const initData = async () => {
-    // Init the model
-    data = await d3.json('/data/compas_rules_0.01_0.05.json');
-
+  /**
+   * Init data and feature map
+   * @param loadedData Loaded HierarchyJSON data
+   */
+  const initData = (loadedData: HierarchyJSON) => {
+    data = loadedData;
     featureMap = new Map<number, string[]>();
     for (const [k, v] of Object.entries(data!.featureMap)) {
       featureMap.set(parseInt(k), v as string[]);
     }
+  };
+
+  /**
+   * Load the data file from /public
+   */
+  const readDataFromFile = async () => {
+    // Init the model
+    const loadedData = await d3.json('/data/compas_rules_0.01_0.05.json');
+    initData(loadedData as HierarchyJSON);
   };
 
   /**
@@ -54,7 +67,7 @@
     }
   };
 
-  initData();
+  // readDataFromFile();
 
   // Construct stores
   const favoritesStore = getFavoritesStore();
@@ -71,6 +84,15 @@
 
   onMount(() => {
     console.log('TimberTrek mounted!');
+    if (notebookMode) {
+      // Listen to the iframe message events
+      document.addEventListener('timbertrekData', (e: Event) => {
+        const notebookEvent = e as NotebookEvent;
+        const loadedData = notebookEvent.data;
+        sunburstWidth = notebookEvent.width;
+        initData(loadedData);
+      });
+    }
   });
 </script>
 

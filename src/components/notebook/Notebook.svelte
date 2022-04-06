@@ -27,6 +27,6 @@
 
 <div class="notebook-page">
   <div class="main-app" bind:this={component}>
-    <TimberTrek />
+    <TimberTrek notebookMode={true} />
   </div>
 </div>

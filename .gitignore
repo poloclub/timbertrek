@@ -17,3 +17,4 @@ token.json
 notebook-widget/timbertrek/data.json
 notebook-widget/timbertrek/*.ipynb
 notebook-widget/timbertrek/*.html
+notebook-widget/timbertrek/timbertrek.js

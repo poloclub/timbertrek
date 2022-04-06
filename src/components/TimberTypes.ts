@@ -3,6 +3,14 @@
  */
 
 /**
+ * Custom event for notebook message events
+ */
+export interface NotebookEvent extends Event {
+  data: HierarchyJSON;
+  width: number;
+}
+
+/**
  * Sets of selected tree IDs under three different filters
  */
 export interface SelectedTrees {

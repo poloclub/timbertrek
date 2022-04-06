@@ -13,25 +13,20 @@ export default defineConfig(({ command, mode }) => {
   } else if (command === 'build') {
     switch (mode) {
       case 'notebook': {
-        // Production notebook widget
+        // Production: notebook widget
         return {
           build: {
             outDir: 'notebook-widget/_timbertrek',
+            sourcemap: false,
             rollupOptions: {
               output: {
                 name: 'timbertrek',
+                sourcemap: false,
                 entryFileNames: 'assets/timbertrek.js',
                 chunkFileNames: 'assets/[name].js',
                 assetFileNames: 'assets/[name].[ext]'
               }
             }
-            // assetsDir: '',
-            // lib: {
-            //   entry: 'src/main.ts',
-            //   formats: ['umd'],
-            //   name: 'timbertrek',
-            //   fileName: format => 'timbertrek.js'
-            // }
           },
           plugins: [
             svelte({
@@ -61,7 +56,7 @@ export default defineConfig(({ command, mode }) => {
       }
 
       case 'production': {
-        // Production for standard web page (default mode)
+        // Production: standard web page (default mode)
         return {
           build: {
             outDir: 'dist'
@@ -71,7 +66,7 @@ export default defineConfig(({ command, mode }) => {
       }
 
       case 'github': {
-        // Production github page
+        // Production: github page
         return {
           build: {
             outDir: 'dist'
