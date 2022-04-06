@@ -51,7 +51,7 @@
     }
   };
 
-  // initData();
+  initData();
 
   // Construct stores
   const favoritesStore = getFavoritesStore();

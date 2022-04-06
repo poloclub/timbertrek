@@ -9,6 +9,8 @@
     "start:r": "sirv public --no-clear --port 5005",
     "dev": "vite",
     "build": "vite build",
+    "build:notebook": "vite build --mode notebook",
+    "build:github": "vite build --mode github",
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json"
   },

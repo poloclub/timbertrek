@@ -1,4 +1,5 @@
 import d3 from '../../utils/d3-import';
+import { config } from '../../config';
 import { round } from '../../utils/utils';
 import type { Writable } from 'svelte/store';
 import type { TreeNode, Point, Padding } from '../TimberTypes';
@@ -229,7 +230,7 @@ export class TreeWindow {
         if (this.treeWindowStoreValue.getFeatureColor) {
           return this.treeWindowStoreValue.getFeatureColor(d.data.f[0]);
         } else {
-          return 'var(--md-gray-500)';
+          return config.colors['gray-500'];
         }
       });
 

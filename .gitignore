@@ -1,3 +1,4 @@
+.ipynb_checkpoints
 dataset
 /node_modules/
 /public/build/
@@ -12,3 +13,7 @@ publish.sh
 dist
 
 token.json
+
+notebook-widget/timbertrek/data.json
+notebook-widget/timbertrek/*.ipynb
+notebook-widget/timbertrek/*.html

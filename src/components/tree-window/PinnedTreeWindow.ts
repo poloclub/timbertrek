@@ -1,5 +1,6 @@
 import { tick } from 'svelte';
 import d3 from '../../utils/d3-import';
+import { config } from '../../config';
 import type { Writable, Unsubscriber } from 'svelte/store';
 import type {
   TreeNode,
@@ -243,7 +244,7 @@ export class PinnedTreeWindow {
         if (this.pinnedTreeStoreValue.getFeatureColor) {
           return this.pinnedTreeStoreValue.getFeatureColor(d.data.f[0]);
         } else {
-          return 'var(--md-gray-500)';
+          return config.colors['gray-500'];
         }
       });
 
@@ -406,7 +407,7 @@ export class PinnedTreeWindow {
         if (this.pinnedTreeStoreValue.getFeatureColor) {
           return this.pinnedTreeStoreValue.getFeatureColor(d.data.f[0]);
         } else {
-          return 'var(--md-gray-500)';
+          return config.colors['gray-500'];
         }
       });
 
@@ -756,7 +757,7 @@ export class PinnedTreeWindow {
           },
           getFeatureColor:
             this.pinnedTreeStoreValue.getFeatureColor === null
-              ? f => 'var(--md-gray-500)'
+              ? f => config.colors['gray-500']
               : this.pinnedTreeStoreValue.getFeatureColor
         });
       }
