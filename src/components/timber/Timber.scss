@@ -30,6 +30,9 @@
   z-index: 1;
   display: flex;
   flex-direction: column;
+
+  width: $sunburst-width;
+  height: $toolbar-height + $sunburst-width + $header-height;
 }
 
 .header {
@@ -129,6 +132,8 @@
 .content {
   display: flex;
   flex-direction: column;
+  width: 100%;
+  height: 100%;
 }
 
 .sunburst {

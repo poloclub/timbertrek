@@ -16,6 +16,7 @@
   import PinnedTreeWindow from '../tree-window/PinnedTreeWindow.svelte';
   import FavoritesPanel from '../favorites-panel/FavoritesPanel.svelte';
   import SearchPanel from '../search-panel/SearchPanel.svelte';
+  import Dropzone from '../dropzone/Dropzone.svelte';
   import d3 from '../../utils/d3-import';
   import type { HierarchyJSON, PinnedTree } from '../TimberTypes';
   import logoIcon from '../../imgs/timbertrek-logo.svg?raw';
@@ -38,7 +39,19 @@
     }
   };
 
-  initData();
+  /**
+   * Listen to data update from the dropzone
+   * @param dropzoneData Dropzone data
+   */
+  const initDataFromDropzone = (dropzoneData: HierarchyJSON) => {
+    data = dropzoneData;
+    featureMap = new Map<number, string[]>();
+    for (const [k, v] of Object.entries(data.featureMap)) {
+      featureMap.set(parseInt(k), v as string[]);
+    }
+  };
+
+  // initData();
 
   // Construct stores
   const favoritesStore = getFavoritesStore();
@@ -99,19 +112,23 @@
     </div>
 
     <div class="content">
-      <div class="toolbar">
-        <Toolbar {favoritesStore} {sunburstStore} {searchStore} />
-      </div>
+      {#if data === null}
+        <Dropzone {initDataFromDropzone} />
+      {:else}
+        <div class="toolbar">
+          <Toolbar {favoritesStore} {sunburstStore} {searchStore} />
+        </div>
 
-      <div class="sunburst">
-        <Sunburst
-          {data}
-          {sunburstStore}
-          {treeWindowStore}
-          {pinnedTreeStore}
-          {searchStore}
-        />
-      </div>
+        <div class="sunburst">
+          <Sunburst
+            {data}
+            {sunburstStore}
+            {treeWindowStore}
+            {pinnedTreeStore}
+            {searchStore}
+          />
+        </div>
+      {/if}
     </div>
 
     <div class="sidebar">

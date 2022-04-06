@@ -206,3 +206,16 @@ export const haveContrast = (
 export const setsAreEqual = <T>(set1: Set<T>, set2: Set<T>): boolean => {
   return set1.size === set2.size && [...set1].every(d => set2.has(d));
 };
+
+/**
+ * Get the file name and file extension from a File object
+ * @param {File} file File object
+ * @returns [file name, file extension]
+ */
+export const splitFileName = (file: File) => {
+  const name = file.name;
+  const lastDot = name.lastIndexOf('.');
+  const value = name.slice(0, lastDot);
+  const extension = name.slice(lastDot + 1);
+  return [value, extension];
+};
