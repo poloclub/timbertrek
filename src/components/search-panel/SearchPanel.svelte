@@ -16,6 +16,7 @@
   // Component variables
   export let data: HierarchyJSON | null = null;
   export let searchStore: Writable<SearchStoreValue> | null = null;
+  export let width = 650;
 
   let component: HTMLElement | null = null;
   let mounted = false;
@@ -124,6 +125,7 @@
 
 <div
   class="search-panel"
+  style={`max-height: ${width}px;`}
   bind:this={component}
   class:shown={searchStoreValue.shown}
 >

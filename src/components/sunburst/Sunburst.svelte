@@ -22,8 +22,6 @@
   let mounted = false;
 
   // View variables
-  const width = config.layout.sunburstWidth;
-  const height = config.layout.sunburstWidth;
   let sunburst: Sunburst | null = null;
 
   /**
@@ -53,9 +51,7 @@
         treeWindowStore,
         pinnedTreeStore,
         searchStore,
-        sunburstUpdated,
-        width,
-        height
+        sunburstUpdated
       });
     }
   };

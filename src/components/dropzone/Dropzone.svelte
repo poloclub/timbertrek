@@ -1,11 +1,13 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { Dropzone } from './Dropzone';
+  import { config } from '../../config';
   import type { HierarchyJSON } from '../TimberTypes';
 
   import logoIcon from '../../imgs/timbertrek-logo.svg?raw';
 
   export let initDataFromDropzone: (dropzoneData: HierarchyJSON) => void;
+  export let width = 650;
 
   let component: HTMLElement | null = null;
   let inputElem: HTMLInputElement | null = null;
@@ -45,7 +47,11 @@
   @import './Dropzone.scss';
 </style>
 
-<div class="dropzone-tab" bind:this={component}>
+<div
+  class="dropzone-tab"
+  style={`width: ${width}px; height: ${width + config.layout.toolbarHeight}px;`}
+  bind:this={component}
+>
   <div
     class="dropzone"
     class:drag-over={dropzone?.isDragging}

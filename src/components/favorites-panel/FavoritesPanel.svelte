@@ -14,6 +14,7 @@
   // Component variables
   export let favoritesStore: Writable<FavoritesStoreValue> | null = null;
   export let pinnedTreeStore: Writable<PinnedTreeStoreValue> | null = null;
+  export let width = 650;
 
   let component: HTMLElement | null = null;
   let mounted = false;
@@ -52,6 +53,7 @@
 
 <div
   class="favorites-panel"
+  style={`max-height: ${width}px;`}
   bind:this={component}
   class:shown={favoritesStoreValue.shown}
 >

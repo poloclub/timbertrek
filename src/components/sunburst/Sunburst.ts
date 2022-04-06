@@ -212,9 +212,7 @@ export class Sunburst {
     treeWindowStore,
     pinnedTreeStore,
     searchStore,
-    sunburstUpdated,
-    width = config.layout.sunburstWidth,
-    height = config.layout.sunburstWidth
+    sunburstUpdated
   }: {
     component: HTMLElement;
     data: HierarchyJSON;
@@ -223,8 +221,6 @@ export class Sunburst {
     pinnedTreeStore: Writable<PinnedTreeStoreValue>;
     searchStore: Writable<SearchStoreValue>;
     sunburstUpdated: () => void;
-    width?: number;
-    height?: number;
   }) {
     console.log('Init sunburst');
     console.log(data);
@@ -233,8 +229,8 @@ export class Sunburst {
     this.svg = d3
       .select(component)
       .select('svg')
-      .attr('width', width)
-      .attr('height', height)
+      .attr('width', '100%')
+      .attr('height', '100%')
       .attr('viewbox', '0 0 650 650')
       .attr('preserveAspectRatio', 'none');
 
@@ -246,8 +242,12 @@ export class Sunburst {
       right: 10
     };
 
-    this.width = width - this.padding.left - this.padding.right;
-    this.height = height - this.padding.top - this.padding.bottom;
+    const svgBBox = (this.svg.node() as HTMLElement).getBoundingClientRect();
+    this.width = svgBBox.width - this.padding.left - this.padding.right;
+    this.height = svgBBox.height - this.padding.top - this.padding.bottom;
+
+    // this.width = width - this.padding.left - this.padding.right;
+    // this.height = height - this.padding.top - this.padding.bottom;
 
     // Transform the data
     this.data = data.trie;

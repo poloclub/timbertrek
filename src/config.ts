@@ -2,7 +2,8 @@ const layout = {
   sunburstWidth: 650,
   treeWindowWidth: 150,
   treeWindowHeaderHeight: 26,
-  treeWindowHeight: 0
+  treeWindowHeight: 0,
+  toolbarHeight: 36
 };
 
 const time = {

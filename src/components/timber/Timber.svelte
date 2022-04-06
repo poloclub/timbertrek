@@ -29,6 +29,8 @@
   let data: HierarchyJSON | null | undefined = null;
   let featureMap: Map<number, string[]> | null = null;
 
+  const sunburstWidth = 500;
+
   const initData = async () => {
     // Init the model
     data = await d3.json('/data/compas_rules_0.01_0.05.json');
@@ -76,7 +78,7 @@
 </style>
 
 <div class="timbertrek-page" bind:this={component}>
-  <div class="timbertrek">
+  <div class="timbertrek" style={`width: ${sunburstWidth}px;`}>
     <div class="header">
       <div class="logo">
         <div class="svg-icon">
@@ -84,7 +86,10 @@
         </div>
         <div class="logo-text">
           <div class="logo-icon">TimberTrek</div>
-          <div class="logo-tag">
+          <div
+            class="logo-tag"
+            title="Identifying decision trees that align with human knowledge"
+          >
             Identifying decision trees that align with human knowledge
           </div>
         </div>
@@ -113,13 +118,13 @@
 
     <div class="content">
       {#if data === null}
-        <Dropzone {initDataFromDropzone} />
+        <Dropzone {initDataFromDropzone} width={sunburstWidth} />
       {:else}
         <div class="toolbar">
           <Toolbar {favoritesStore} {sunburstStore} {searchStore} />
         </div>
 
-        <div class="sunburst">
+        <div class="sunburst-wrapper">
           <Sunburst
             {data}
             {sunburstStore}
@@ -132,11 +137,15 @@
     </div>
 
     <div class="sidebar">
-      <FavoritesPanel {favoritesStore} {pinnedTreeStore} />
+      <FavoritesPanel
+        {favoritesStore}
+        {pinnedTreeStore}
+        width={sunburstWidth}
+      />
     </div>
 
     <div class="sidebar">
-      <SearchPanel {data} {searchStore} />
+      <SearchPanel {data} {searchStore} width={sunburstWidth} />
     </div>
   </div>
 
