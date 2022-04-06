@@ -83,7 +83,6 @@
   });
 
   onMount(() => {
-    console.log('TimberTrek mounted!');
     if (notebookMode) {
       // Listen to the iframe message events
       document.addEventListener('timbertrekData', (e: Event) => {

@@ -222,8 +222,8 @@ export class Sunburst {
     searchStore: Writable<SearchStoreValue>;
     sunburstUpdated: () => void;
   }) {
-    console.log('Init sunburst');
-    console.log(data);
+    // console.log('Init sunburst');
+    // console.log(data);
 
     // Set up view box
     this.svg = d3
