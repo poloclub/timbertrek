@@ -2,29 +2,9 @@
 
 """The setup script."""
 
-from json import load
+from json import loads
 from setuptools import setup, find_packages
 from pathlib import Path
-from pathlib import Path
-
-
-def _fetchVersion():
-    HERE = Path(__file__).parent.parent.resolve()
-
-    for settings in HERE.rglob("package.json"):
-        try:
-            with settings.open() as f:
-                version = load(f)["version"]
-                return (
-                    version.replace("-alpha.", "a")
-                    .replace("-beta.", "b")
-                    .replace("-rc.", "rc")
-                )
-        except FileNotFoundError:
-            pass
-
-    raise FileNotFoundError(f"Could not find package.json under dir {HERE!s}")
-
 
 with open("README.md") as readme_file:
     readme = readme_file.read()
@@ -51,6 +31,7 @@ setup(
     install_requires=requirements,
     license="MIT license",
     long_description=readme,
+    long_description_content_type="text/markdown",
     include_package_data=True,
     keywords="timbertrek",
     name="timbertrek",
@@ -58,6 +39,6 @@ setup(
     test_suite="tests",
     tests_require=test_requirements,
     url="https://github.com/xiaohk/timbertrek",
-    version=_fetchVersion(),
+    version="0.1.0",
     zip_safe=False,
 )
