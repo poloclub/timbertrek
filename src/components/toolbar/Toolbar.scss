@@ -10,6 +10,7 @@
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
+  gap: 5px;
 
   font-size: 0.92rem;
   line-height: 1;
@@ -19,14 +20,21 @@ $depth-box-width: 24px;
 
 .depths {
   display: flex;
+  flex-shrink: 1;
+  min-width: 0px;
   flex-direction: row;
   justify-content: space-between;
   align-items: baseline;
+  gap: 5px;
 
   color: $gray-800;
 
   .depth-label {
-    margin-right: 6px;
+    min-width: 0px;
+    flex-shrink: 1;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
   }
 
   .depth-box-container {
@@ -35,6 +43,7 @@ $depth-box-width: 24px;
     align-items: baseline;
     gap: 8px;
     position: relative;
+    flex-shrink: 0;
 
     .depth-box-lines {
       display: flex;
@@ -109,12 +118,20 @@ $depth-box-width: 24px;
   display: flex;
   gap: 6px;
   flex-direction: row;
+  flex-shrink: 2;
+  min-width: 0px;
 
   .tool-button {
     display: flex;
     flex-direction: row;
     align-items: flex-end;
     gap: 5px;
+
+    flex-shrink: 1;
+    min-width: 0px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
 
     border-radius: 5px;
     padding: 4px 5px;
@@ -127,6 +144,14 @@ $depth-box-width: 24px;
     background-color: $gray-50;
 
     transition: background-color 100ms linear;
+
+    .button-text {
+      flex-shrink: 1;
+      min-width: 0px;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+    }
 
     &.shown {
       background-color: adjust-color($color: white, $lightness: -12%);

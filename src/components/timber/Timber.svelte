@@ -29,7 +29,8 @@
   let data: HierarchyJSON | null | undefined = null;
   let featureMap: Map<number, string[]> | null = null;
 
-  const sunburstWidth = 500;
+  const devMode = false;
+  const sunburstWidth = 650;
 
   const initData = async () => {
     // Init the model
@@ -159,14 +160,16 @@
     {/if}
   {/each}
 
-  <div class="dev-bar">
-    <div
-      class="button"
-      on:click={() => {
-        localStorage.clear();
-      }}
-    >
-      localStorage.clear()
+  {#if devMode}
+    <div class="dev-bar">
+      <div
+        class="button"
+        on:click={() => {
+          localStorage.clear();
+        }}
+      >
+        localStorage.clear()
+      </div>
     </div>
-  </div>
+  {/if}
 </div>

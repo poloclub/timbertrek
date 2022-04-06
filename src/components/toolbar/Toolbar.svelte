@@ -97,7 +97,7 @@
           {@html iconHeartSolid}
         </div>
       </span>
-      <span class="tool-name"> My Favorites </span>
+      <span class="button-text"> Favorites </span>
     </div>
 
     <div
@@ -110,7 +110,7 @@
       <span class="svg-icon">
         {@html iconSearch}
       </span>
-      <span class="tool-name"> Search </span>
+      <span class="button-text"> Search </span>
     </div>
   </div>
 </div>
