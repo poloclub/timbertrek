@@ -610,7 +610,9 @@ def transform_trie_to_rules(
     x_all = data_df.to_numpy()[:, 0 : data_df.shape[1] - 1]
     y_all = data_df.to_numpy()[:, data_df.shape[1] - 1]
 
-    for tid in tqdm(new_tree_map, desc="Generating decision paths..."):
+    for tid in tqdm(
+        new_tree_map, desc=f"Generating decision paths from {len(new_tree_map)} trees"
+    ):
         cur_tree = new_tree_map[tid]
         cur_acc = count_leaf_samples(cur_tree[0], x_all, y_all)
         cur_tree.append(cur_acc)
@@ -646,11 +648,12 @@ def _make_html(decision_paths, width):
     html_bottom = """</head><body></body></html>"""
 
     # Read the bundled JS file
-    #     js_string = pkgutil.get_data(__name__, "timbertrek.js")
-    with open("./timbertrek.js", "r") as fp:
-        js_string = fp.read()
+    js_b = pkgutil.get_data(__name__, "timbertrek.js")
 
-    js_b = bytes(js_string, encoding="utf-8")
+    # Read local JS file (for development only)
+    # with open("./timbertrek.js", "r") as fp:
+    #     js_string = fp.read()
+    # js_b = bytes(js_string, encoding="utf-8")
 
     # Encode the JS & CSS with base 64
     js_base64 = base64.b64encode(js_b).decode("utf-8")
@@ -685,7 +688,7 @@ def _make_html(decision_paths, width):
     return html.escape(html_str)
 
 
-def visualize(decision_paths, width, height):
+def visualize(decision_paths, width=500, height=650):
     """
     Render TimberTrek in the output cell.
 
@@ -697,6 +700,17 @@ def visualize(decision_paths, width, height):
     Return:
         HTML code with deferred JS code in base64 format
     """
+
+    # Simple validations
+    assert isinstance(decision_paths, dict), "`decision_paths` has to be a dictionary."
+    assert "trie" in decision_paths, "decision_paths` is not valid (no `trie` key)."
+    assert (
+        "featureMap" in decision_paths
+    ), "decision_paths` is not valid (no `featureMap` key)."
+    assert (
+        "treeMap" in decision_paths
+    ), "decision_paths` is not valid (no `treeMap` key)."
+
     html_str = _make_html(decision_paths, width)
 
     # Randomly generate an ID for the iframe to avoid collision
