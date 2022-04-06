@@ -803,7 +803,7 @@ export class SearchPanel {
       label.append('span').text(`${featureInfo[2]} ${featureInfo[1]}`);
       label.attr(
         'title',
-        `Show/hide trees using ${featureInfo[0]} ${featureInfo[1]} at depth ${depth}`
+        `Show/hide trees using "${featureInfo[0]} ${featureInfo[1]}" at depth ${depth}`
       );
 
       // Change checkbox color
@@ -825,6 +825,29 @@ export class SearchPanel {
    * Reset the filter for the depth row
    */
   refreshDepth = (depth: number) => {
-    console.log('refreshing depth', depth);
+    const checkboxes = d3
+      .select(this.component)
+      .select(`#level-row-${depth} .level-content`);
+
+    const curFeatureIDs = this.searchStoreValue.curDepthFeatures.get(depth);
+    if (curFeatureIDs === undefined) {
+      console.warn(`Unknown depth ${depth}`);
+      return;
+    }
+
+    // Check the unchecked checkboxes
+    for (const f of this.searchStoreValue.featureOrder) {
+      const checkbox = checkboxes
+        .select(`#depth-check-box-label-${depth}-${f}`)
+        .select('.depth-checkbox');
+
+      if (!checkbox.property('checked')) {
+        checkbox.property('checked', true);
+        curFeatureIDs.add(f);
+      }
+    }
+
+    this.searchStoreValue.curDepthFeatures.set(depth, curFeatureIDs);
+    this.searchStore.set(this.searchStoreValue);
   };
 }

@@ -57,8 +57,8 @@
     align-items: center;
     justify-content: center;
 
-    fill: $gray-400;
-    color: $gray-400;
+    fill: $gray-200;
+    color: $gray-200;
     transition: fill 100ms $ease-cubic-in-out;
     cursor: pointer;
     pointer-events: fill;
@@ -69,13 +69,13 @@
     }
 
     &:hover {
-      fill: $gray-100;
-      color: $gray-100;
+      fill: $gray-500;
+      color: $gray-500;
     }
 
     &:active {
-      fill: white;
-      color: $gray-50;
+      fill: $gray-600;
+      color: $gray-600;
     }
 
     &.paper-icon {
