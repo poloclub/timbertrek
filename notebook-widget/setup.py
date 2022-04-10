@@ -9,7 +9,7 @@ from pathlib import Path
 with open("README.md") as readme_file:
     readme = readme_file.read()
 
-requirements = ["numpy", "ipython"]
+requirements = ["numpy", "ipython", "tqdm"]
 
 test_requirements = []
 
@@ -28,7 +28,7 @@ setup(
         "Interactive Visualization",
     ],
     classifiers=[
-        "License :: MIT",
+        "License :: OSI Approved :: MIT License",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.6",
