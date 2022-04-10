@@ -8,7 +8,7 @@
 <style lang="scss">
   @import '../../define';
 
-  .article-page {
+  .notebook-page {
     width: 100vw;
     height: 100vh;
   }

@@ -67,7 +67,7 @@
     }
   };
 
-  // readDataFromFile();
+  readDataFromFile();
 
   // Construct stores
   const favoritesStore = getFavoritesStore();
