@@ -1,0 +1,49 @@
+{
+  "content": [
+    {
+      "content": null,
+      "created": "2022-04-10T21:50:25.197091Z",
+      "format": null,
+      "last_modified": "2022-04-07T14:35:18.693156Z",
+      "mimetype": null,
+      "name": "campas.ipynb",
+      "path": "campas.ipynb",
+      "size": 1194982,
+      "type": "notebook",
+      "writable": true
+    },
+    {
+      "content": null,
+      "created": "2022-04-10T21:50:25.205043Z",
+      "format": null,
+      "last_modified": "2022-01-23T21:04:56Z",
+      "mimetype": "text/csv",
+      "name": "compas_data.csv",
+      "path": "compas_data.csv",
+      "size": 179761,
+      "type": "file",
+      "writable": true
+    },
+    {
+      "content": null,
+      "created": "2022-04-10T21:50:25.200907Z",
+      "format": null,
+      "last_modified": "2022-02-16T01:41:56Z",
+      "mimetype": "application/json",
+      "name": "compas_0.01_0.05.json",
+      "path": "compas_0.01_0.05.json",
+      "size": 280328,
+      "type": "file",
+      "writable": true
+    }
+  ],
+  "created": "2022-04-10T21:50:25.201521Z",
+  "format": "json",
+  "last_modified": "2022-04-10T21:50:25.201521Z",
+  "mimetype": null,
+  "name": "",
+  "path": "",
+  "size": null,
+  "type": "directory",
+  "writable": true
+}
