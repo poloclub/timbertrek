@@ -67,7 +67,7 @@ export default defineConfig(({ command, mode }) => {
         return {
           base: '/timbertrek/',
           build: {
-            outDir: 'dist'
+            outDir: 'gh-page'
           },
           plugins: [svelte()]
         };
