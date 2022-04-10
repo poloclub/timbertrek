@@ -18,14 +18,11 @@ export default defineConfig(({ command, mode }) => {
           build: {
             outDir: 'notebook-widget/_timbertrek',
             sourcemap: false,
-            rollupOptions: {
-              output: {
-                name: 'timbertrek',
-                sourcemap: false,
-                entryFileNames: 'assets/timbertrek.js',
-                chunkFileNames: 'assets/[name].js',
-                assetFileNames: 'assets/[name].[ext]'
-              }
+            lib: {
+              entry: 'src/main-notebook.ts',
+              formats: ['iife'],
+              name: 'timbertrek',
+              fileName: format => 'timbertrek.js'
             }
           },
           plugins: [

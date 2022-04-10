@@ -37,10 +37,12 @@
   height: $header-height;
   border-bottom: 1px solid $gray-light-border;
   padding: 0px $panel-h-padding;
+
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
+  gap: 4px;
 
   background-color: $gray-800;
   border-top-left-radius: $border-radius;
