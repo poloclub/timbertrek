@@ -1,5 +1,4 @@
 import numpy as np
-import pandas as pd
 import re
 import random
 import html
@@ -9,7 +8,6 @@ import pkgutil
 from tqdm import tqdm
 from collections import deque
 from IPython.display import display_html
-from copy import deepcopy
 from json import dump, load, dumps
 
 
