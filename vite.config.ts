@@ -65,6 +65,7 @@ export default defineConfig(({ command, mode }) => {
       case 'github': {
         // Production: github page
         return {
+          base: '/timbertrek/',
           build: {
             outDir: 'dist'
           },

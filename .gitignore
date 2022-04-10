@@ -11,6 +11,7 @@ pnpm-lock.yaml
 deploy-gh-page.sh
 publish.sh
 dist
+gh-page
 lite
 
 token.json

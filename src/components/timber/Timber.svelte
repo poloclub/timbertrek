@@ -41,7 +41,7 @@
   const initData = (loadedData: HierarchyJSON) => {
     data = loadedData;
     featureMap = new Map<number, string[]>();
-    for (const [k, v] of Object.entries(data!.featureMap)) {
+    for (const [k, v] of Object.entries(data.featureMap)) {
       featureMap.set(parseInt(k), v as string[]);
     }
   };
@@ -51,7 +51,9 @@
    */
   const readDataFromFile = async () => {
     // Init the model
-    const loadedData = await d3.json('/data/compas_rules_0.01_0.05.json');
+    const loadedData = await d3.json(
+      `${import.meta.env.BASE_URL}data/compas_rules_0.01_0.05.json`
+    );
     initData(loadedData as HierarchyJSON);
   };
 
