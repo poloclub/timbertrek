@@ -17,6 +17,13 @@
         "liteExtension": false,
         "load": "static/remoteEntry.a458e80b4361f068e82d.js",
         "name": "jupyter-matplotlib"
+      },
+      {
+        "extension": "./extension",
+        "liteExtension": false,
+        "load": "static/remoteEntry.034f4c6f7f5d4eb9c65a.js",
+        "name": "jupyterlab-stickyland",
+        "style": "./style"
       }
     ],
     "fullLabextensionsUrl": "./extensions",
