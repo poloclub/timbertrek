@@ -51,8 +51,10 @@
    */
   const readDataFromFile = async () => {
     // Init the model
+    // const modelFile = 'compas_rules_0.01_0.05.json';
+    const modelFile = 'compas-rules-mul_0.05-reg_0.01-min_10.json';
     const loadedData = await d3.json(
-      `${import.meta.env.BASE_URL}data/compas_rules_0.01_0.05.json`
+      `${import.meta.env.BASE_URL}data/${modelFile}`
     );
     initData(loadedData as HierarchyJSON);
   };
@@ -112,9 +114,9 @@
           <div class="logo-icon">TimberTrek</div>
           <div
             class="logo-tag"
-            title="Identifying decision trees that align with human knowledge"
+            title="Curating decision trees that align with human knowledge"
           >
-            Identifying decision trees that align with human knowledge
+            Curating decision trees that align with human knowledge
           </div>
         </div>
       </div>
