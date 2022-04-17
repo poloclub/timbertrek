@@ -1,5 +1,6 @@
 import { tick } from 'svelte';
 import d3 from '../../utils/d3-import';
+import { getLatoTextWidth } from '../../utils/text-width';
 import { config } from '../../config';
 import type { Writable, Unsubscriber } from 'svelte/store';
 import type {
@@ -8,7 +9,8 @@ import type {
   Padding,
   PinnedTree,
   Position,
-  SankeyHierarchyPointNode
+  SankeyHierarchyPointNode,
+  LabelPosition
 } from '../TimberTypes';
 import type { PinnedTreeStoreValue, FavoritesStoreValue } from '../../stores';
 import {
@@ -299,19 +301,165 @@ export class PinnedTreeWindow {
       }
     ];
 
-    const labelGroup = content.append('g').attr('class', 'label-group');
-    labelGroup
+    const edgeLabelGroup = content
+      .append('g')
+      .attr('class', 'edge-label-group');
+    edgeLabelGroup
       .selectAll('text.split-label')
       .data(midpoints)
       .join('text')
       .attr('class', 'split-label')
       .classed('split-label-left', (d, i) => i === 0)
       .attr('x', d => d.x)
-      .attr('y', d => d.y)
+      .attr('y', d => d.y + 3)
       .text((d, i) => (i === 0 ? 'true' : 'false'));
 
     // Add node text
-    // content.append('text').attr('class', 'split-label').text('Age < 21');
+    // Compute the label positions
+    const labelPositions = this.#computeLabelLayout(treeRoot, nodeR);
+
+    const nodeLabelGroup = content
+      .append('g')
+      .attr('class', 'node-label-group');
+
+    const nodeLabels = nodeLabelGroup
+      .selectAll('text.node-label')
+      .data(labelPositions)
+      .join('text')
+      .attr('class', 'node-label')
+      .classed('node-label-left', d => d.onLeft)
+      .attr('x', d => d.x)
+      .attr('y', d => d.y)
+      .text(d => d.text)
+      .style('fill', d => {
+        if (this.pinnedTreeStoreValue.getFeatureColor) {
+          return this.pinnedTreeStoreValue.getFeatureColor(d.featureName);
+        } else {
+          return config.colors['gray-500'];
+        }
+      });
+
+    // Truncate text to fit width
+    nodeLabels.each((d, i, g) => {
+      const element = g[i] as SVGTextElement;
+      const label = d3.select(element);
+      let text = d.text;
+      let curWidth = element.getBoundingClientRect().width;
+
+      while (curWidth > d.width) {
+        text = text.replace('...', '');
+        text = text.slice(0, text.length - 1);
+        text = `${text}...`;
+        curWidth = getLatoTextWidth(text, 16 * 0.8);
+      }
+
+      label.text(text);
+    });
+  }
+
+  /**
+   * Use a greedy method to compute the label layout
+   * @param treeRoot Tree root node
+   * @param nodeR Radius of each node
+   * @returns Array of label positions
+   */
+  #computeLabelLayout(
+    treeRoot: d3.HierarchyPointNode<TreeNode>,
+    nodeR: number
+  ) {
+    // Step 1: BFS and determine the label position and space
+    const labelPositions: LabelPosition[] = [];
+
+    // Update left and right pointers for a greedy search of space
+    const internalHPadding = 12;
+    let leftX = internalHPadding;
+    let rightX = this.width - internalHPadding;
+    const labelGap = 5;
+
+    const treeNodes = treeRoot.descendants();
+
+    for (const [i, node] of treeNodes.entries()) {
+      console.log(i, node);
+      let hasRightSibling = false;
+
+      const labelText =
+        this.pinnedTreeStoreValue.getFeatureInfo === null
+          ? ''
+          : this.pinnedTreeStoreValue.getFeatureInfo(node.data.f[0]).shortValue;
+
+      // Update the initial pointer based on next sibling
+      if (i + 1 < treeNodes.length && node.depth === treeNodes[i + 1].depth) {
+        hasRightSibling = true;
+        rightX = treeNodes[i + 1].x - nodeR - labelGap;
+      }
+
+      // Compute the left and right available space
+      const leftWidth = node.x - nodeR - leftX - labelGap;
+      const rightWidth = hasRightSibling
+        ? (rightX - node.x - nodeR) / 2 - labelGap
+        : rightX - node.x - nodeR - labelGap;
+
+      // Choose the larger available space (greedy search)
+      let curPosition: LabelPosition;
+      if (leftWidth > rightWidth) {
+        // Put label on the left
+        // this.svg
+        //   ?.select('.content')
+        //   .append('rect')
+        //   .attr('width', leftWidth)
+        //   .attr('height', 5)
+        //   .attr('x', leftX)
+        //   .attr('y', node.y)
+        //   .style('opacity', 0.3);
+
+        curPosition = {
+          x: node.x - nodeR - labelGap,
+          y: node.y,
+          onLeft: true,
+          featureName: node.data.f[0],
+          width: leftWidth,
+          text: labelText
+        };
+
+        leftX = node.x + nodeR;
+        rightX = this.width - internalHPadding;
+      } else {
+        // this.svg
+        //   ?.select('.content')
+        //   .append('rect')
+        //   .attr('width', rightWidth)
+        //   .attr('height', 5)
+        //   .attr('x', rightX - rightWidth)
+        //   .attr('y', node.y)
+        //   .style('opacity', 0.3);
+
+        // Put label on the right
+        curPosition = {
+          x: node.x + nodeR + labelGap,
+          y: node.y,
+          onLeft: false,
+          featureName: node.data.f[0],
+          width: rightWidth,
+          text: labelText
+        };
+
+        leftX = node.x + nodeR + labelGap + rightWidth;
+        rightX = this.width - internalHPadding;
+      }
+
+      // Only add label for non-leaf nodes
+      if (node.data.f[0] !== '+' && node.data.f[0] !== '-') {
+        labelPositions.push(curPosition);
+      }
+
+      // Reset the leftX and rightX if the next node is in a new depth
+      if (i + 1 < treeNodes.length && node.depth !== treeNodes[i + 1].depth) {
+        leftX = internalHPadding;
+        rightX = this.width - internalHPadding;
+      }
+    }
+
+    return labelPositions;
   }
 
   /**

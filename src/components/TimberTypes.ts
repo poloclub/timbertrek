@@ -5,6 +5,18 @@
 /**
  * Custom event for notebook message events
  */
+export interface LabelPosition {
+  x: number;
+  y: number;
+  onLeft: boolean;
+  featureName: string;
+  width: number;
+  text: string;
+}
+
+/**
+ * Custom event for notebook message events
+ */
 export interface NotebookEvent extends Event {
   data: HierarchyJSON;
   width: number;

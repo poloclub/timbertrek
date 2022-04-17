@@ -250,14 +250,28 @@ $border-color: $gray-light-border;
   }
 
   :global(text.split-label) {
+    font-family: 'Lato';
     text-anchor: start;
     dominant-baseline: auto;
-    fill: $gray-700;
+    fill: $gray-500;
     font-weight: 300;
     font-size: 0.8rem;
   }
 
   :global(text.split-label.split-label-left) {
+    text-anchor: end;
+  }
+
+  :global(text.node-label) {
+    font-family: 'Lato';
+    text-anchor: start;
+    dominant-baseline: middle;
+    fill: $gray-700;
+    font-weight: 300;
+    font-size: 0.8rem;
+  }
+
+  :global(text.node-label-left) {
     text-anchor: end;
   }
 }
