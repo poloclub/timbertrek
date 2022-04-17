@@ -117,8 +117,8 @@ export class PinnedTreeWindow {
     this.height = height - this.padding.top - this.padding.bottom;
 
     // Draw the tree
-    // this.#drawCurTree();
-    this.#drawCurSankeyTree();
+    this.#drawCurTree();
+    // this.#drawCurSankeyTree();
 
     // FLIP animation to show the window
     // Step 1: Register the end position (we know start position)
@@ -283,6 +283,24 @@ export class PinnedTreeWindow {
       .attr('dy', 0.5)
       .text(d => d.data.f[0]);
 
+    // Add text
+    this.#drawStandardLabels(linkGroup, content, treeRoot);
+  }
+
+  /**
+   * Draw the text labels for the standard tree
+   */
+  #drawStandardLabels(
+    linkGroup: d3.Selection<SVGGElement, unknown, null, undefined>,
+    content: d3.Selection<SVGGElement, unknown, null, undefined>,
+    treeRoot: d3.HierarchyPointNode<TreeNode>,
+    trans: null | d3.Transition<
+      d3.BaseType,
+      unknown,
+      d3.BaseType,
+      unknown
+    > = null
+  ) {
     // Add true/false label on the first split point
     const firstPathData = linkGroup
       .selectAll(`.link-${this.pinnedTree.tree.f[0]}`)
@@ -306,7 +324,9 @@ export class PinnedTreeWindow {
 
     const edgeLabelGroup = content
       .append('g')
-      .attr('class', 'edge-label-group');
+      .attr('class', 'edge-label-group standard')
+      .style('opacity', trans ? 0 : 1);
+
     edgeLabelGroup
       .selectAll('text.split-label')
       .data(midpoints)
@@ -323,7 +343,8 @@ export class PinnedTreeWindow {
 
     const nodeLabelGroup = content
       .append('g')
-      .attr('class', 'node-label-group');
+      .attr('class', 'node-label-group standard')
+      .style('opacity', trans ? 0 : 1);
 
     const nodeLabels = nodeLabelGroup
       .selectAll('g.node-label')
@@ -356,6 +377,11 @@ export class PinnedTreeWindow {
 
       label.text(text);
     });
+
+    if (trans) {
+      edgeLabelGroup.transition(trans).style('opacity', 1);
+      nodeLabelGroup.transition(trans).style('opacity', 1);
+    }
   }
 
   /**
@@ -648,6 +674,24 @@ export class PinnedTreeWindow {
       });
 
     // Step 4: Draw the labels
+    this.#drawSankeyLabels(linkGroup, content, sankeyNodes, rectR);
+  }
+
+  /**
+   * Add node labels for the sankey decision tree
+   */
+  #drawSankeyLabels(
+    linkGroup: d3.Selection<SVGGElement, unknown, null, undefined>,
+    content: d3.Selection<SVGGElement, unknown, null, undefined>,
+    sankeyNodes: SankeyHierarchyPointNode[],
+    rectR: number,
+    trans: null | d3.Transition<
+      d3.BaseType,
+      unknown,
+      d3.BaseType,
+      unknown
+    > = null
+  ) {
     // Add true/false label on the first split point
     const firstPathData = linkGroup
       .selectAll(`.link-${this.pinnedTree.tree.f[0]}`)
@@ -685,7 +729,8 @@ export class PinnedTreeWindow {
 
     const edgeLabelGroup = content
       .append('g')
-      .attr('class', 'edge-label-group');
+      .attr('class', 'edge-label-group sankey')
+      .style('opacity', trans ? 0 : 1);
 
     edgeLabelGroup
       .selectAll('text.split-label')
@@ -703,7 +748,8 @@ export class PinnedTreeWindow {
 
     const nodeLabelGroup = content
       .append('g')
-      .attr('class', 'node-label-group');
+      .attr('class', 'node-label-group sankey')
+      .style('opacity', trans ? 0 : 1);
 
     const nodeLabels = nodeLabelGroup
       .selectAll('g.node-label')
@@ -739,6 +785,11 @@ export class PinnedTreeWindow {
 
       label.text(text);
     });
+
+    if (trans) {
+      edgeLabelGroup.transition(trans).style('opacity', 1);
+      nodeLabelGroup.transition(trans).style('opacity', 1);
+    }
   }
 
   /**
@@ -753,7 +804,7 @@ export class PinnedTreeWindow {
 
     // Update left and right pointers for a greedy search of space
     const internalHPadding = 20;
-    const yOffset = 2;
+    const yOffset = 1;
     let leftX = internalHPadding;
     let rightX = this.width - internalHPadding;
     const labelGap = 5;
@@ -874,7 +925,12 @@ export class PinnedTreeWindow {
    * Update the tree with this.curTreeID
    */
   #changeSankeyToStandard() {
-    const content = this.svg.select('g.content');
+    const content = this.svg.select('g.content') as d3.Selection<
+      SVGGElement,
+      unknown,
+      null,
+      undefined
+    >;
 
     const root = d3.hierarchy(this.pinnedTree.tree, d => d.c);
     const rectR = nodeR * 1;
@@ -894,7 +950,13 @@ export class PinnedTreeWindow {
     >;
 
     // Update the links
-    const linkGroup = content.select('.link-group');
+    const linkGroup = content.select('.link-group') as d3.Selection<
+      SVGGElement,
+      unknown,
+      null,
+      undefined
+    >;
+
     linkGroup
       .selectAll('path.link')
       .data(treeRoot.links())
@@ -951,27 +1013,41 @@ export class PinnedTreeWindow {
       .attr('dy', 0.5)
       .style('opacity', 1);
 
-    // Add true/false label on the first split point
+    // Change the labels
     content
-      .select('.node-label-group')
-      .style('display', 'unset')
-      .style('opacity', 0)
+      .select('.node-label-group.sankey')
       .transition(trans)
-      .style('opacity', 1);
+      .style('opacity', 0);
+    content
+      .select('.edge-label-group.sankey')
+      .transition(trans)
+      .style('opacity', 0);
 
-    content
-      .select('.edge-label-group')
-      .style('display', 'unset')
-      .style('opacity', 0)
-      .transition(trans)
-      .style('opacity', 1);
+    if (content.select('.node-label-group.standard').size() === 0) {
+      this.#drawStandardLabels(linkGroup, content, treeRoot, trans);
+    } else {
+      content
+        .select('.node-label-group.standard')
+        .transition(trans)
+        .style('opacity', 1);
+
+      content
+        .select('.edge-label-group.standard')
+        .transition(trans)
+        .style('opacity', 1);
+    }
   }
 
   /**
    * Update the tree with this.curTreeID in the sankey tree style
    */
   #changeStandardToSankey() {
-    const content = this.svg.select('.content');
+    const content = this.svg.select('.content') as d3.Selection<
+      SVGGElement,
+      unknown,
+      null,
+      undefined
+    >;
 
     // Step 1: Set up the tree layout
     const root = d3.hierarchy(this.pinnedTree.tree, d => d.c);
@@ -981,7 +1057,12 @@ export class PinnedTreeWindow {
       root
     ) as d3.HierarchyPointNode<TreeNode>;
 
-    const linkGroup = content.select('.link-group');
+    const linkGroup = content.select('.link-group') as d3.Selection<
+      SVGGElement,
+      unknown,
+      null,
+      undefined
+    >;
 
     // Step 2: Update the nodes
     const nodeGroup = content.select('.node-group');
@@ -1096,10 +1177,28 @@ export class PinnedTreeWindow {
 
     // Update 4: Update the labels
     // Hide the standard labels
-    content.select('.node-label-group').transition(trans).style('opacity', 0);
-    content.select('.edge-label-group').transition(trans).style('opacity', 0);
+    content
+      .select('.node-label-group.standard')
+      .transition(trans)
+      .style('opacity', 0);
+    content
+      .select('.edge-label-group.standard')
+      .transition(trans)
+      .style('opacity', 0);
 
-    // Compute the sankey label layout
+    // Activate the sankey labels
+    if (content.select('.node-label-group.sankey').size() === 0) {
+      this.#drawSankeyLabels(linkGroup, content, sankeyNodes, rectR, trans);
+    } else {
+      content
+        .select('.node-label-group.sankey')
+        .transition(trans)
+        .style('opacity', 1);
+      content
+        .select('.edge-label-group.sankey')
+        .transition(trans)
+        .style('opacity', 1);
+    }
   }
 
   /**
