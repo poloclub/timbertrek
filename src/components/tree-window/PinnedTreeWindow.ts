@@ -361,6 +361,24 @@ export class PinnedTreeWindow {
 
     nodeLabels.append('title').text(d => d.textLong);
 
+    // Release unused width (to avoid A->Right only uses half width when B
+    // also chooses Right)
+    nodeLabelTexts.each((d, i, g) => {
+      const curLabel = d3.select(g[i]);
+      if (i + 1 < g.length) {
+        const nextLabel = d3.select(g[i + 1]);
+        const curData = curLabel.data()[0] as LabelPosition;
+        const nextData = nextLabel.data()[0] as LabelPosition;
+        if (
+          curData.y === nextData.y &&
+          curData.pos === LabelPos.right &&
+          nextData.pos === LabelPos.right
+        ) {
+          curData.width *= 2;
+        }
+      }
+    });
+
     // Truncate text to fit width
     nodeLabelTexts.each((d, i, g) => {
       const element = g[i];
