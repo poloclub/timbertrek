@@ -12,6 +12,7 @@ export interface LabelPosition {
   featureName: string;
   width: number;
   text: string;
+  textLong: string;
 }
 
 /**

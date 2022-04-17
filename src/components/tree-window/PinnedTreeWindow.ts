@@ -323,13 +323,15 @@ export class PinnedTreeWindow {
       .attr('class', 'node-label-group');
 
     const nodeLabels = nodeLabelGroup
-      .selectAll('text.node-label')
+      .selectAll('g.node-label')
       .data(labelPositions)
-      .join('text')
+      .join('g')
       .attr('class', 'node-label')
       .classed('node-label-left', d => d.onLeft)
-      .attr('x', d => d.x)
-      .attr('y', d => d.y)
+      .attr('transform', d => `translate(${d.x}, ${d.y})`);
+
+    const nodeLabelTexts = nodeLabels
+      .append('text')
       .text(d => d.text)
       .style('fill', d => {
         if (this.pinnedTreeStoreValue.getFeatureColor) {
@@ -339,9 +341,11 @@ export class PinnedTreeWindow {
         }
       });
 
+    nodeLabels.append('title').text(d => d.textLong);
+
     // Truncate text to fit width
-    nodeLabels.each((d, i, g) => {
-      const element = g[i] as SVGTextElement;
+    nodeLabelTexts.each((d, i, g) => {
+      const element = g[i];
       const label = d3.select(element);
       let text = d.text;
       let curWidth = element.getBoundingClientRect().width;
@@ -387,6 +391,11 @@ export class PinnedTreeWindow {
           ? ''
           : this.pinnedTreeStoreValue.getFeatureInfo(node.data.f[0]).shortValue;
 
+      const labelTextLong =
+        this.pinnedTreeStoreValue.getFeatureInfo === null
+          ? ''
+          : this.pinnedTreeStoreValue.getFeatureInfo(node.data.f[0]).nameValue;
+
       // Update the initial pointer based on next sibling
       if (i + 1 < treeNodes.length && node.depth === treeNodes[i + 1].depth) {
         hasRightSibling = true;
@@ -402,37 +411,19 @@ export class PinnedTreeWindow {
       // Choose the larger available space (greedy search)
       let curPosition: LabelPosition;
       if (leftWidth > rightWidth) {
-        // Put label on the left
-        // this.svg
-        //   ?.select('.content')
-        //   .append('rect')
-        //   .attr('width', leftWidth)
-        //   .attr('height', 5)
-        //   .attr('x', leftX)
-        //   .attr('y', node.y)
-        //   .style('opacity', 0.3);
-
         curPosition = {
           x: node.x - nodeR - labelGap,
           y: node.y,
           onLeft: true,
           featureName: node.data.f[0],
           width: leftWidth,
-          text: labelText
+          text: labelText,
+          textLong: labelTextLong
         };
 
         leftX = node.x + nodeR;
         rightX = this.width - internalHPadding;
       } else {
-        // this.svg
-        //   ?.select('.content')
-        //   .append('rect')
-        //   .attr('width', rightWidth)
-        //   .attr('height', 5)
-        //   .attr('x', rightX - rightWidth)
-        //   .attr('y', node.y)
-        //   .style('opacity', 0.3);
-
         // Put label on the right
         curPosition = {
           x: node.x + nodeR + labelGap,
@@ -440,7 +431,8 @@ export class PinnedTreeWindow {
           onLeft: false,
           featureName: node.data.f[0],
           width: rightWidth,
-          text: labelText
+          text: labelText,
+          textLong: labelTextLong
         };
 
         leftX = node.x + nodeR + labelGap + rightWidth;

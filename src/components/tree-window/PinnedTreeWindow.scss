@@ -262,7 +262,7 @@ $border-color: $gray-light-border;
     text-anchor: end;
   }
 
-  :global(text.node-label) {
+  :global(.node-label text) {
     font-family: 'Lato';
     text-anchor: start;
     dominant-baseline: middle;
@@ -271,7 +271,7 @@ $border-color: $gray-light-border;
     font-size: 0.8rem;
   }
 
-  :global(text.node-label-left) {
+  :global(.node-label-left text) {
     text-anchor: end;
   }
 }
