@@ -13,6 +13,7 @@
     "build:notebook": "vite build --mode notebook",
     "build:github": "vite build --mode github",
     "publish:gh": "pnpm run build:github && pnpm run build:lite && source publish-gh.sh",
+    "publish:vercel": "source publish-vercel.sh",
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json"
   },

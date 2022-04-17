@@ -10,6 +10,7 @@ import { getLatoTextWidth } from '../../utils/text-width';
 import { getContrastRatio } from '../../utils/utils';
 
 const HALF_PI = Math.PI / 2;
+const MIN_TEXT_HEIGHT = 20;
 
 /**
  * Initialize text arc
@@ -285,7 +286,6 @@ export function drawText(this: Sunburst) {
 
   const sectorRadius =
     this.yScale(texts.datum().y1) - this.yScale(texts.datum().y0) - 15;
-  const maxTextHeight = 18.5;
 
   // Adaptively choose the font size (linear to depth gap)
   const curFontSize = this.textFontScale(
@@ -357,7 +357,7 @@ export function drawText(this: Sunburst) {
       // Height check
       const innerArcLength =
         this.yScale(d.y1) * (this.xScale(d.x1) - this.xScale(d.x0));
-      if (innerArcLength < maxTextHeight) {
+      if (innerArcLength < MIN_TEXT_HEIGHT) {
         return '';
       }
 
@@ -458,7 +458,6 @@ export function drawSecondaryText(this: Sunburst, undrawnFs: Set<number>) {
     this.yScale(secondaryTexts.datum().y1) -
     this.yScale(secondaryTexts.datum().y0) -
     15;
-  const maxTextHeight = 18.5;
 
   // Adaptively choose the font size (linear to depth gap)
   const curFontSize = this.textFontScale(
@@ -515,7 +514,7 @@ export function drawSecondaryText(this: Sunburst, undrawnFs: Set<number>) {
     // Height check
     const innerArcLength =
       this.yScale(d.y1) * (this.xScale(d.x1) - this.xScale(d.x0));
-    if (innerArcLength < maxTextHeight) {
+    if (innerArcLength < MIN_TEXT_HEIGHT) {
       return '';
     }
 

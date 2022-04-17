@@ -25,7 +25,6 @@
   border-radius: $border-radius;
   box-shadow: 0px 0px 2px hsla(0, 0%, 0%, 0.03),
     0px 0px 10px hsla(0, 0%, 0%, 0.05);
-  overflow-x: hidden;
 
   position: relative;
   z-index: 1;
@@ -87,6 +86,7 @@
       margin-top: 1px;
       :global(svg) {
         height: 15px;
+        width: 12px;
       }
     }
   }

@@ -3,6 +3,7 @@ cd lite
 rm -rf _output/*
 rm -rf output
 jupyter lite build --contents content --output-dir output
+rm -r ../gh-page/notebook/
 mkdir ../gh-page/notebook/
 cp -r output/* ../gh-page/notebook
 rm -rf output

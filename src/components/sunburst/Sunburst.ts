@@ -270,6 +270,8 @@ export class Sunburst {
     this.colorScale = d3.scaleOrdinal();
 
     this.featureOrder = [];
+    console.log(this.data);
+    console.log(this.featureMap);
     this.dataRoot = d3
       .hierarchy(this.data, d => d.c)
       // Count the leaves (trees)
@@ -339,7 +341,7 @@ export class Sunburst {
         // Set minimal angle to avoid animation artifact
         let newX1 = da.x1;
         if (da.x0 === da.x1) {
-          newX1 = da.x0 + 1e-5;
+          newX1 = da.x0 + 1e-6;
         }
         return this.xScale(newX1);
       })
@@ -538,7 +540,7 @@ export class Sunburst {
       if (aFeatureCount !== undefined && bFeatureCount !== undefined) {
         return bFeatureCount - aFeatureCount || aLightness - bLightness;
       } else {
-        console.warn(`Encountered unrecorded keys ${aName} ${bName}`);
+        console.warn(`Encountered unrecorded keys '${aName}', '${bName}'`);
         return 0;
       }
     });
@@ -724,7 +726,7 @@ export class Sunburst {
     // Figure out the height of the trie and initialize the depth
     this.sunburstStoreValue.depthMax = this.partition.height;
     this.sunburstStoreValue.depthLow = 1;
-    this.sunburstStoreValue.depthHigh = this.sunburstStoreValue.depthMax - 3;
+    this.sunburstStoreValue.depthHigh = this.sunburstStoreValue.depthLow + 2;
     this.sunburstStoreValue.action = SunburstAction.None;
 
     // Initialize the depth colors with empty strings
