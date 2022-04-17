@@ -256,6 +256,10 @@ $border-color: $gray-light-border;
     fill: $gray-500;
     font-weight: 300;
     font-size: 0.8rem;
+
+    cursor: default;
+    user-select: none;
+    -webkit-user-select: none;
   }
 
   :global(text.split-label.split-label-left) {
@@ -269,10 +273,18 @@ $border-color: $gray-light-border;
     fill: $gray-700;
     font-weight: 300;
     font-size: 0.8rem;
+
+    cursor: default;
+    user-select: none;
+    -webkit-user-select: none;
   }
 
   :global(.node-label-left text) {
     text-anchor: end;
+  }
+
+  :global(.node-label-middle text) {
+    text-anchor: middle;
   }
 }
 

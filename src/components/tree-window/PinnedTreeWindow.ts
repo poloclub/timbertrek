@@ -2,6 +2,7 @@ import { tick } from 'svelte';
 import d3 from '../../utils/d3-import';
 import { getLatoTextWidth } from '../../utils/text-width';
 import { config } from '../../config';
+import { getContrastRatio } from '../../utils/utils';
 import type { Writable, Unsubscriber } from 'svelte/store';
 import type {
   TreeNode,
@@ -12,11 +13,14 @@ import type {
   SankeyHierarchyPointNode,
   LabelPosition
 } from '../TimberTypes';
+import { LabelPos } from '../TimberTypes';
 import type { PinnedTreeStoreValue, FavoritesStoreValue } from '../../stores';
 import {
   getPinnedTreeStoreDefaultValue,
   getFavoritesStoreDefaultValue
 } from '../../stores';
+
+const nodeR = 8;
 
 export class PinnedTreeWindow {
   pinnedTree: PinnedTree;
@@ -113,8 +117,8 @@ export class PinnedTreeWindow {
     this.height = height - this.padding.top - this.padding.bottom;
 
     // Draw the tree
-    this.#drawCurTree();
-    // this.#drawCurSankeyTree();
+    // this.#drawCurTree();
+    this.#drawCurSankeyTree();
 
     // FLIP animation to show the window
     // Step 1: Register the end position (we know start position)
@@ -191,7 +195,6 @@ export class PinnedTreeWindow {
       );
 
     const root = d3.hierarchy(this.pinnedTree.tree, d => d.c);
-    const nodeR = 7;
     const rectR = nodeR * 1;
 
     const treeRoot = d3.tree().size([this.width, this.height])(
@@ -327,19 +330,13 @@ export class PinnedTreeWindow {
       .data(labelPositions)
       .join('g')
       .attr('class', 'node-label')
-      .classed('node-label-left', d => d.onLeft)
+      .classed('node-label-left', d => d.pos === LabelPos.left)
       .attr('transform', d => `translate(${d.x}, ${d.y})`);
 
     const nodeLabelTexts = nodeLabels
       .append('text')
       .text(d => d.text)
-      .style('fill', d => {
-        if (this.pinnedTreeStoreValue.getFeatureColor) {
-          return this.pinnedTreeStoreValue.getFeatureColor(d.featureName);
-        } else {
-          return config.colors['gray-500'];
-        }
-      });
+      .style('fill', d => d.backTextColor);
 
     nodeLabels.append('title').text(d => d.textLong);
 
@@ -383,9 +380,9 @@ export class PinnedTreeWindow {
     const treeNodes = treeRoot.descendants();
 
     for (const [i, node] of treeNodes.entries()) {
-      console.log(i, node);
       let hasRightSibling = false;
 
+      // Get the label text
       const labelText =
         this.pinnedTreeStoreValue.getFeatureInfo === null
           ? ''
@@ -395,6 +392,18 @@ export class PinnedTreeWindow {
         this.pinnedTreeStoreValue.getFeatureInfo === null
           ? ''
           : this.pinnedTreeStoreValue.getFeatureInfo(node.data.f[0]).nameValue;
+
+      // Get the label colors (front and back)
+      let frontTextColor = config.colors['gray-50'];
+      let backTextColor = config.colors['gray-700'];
+
+      if (this.pinnedTreeStoreValue.getFeatureColor) {
+        const backgroundColor = this.pinnedTreeStoreValue.getFeatureColor(
+          node.data.f[0]
+        );
+        backTextColor = backgroundColor;
+        frontTextColor = this.#getFrontTextColor(backgroundColor);
+      }
 
       // Update the initial pointer based on next sibling
       if (i + 1 < treeNodes.length && node.depth === treeNodes[i + 1].depth) {
@@ -414,11 +423,13 @@ export class PinnedTreeWindow {
         curPosition = {
           x: node.x - nodeR - labelGap,
           y: node.y,
-          onLeft: true,
+          pos: LabelPos.left,
           featureName: node.data.f[0],
           width: leftWidth,
           text: labelText,
-          textLong: labelTextLong
+          textLong: labelTextLong,
+          frontTextColor,
+          backTextColor
         };
 
         leftX = node.x + nodeR;
@@ -428,11 +439,13 @@ export class PinnedTreeWindow {
         curPosition = {
           x: node.x + nodeR + labelGap,
           y: node.y,
-          onLeft: false,
+          pos: LabelPos.right,
           featureName: node.data.f[0],
           width: rightWidth,
           text: labelText,
-          textLong: labelTextLong
+          textLong: labelTextLong,
+          frontTextColor,
+          backTextColor
         };
 
         leftX = node.x + nodeR + labelGap + rightWidth;
@@ -455,6 +468,33 @@ export class PinnedTreeWindow {
   }
 
   /**
+   * Compute the front text color based on the background color
+   * @param backgroundColor Background color
+   * @returns Front text color
+   */
+  #getFrontTextColor = (backgroundColor: string): string => {
+    const background = d3.color(backgroundColor);
+
+    let foreground = 'currentcolor';
+    if (background !== null) {
+      // Check contract ratio if we use white color
+      const whiteRGB = [252, 252, 252];
+      const blackRGB = [74, 74, 74];
+      const rgb = d3.color(background).rgb();
+      const backgroundRGB = [rgb.r, rgb.g, rgb.b];
+
+      if (
+        getContrastRatio(whiteRGB, backgroundRGB) <
+        getContrastRatio(blackRGB, backgroundRGB)
+      ) {
+        foreground = 'hsla(0, 0%, 99%, 1)';
+      }
+    }
+
+    return foreground;
+  };
+
+  /**
    * Draw the tree with this.curTreeID in the sankey tree style
    */
   #drawCurSankeyTree() {
@@ -468,7 +508,6 @@ export class PinnedTreeWindow {
 
     // Step 1: Set up the tree layout
     const root = d3.hierarchy(this.pinnedTree.tree, d => d.c);
-    const nodeR = 7;
     const rectR = nodeR * 1;
 
     const treeRoot = d3.tree().size([this.width, this.height])(
@@ -530,6 +569,18 @@ export class PinnedTreeWindow {
       .join('g')
       .attr('class', 'node')
       .attr('transform', d => `translate(${d.x}, ${d.y})`);
+
+    nodes
+      .filter(d => d.data.f[0] !== '+' && d.data.f[0] !== '-')
+      .append('title')
+      .text(d => {
+        if (this.pinnedTreeStoreValue.getFeatureInfo) {
+          return this.pinnedTreeStoreValue.getFeatureInfo(d.data.f[0])
+            .nameValue;
+        } else {
+          return '';
+        }
+      });
 
     // Draw decision points as a circle
     const decisionSet = new Set(['-', '+']);
@@ -595,6 +646,228 @@ export class PinnedTreeWindow {
           [target.x + target.width / 2, target.y - rectR]
         ]);
       });
+
+    // Step 4: Draw the labels
+    // Add true/false label on the first split point
+    const firstPathData = linkGroup
+      .selectAll(`.link-${this.pinnedTree.tree.f[0]}`)
+      .data() as d3.HierarchyPointLink<TreeNode>[];
+
+    // Here we can assume the order is left to right from the tree layout
+    // Parse the mid point of each path
+    const xGap = 5;
+    const yGap = -0.5;
+
+    const midpoints: Point[] = [];
+
+    for (const i of [0, 1]) {
+      const curSource = firstPathData[i].source as SankeyHierarchyPointNode;
+      const curTarget = firstPathData[i].target as SankeyHierarchyPointNode;
+
+      const x1 = curSource.x + curSource.width / 2;
+      const x2 = curTarget.x + curTarget.width / 2;
+      const y1 = curSource.y;
+      const y2 = curTarget.y - rectR;
+
+      // It is a bit tricky here: the source is at the center but target is at
+      // the edge, we can use similar triangle angle ratio to get the true x/y
+      const vGap = sankeyNodes[1].y - sankeyNodes[0].y - 2 * nodeR;
+      const hGap = (nodeR / (vGap + nodeR)) * Math.abs(x1 - x2);
+
+      const trueX1 = i === 0 ? x1 - hGap : x1 + hGap;
+      const trueY1 = y1 + nodeR;
+
+      midpoints.push({
+        x: i === 0 ? (trueX1 + x2) / 2 - xGap : (trueX1 + x2) / 2 + xGap,
+        y: (trueY1 + y2) / 2 + yGap
+      });
+    }
+
+    const edgeLabelGroup = content
+      .append('g')
+      .attr('class', 'edge-label-group');
+
+    edgeLabelGroup
+      .selectAll('text.split-label')
+      .data(midpoints)
+      .join('text')
+      .attr('class', 'split-label')
+      .classed('split-label-left', (d, i) => i === 0)
+      .attr('x', d => d.x)
+      .attr('y', d => d.y + 3)
+      .text((d, i) => (i === 0 ? 'true' : 'false'));
+
+    // Add node text
+    // Compute the label positions
+    const labelPositions = this.#computeSankeyLabelLayout(sankeyNodes);
+
+    const nodeLabelGroup = content
+      .append('g')
+      .attr('class', 'node-label-group');
+
+    const nodeLabels = nodeLabelGroup
+      .selectAll('g.node-label')
+      .data(labelPositions)
+      .join('g')
+      .attr('class', 'node-label')
+      .classed('node-label-left', d => d.pos === LabelPos.left)
+      .classed('node-label-middle', d => d.pos === LabelPos.middle)
+      .attr('transform', d => `translate(${d.x}, ${d.y})`);
+
+    const nodeLabelTexts = nodeLabels
+      .append('text')
+      .text(d => d.text)
+      .style('fill', d =>
+        d.pos === LabelPos.middle ? d.frontTextColor : d.backTextColor
+      );
+
+    nodeLabels.append('title').text(d => d.textLong);
+
+    // Truncate text to fit width
+    nodeLabelTexts.each((d, i, g) => {
+      const element = g[i];
+      const label = d3.select(element);
+      let text = d.text;
+      let curWidth = element.getBoundingClientRect().width;
+
+      while (curWidth > d.width) {
+        text = text.replace('...', '');
+        text = text.slice(0, text.length - 1);
+        text = `${text}...`;
+        curWidth = getLatoTextWidth(text, 16 * 0.8);
+      }
+
+      label.text(text);
+    });
+  }
+
+  /**
+   * Use a greedy method to compute the label layout
+   * @param sankeyNodes List of sankey nodes
+   * @param nodeR Radius of each node
+   * @returns Array of label positions
+   */
+  #computeSankeyLabelLayout(sankeyNodes: SankeyHierarchyPointNode[]) {
+    // Step 1: BFS and determine the label position and space
+    const labelPositions: LabelPosition[] = [];
+
+    // Update left and right pointers for a greedy search of space
+    const internalHPadding = 20;
+    const yOffset = 2;
+    let leftX = internalHPadding;
+    let rightX = this.width - internalHPadding;
+    const labelGap = 5;
+
+    for (const [i, node] of sankeyNodes.entries()) {
+      let hasRightSibling = false;
+
+      // Get the label text
+      const labelText =
+        this.pinnedTreeStoreValue.getFeatureInfo === null
+          ? ''
+          : this.pinnedTreeStoreValue.getFeatureInfo(node.data.f[0]).shortValue;
+
+      const labelTextLong =
+        this.pinnedTreeStoreValue.getFeatureInfo === null
+          ? ''
+          : this.pinnedTreeStoreValue.getFeatureInfo(node.data.f[0]).nameValue;
+
+      // Get the label colors (front and back)
+      let frontTextColor = config.colors['gray-50'];
+      let backTextColor = config.colors['gray-700'];
+
+      if (this.pinnedTreeStoreValue.getFeatureColor) {
+        const backgroundColor = this.pinnedTreeStoreValue.getFeatureColor(
+          node.data.f[0]
+        );
+        backTextColor = backgroundColor;
+        frontTextColor = this.#getFrontTextColor(backgroundColor);
+      }
+
+      // Update the initial pointer based on next sibling
+      if (
+        i + 1 < sankeyNodes.length &&
+        node.depth === sankeyNodes[i + 1].depth
+      ) {
+        hasRightSibling = true;
+        rightX = sankeyNodes[i + 1].x - labelGap;
+      }
+
+      // Compute the left, middle, right available space
+      const leftWidth = node.x - leftX - labelGap;
+      const rightWidth = hasRightSibling
+        ? 0
+        : rightX - node.x - node.width - labelGap;
+      const middleWidth = node.width - 2 * labelGap;
+
+      // Choose the larger available space (greedy search)
+      let curPosition: LabelPosition;
+      if (leftWidth > rightWidth && leftWidth > middleWidth) {
+        // Put label on the left
+        curPosition = {
+          x: node.x - labelGap,
+          y: node.y + yOffset,
+          pos: LabelPos.left,
+          featureName: node.data.f[0],
+          width: leftWidth,
+          text: labelText,
+          textLong: labelTextLong,
+          frontTextColor,
+          backTextColor
+        };
+
+        leftX = node.x + node.width;
+        rightX = this.width - internalHPadding;
+      } else if (middleWidth >= leftWidth && middleWidth >= rightWidth) {
+        // Put label in the middle
+        curPosition = {
+          x: node.x + node.width / 2,
+          y: node.y + yOffset,
+          pos: LabelPos.middle,
+          featureName: node.data.f[0],
+          width: middleWidth,
+          text: labelText,
+          textLong: labelTextLong,
+          frontTextColor,
+          backTextColor
+        };
+
+        leftX = node.x + node.width;
+        rightX = this.width - internalHPadding;
+      } else {
+        // Put label on the right
+        curPosition = {
+          x: node.x + node.width + labelGap,
+          y: node.y + yOffset,
+          pos: LabelPos.right,
+          featureName: node.data.f[0],
+          width: rightWidth,
+          text: labelText,
+          textLong: labelTextLong,
+          frontTextColor,
+          backTextColor
+        };
+
+        leftX = node.x + node.width;
+        rightX = this.width - internalHPadding;
+      }
+
+      // Only add label for non-leaf nodes
+      if (node.data.f[0] !== '+' && node.data.f[0] !== '-') {
+        labelPositions.push(curPosition);
+      }
+
+      // Reset the leftX and rightX if the next node is in a new depth
+      if (
+        i + 1 < sankeyNodes.length &&
+        node.depth !== sankeyNodes[i + 1].depth
+      ) {
+        leftX = internalHPadding;
+        rightX = this.width - internalHPadding;
+      }
+    }
+
+    return labelPositions;
   }
 
   /**
@@ -604,7 +877,6 @@ export class PinnedTreeWindow {
     const content = this.svg.select('g.content');
 
     const root = d3.hierarchy(this.pinnedTree.tree, d => d.c);
-    const nodeR = 7;
     const rectR = nodeR * 1;
 
     const treeRoot = d3.tree().size([this.width, this.height])(
@@ -681,7 +953,14 @@ export class PinnedTreeWindow {
 
     // Add true/false label on the first split point
     content
-      .select('.label-group')
+      .select('.node-label-group')
+      .style('display', 'unset')
+      .style('opacity', 0)
+      .transition(trans)
+      .style('opacity', 1);
+
+    content
+      .select('.edge-label-group')
       .style('display', 'unset')
       .style('opacity', 0)
       .transition(trans)
@@ -696,7 +975,6 @@ export class PinnedTreeWindow {
 
     // Step 1: Set up the tree layout
     const root = d3.hierarchy(this.pinnedTree.tree, d => d.c);
-    const nodeR = 7;
     const rectR = nodeR * 1;
 
     const treeRoot = d3.tree().size([this.width, this.height])(
@@ -816,7 +1094,12 @@ export class PinnedTreeWindow {
         ]);
       });
 
-    content.select('.label-group').transition(trans).style('opacity', 0);
+    // Update 4: Update the labels
+    // Hide the standard labels
+    content.select('.node-label-group').transition(trans).style('opacity', 0);
+    content.select('.edge-label-group').transition(trans).style('opacity', 0);
+
+    // Compute the sankey label layout
   }
 
   /**
@@ -897,7 +1180,7 @@ export class PinnedTreeWindow {
           },
           getFeatureColor:
             this.pinnedTreeStoreValue.getFeatureColor === null
-              ? f => config.colors['gray-500']
+              ? () => config.colors['gray-500']
               : this.pinnedTreeStoreValue.getFeatureColor
         });
       }

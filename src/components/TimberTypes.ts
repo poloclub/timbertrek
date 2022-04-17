@@ -3,16 +3,27 @@
  */
 
 /**
+ * Where to put the label next to the node
+ */
+export enum LabelPos {
+  left,
+  middle,
+  right
+}
+
+/**
  * Custom event for notebook message events
  */
 export interface LabelPosition {
   x: number;
   y: number;
-  onLeft: boolean;
+  pos: LabelPos;
   featureName: string;
   width: number;
   text: string;
   textLong: string;
+  frontTextColor: string;
+  backTextColor: string;
 }
 
 /**
