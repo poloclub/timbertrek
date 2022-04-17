@@ -22,6 +22,13 @@
   let pinnedTreeWindow: PinnedTreeWindow | null = null;
   let initialized = false;
 
+  let initSwitchChecked = false;
+  // Check the local storage to see the initial switch should be on or off
+  console.log(localStorage.getItem('initSwitchChecked'));
+  if (localStorage.getItem('initSwitchChecked') === 'true') {
+    initSwitchChecked = true;
+  }
+
   onMount(() => {
     mounted = true;
   });
@@ -43,7 +50,8 @@
         pinnedTree,
         pinnedTreeStore,
         favoritesStore,
-        pinnedTreeWindowUpdated
+        pinnedTreeWindowUpdated,
+        initSwitchChecked
       });
     }
   };
@@ -172,7 +180,7 @@
   <div class="control-footer">
     <button
       class="switch"
-      aria-checked="false"
+      aria-checked={initSwitchChecked ? 'true' : 'false'}
       title="Toggle to visualize sample size as node width"
       on:click={e => pinnedTreeWindow?.switchToggled(e)}
     >

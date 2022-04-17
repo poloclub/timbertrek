@@ -39,7 +39,7 @@ export class PinnedTreeWindow {
   favoritesStoreValue: FavoritesStoreValue;
   favoritesStoreUnsubscriber: Unsubscriber;
 
-  sankey = false;
+  sankey: boolean;
 
   // FLIP animation
   hidden = true;
@@ -52,6 +52,7 @@ export class PinnedTreeWindow {
     pinnedTreeStore,
     favoritesStore,
     pinnedTreeWindowUpdated,
+    initSwitchChecked,
     width = 200,
     height = 200
   }: {
@@ -60,6 +61,7 @@ export class PinnedTreeWindow {
     pinnedTreeStore: Writable<PinnedTreeStoreValue>;
     favoritesStore: Writable<FavoritesStoreValue>;
     pinnedTreeWindowUpdated: () => void;
+    initSwitchChecked: boolean;
     width?: number;
     height?: number;
   }) {
@@ -117,8 +119,13 @@ export class PinnedTreeWindow {
     this.height = height - this.padding.top - this.padding.bottom;
 
     // Draw the tree
-    this.#drawCurTree();
-    // this.#drawCurSankeyTree();
+    if (initSwitchChecked) {
+      this.sankey = true;
+      this.#drawCurSankeyTree();
+    } else {
+      this.sankey = false;
+      this.#drawCurTree();
+    }
 
     // FLIP animation to show the window
     // Step 1: Register the end position (we know start position)
@@ -387,6 +394,11 @@ export class PinnedTreeWindow {
       let curWidth = element.getBoundingClientRect().width;
 
       while (curWidth > d.width) {
+        if (text === '...') {
+          text = '.';
+          break;
+        }
+
         text = text.replace('...', '');
         text = text.slice(0, text.length - 1);
         text = `${text}...`;
@@ -457,9 +469,16 @@ export class PinnedTreeWindow {
 
       // Compute the left and right available space
       const leftWidth = node.x - nodeR - leftX - labelGap;
-      const rightWidth = hasRightSibling
-        ? (rightX - node.x - nodeR) / 2 - labelGap
-        : rightX - node.x - nodeR - labelGap;
+      let rightWidth = rightX - node.x - nodeR - labelGap;
+
+      if (hasRightSibling) {
+        if (
+          treeNodes[i + 1].data.f[0] !== '+' &&
+          treeNodes[i + 1].data.f[0] !== '-'
+        ) {
+          rightWidth = (rightX - node.x - nodeR) / 2 - labelGap;
+        }
+      }
 
       // Choose the larger available space (greedy search)
       let curPosition: LabelPosition;
@@ -795,6 +814,11 @@ export class PinnedTreeWindow {
       let curWidth = element.getBoundingClientRect().width;
 
       while (curWidth > d.width) {
+        if (text === '...') {
+          text = '.';
+          break;
+        }
+
         text = text.replace('...', '');
         text = text.slice(0, text.length - 1);
         text = `${text}...`;
@@ -1035,11 +1059,14 @@ export class PinnedTreeWindow {
     content
       .select('.node-label-group.sankey')
       .transition(trans)
-      .style('opacity', 0);
+      .style('opacity', 0)
+      .style('pointer-events', 'none');
+
     content
       .select('.edge-label-group.sankey')
       .transition(trans)
-      .style('opacity', 0);
+      .style('opacity', 0)
+      .style('pointer-events', 'none');
 
     if (content.select('.node-label-group.standard').size() === 0) {
       this.#drawStandardLabels(linkGroup, content, treeRoot, trans);
@@ -1047,13 +1074,18 @@ export class PinnedTreeWindow {
       content
         .select('.node-label-group.standard')
         .transition(trans)
-        .style('opacity', 1);
+        .style('opacity', 1)
+        .style('pointer-events', 'unset');
 
       content
         .select('.edge-label-group.standard')
         .transition(trans)
-        .style('opacity', 1);
+        .style('opacity', 1)
+        .style('pointer-events', 'unset');
     }
+
+    // Next new window uses standard by default
+    localStorage.setItem('initSwitchChecked', 'false');
   }
 
   /**
@@ -1198,11 +1230,14 @@ export class PinnedTreeWindow {
     content
       .select('.node-label-group.standard')
       .transition(trans)
-      .style('opacity', 0);
+      .style('opacity', 0)
+      .style('pointer-events', 'none');
+
     content
       .select('.edge-label-group.standard')
       .transition(trans)
-      .style('opacity', 0);
+      .style('opacity', 0)
+      .style('pointer-events', 'none');
 
     // Activate the sankey labels
     if (content.select('.node-label-group.sankey').size() === 0) {
@@ -1211,12 +1246,18 @@ export class PinnedTreeWindow {
       content
         .select('.node-label-group.sankey')
         .transition(trans)
-        .style('opacity', 1);
+        .style('opacity', 1)
+        .style('pointer-events', 'unset');
+
       content
         .select('.edge-label-group.sankey')
         .transition(trans)
-        .style('opacity', 1);
+        .style('opacity', 1)
+        .style('pointer-events', 'unset');
     }
+
+    // Next new window uses sankey by default
+    localStorage.setItem('initSwitchChecked', 'true');
   }
 
   /**
