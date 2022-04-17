@@ -2,7 +2,7 @@ import { tick } from 'svelte';
 import d3 from '../../utils/d3-import';
 import { getLatoTextWidth } from '../../utils/text-width';
 import { config } from '../../config';
-import { getContrastRatio } from '../../utils/utils';
+import { getContrastRatio, round } from '../../utils/utils';
 import type { Writable, Unsubscriber } from 'svelte/store';
 import type {
   TreeNode,
@@ -40,6 +40,7 @@ export class PinnedTreeWindow {
   favoritesStoreUnsubscriber: Unsubscriber;
 
   sankey: boolean;
+  accuracyScale: d3.ScaleLinear<number, number, never> | null = null;
 
   // FLIP animation
   hidden = true;
@@ -272,6 +273,32 @@ export class PinnedTreeWindow {
         }
       });
 
+    nodes
+      .filter(d => decisionSet.has(d.data.f[0]))
+      .append('title')
+      .text(d => {
+        const label = d.data.f[0] === '+' ? 'yes' : 'no';
+        const accuracy = `${round(d.data.f[2] / d.data.f[1], 4)} (${
+          d.data.f[2]
+        } / ${d.data.f[1]})`;
+        return `Predict: ${label} - Accuracy: ${accuracy}`;
+      });
+
+    // Create a scale to encode the accuracy distribution
+    if (this.accuracyScale === null) {
+      const accuracies: number[] = [];
+      nodes
+        .filter(d => decisionSet.has(d.data.f[0]))
+        .each(d => {
+          accuracies.push(d.data.f[2] / d.data.f[1]);
+        });
+
+      this.accuracyScale = d3
+        .scaleLinear()
+        .domain([Math.min(...accuracies), Math.max(...accuracies)])
+        .range([0.3, 1]);
+    }
+
     // Draw decisions as a rectangle with a symbol
     nodes
       .filter(d => decisionSet.has(d.data.f[0]))
@@ -282,13 +309,18 @@ export class PinnedTreeWindow {
       .attr('rx', 2)
       .attr('ry', 2)
       .attr('width', 2 * rectR)
-      .attr('height', 2 * rectR);
+      .attr('height', 2 * rectR)
+      .style('stroke-opacity', d =>
+        this.accuracyScale!(d.data.f[2] / d.data.f[1])
+      );
+    // .style('stroke-dasharray', d => this.accuracyScale(d.data.f[2] / d.data.f[1]));
 
     nodes
       .filter(d => decisionSet.has(d.data.f[0]))
       .append('text')
       .attr('dy', 0.5)
-      .text(d => d.data.f[0]);
+      .text(d => d.data.f[0])
+      .style('opacity', d => this.accuracyScale!(d.data.f[2] / d.data.f[1]));
 
     // Add text
     this.#drawStandardLabels(linkGroup, content, treeRoot);
@@ -645,6 +677,17 @@ export class PinnedTreeWindow {
         }
       });
 
+    nodes
+      .filter(d => d.data.f[0] === '+' || d.data.f[0] === '-')
+      .append('title')
+      .text(d => {
+        const label = d.data.f[0] === '+' ? 'yes' : 'no';
+        const accuracy = `${round(d.data.f[2] / d.data.f[1], 4)} (${
+          d.data.f[2]
+        } / ${d.data.f[1]})`;
+        return `Predict: ${label} - Accuracy: ${accuracy}`;
+      });
+
     // Draw decision points as a circle
     const decisionSet = new Set(['-', '+']);
     nodes
@@ -665,6 +708,21 @@ export class PinnedTreeWindow {
         }
       });
 
+    // Create a scale to encode the accuracy distribution
+    if (this.accuracyScale === null) {
+      const accuracies: number[] = [];
+      nodes
+        .filter(d => decisionSet.has(d.data.f[0]))
+        .each(d => {
+          accuracies.push(d.data.f[2] / d.data.f[1]);
+        });
+
+      this.accuracyScale = d3
+        .scaleLinear()
+        .domain([Math.min(...accuracies), Math.max(...accuracies)])
+        .range([0.3, 1]);
+    }
+
     // Draw decisions as a rectangle with a symbol
     nodes
       .filter(d => decisionSet.has(d.data.f[0]))
@@ -675,7 +733,10 @@ export class PinnedTreeWindow {
       .attr('rx', d => (d.width < 16 ? 1 : 2))
       .attr('ry', d => (d.width < 16 ? 1 : 2))
       .attr('width', d => d.width)
-      .attr('height', 2 * rectR);
+      .attr('height', 2 * rectR)
+      .style('stroke-opacity', d =>
+        this.accuracyScale!(d.data.f[2] / d.data.f[1])
+      );
 
     nodes
       .filter(d => decisionSet.has(d.data.f[0]))
@@ -683,7 +744,9 @@ export class PinnedTreeWindow {
       .attr('x', d => d.width / 2)
       .attr('dy', 0.5)
       .text(d => d.data.f[0])
-      .style('opacity', d => (d.width < 16 ? 0 : 1));
+      .style('opacity', d =>
+        d.width < 16 ? 0 : this.accuracyScale!(d.data.f[2] / d.data.f[1])
+      );
 
     // Step 3: Draw the links
     linkGroup
@@ -1053,7 +1116,7 @@ export class PinnedTreeWindow {
       .transition(trans)
       .attr('x', 0)
       .attr('dy', 0.5)
-      .style('opacity', 1);
+      .style('opacity', d => this.accuracyScale!(d.data.f[2] / d.data.f[1]));
 
     // Change the labels
     content
@@ -1207,7 +1270,9 @@ export class PinnedTreeWindow {
       .attr('x', d => d.width / 2)
       .attr('dy', 0.5)
       .text(d => d.data.f[0])
-      .style('opacity', d => (d.width < 16 ? 0 : 1));
+      .style('opacity', d =>
+        d.width < 16 ? 0 : this.accuracyScale!(d.data.f[2] / d.data.f[1])
+      );
 
     // Update 3: Update the links
     linkGroup

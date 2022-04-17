@@ -24,7 +24,6 @@
 
   let initSwitchChecked = false;
   // Check the local storage to see the initial switch should be on or off
-  console.log(localStorage.getItem('initSwitchChecked'));
   if (localStorage.getItem('initSwitchChecked') === 'true') {
     initSwitchChecked = true;
   }
