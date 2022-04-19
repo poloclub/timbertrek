@@ -22,11 +22,85 @@ export function syncAccuracyRange(this: Sunburst) {
     }
   });
 
-  // The selected trees are the intersection of three filters
+  // The selected trees are the intersection of all filters
   const selectedTreeIDs = new Set<number>();
   for (const treeID of this.selectedTrees.accuracy) {
     if (
       this.selectedTrees.depth.has(treeID) &&
+      this.selectedTrees.minSample.has(treeID) &&
+      this.selectedTrees.height.has(treeID)
+    ) {
+      selectedTreeIDs.add(treeID);
+    }
+  }
+
+  // Step 2: Traverse the rule nodes to mark unused leaf
+  this.dataRoot.eachBefore(d => {
+    if (d.data.t !== undefined) {
+      if (selectedTreeIDs.has(d.data.t)) {
+        d.data.u = true;
+      } else {
+        d.data.u = false;
+      }
+    }
+  });
+
+  // Step 3: Update the node sum at each level (only count used leaves)
+  this.dataRoot = this.dataRoot.sum(d => (d.u !== undefined && d.u ? 1 : 0));
+
+  // Update the partition data
+  const partition = d3.partition()(this.dataRoot) as HierarchyNode;
+
+  // Update the tree count to filter out unselected trees
+  partition.eachAfter(d => {
+    if (d.data.u !== undefined && d.data.u) {
+      d.uniqueTreeIDs = new Set([d.data.t!]);
+    } else {
+      const curIDs = new Set<number>();
+      d.children?.forEach(c => {
+        c.uniqueTreeIDs?.forEach(id => {
+          curIDs.add(id);
+        });
+      });
+      d.uniqueTreeIDs = curIDs;
+    }
+  });
+
+  // Transfer the ID set to its length at each node
+  partition.each(d => {
+    d.treeNum = d.uniqueTreeIDs?.size || 0;
+    d.uniqueTreeIDs = null;
+  });
+
+  this.partition = partition;
+  this.updateSunburst();
+}
+
+/**
+ * Sync the sunburst chart with the selected minSample range
+ * @param this Sunburst
+ */
+export function syncMinSampleRange(this: Sunburst) {
+  // Step 1: traverse the tree map to find which trees meet the criteria
+  if (this.searchStoreValue.treeMinSampleMap === null) return;
+
+  for (const [treeID, minSample] of this.searchStoreValue.treeMinSampleMap) {
+    if (
+      minSample >= this.localMinSampleLow &&
+      minSample <= this.localMinSampleHigh
+    ) {
+      this.selectedTrees.minSample.add(treeID);
+    } else {
+      this.selectedTrees.minSample.delete(treeID);
+    }
+  }
+
+  // The selected trees are the intersection of four filters
+  const selectedTreeIDs = new Set<number>();
+  for (const treeID of this.selectedTrees.accuracy) {
+    if (
+      this.selectedTrees.depth.has(treeID) &&
+      this.selectedTrees.minSample.has(treeID) &&
       this.selectedTrees.height.has(treeID)
     ) {
       selectedTreeIDs.add(treeID);
@@ -96,6 +170,7 @@ export function syncHeightRange(this: Sunburst) {
   for (const treeID of this.selectedTrees.accuracy) {
     if (
       this.selectedTrees.depth.has(treeID) &&
+      this.selectedTrees.minSample.has(treeID) &&
       this.selectedTrees.height.has(treeID)
     ) {
       selectedTreeIDs.add(treeID);
@@ -182,6 +257,7 @@ export function syncDepthFeatures(this: Sunburst) {
   for (const treeID of this.selectedTrees.accuracy) {
     if (
       this.selectedTrees.depth.has(treeID) &&
+      this.selectedTrees.minSample.has(treeID) &&
       this.selectedTrees.height.has(treeID)
     ) {
       selectedTreeIDs.add(treeID);

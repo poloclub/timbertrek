@@ -29,6 +29,7 @@
   enum RefreshLocation {
     Accuracy,
     Height,
+    MinSample,
     Depth
   }
 
@@ -80,6 +81,11 @@
     switch (location) {
       case RefreshLocation.Accuracy: {
         searchPanel.refreshAccuracy();
+        break;
+      }
+
+      case RefreshLocation.MinSample: {
+        searchPanel.refreshMinSample();
         break;
       }
 
@@ -207,7 +213,7 @@
           <span
             class="title-icon refresh-button"
             title="Reset the filter"
-            on:click={e => refreshClicked(e, RefreshLocation.Accuracy)}
+            on:click={e => refreshClicked(e, RefreshLocation.MinSample)}
           >
             {@html refreshIcon}
           </span>

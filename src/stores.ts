@@ -27,6 +27,7 @@ export interface SearchStoreValue {
    */
   treeDepthFeaturesMap: Map<number, Map<number, Set<number>>> | null;
   treeHeightMap: Map<number, number> | null;
+  treeMinSampleMap: Map<number, number> | null;
   featureMap: Map<number, string[]>;
   getFeatureColor: null | ((f: string) => string);
   featureOrder: number[];
@@ -110,6 +111,7 @@ export const getSearchStoreDefaultValue = (): SearchStoreValue => {
     curDepthFeatures: new Map<number, Set<number>>(),
     treeDepthFeaturesMap: null,
     treeHeightMap: null,
+    treeMinSampleMap: null,
     featureMap: new Map<number, string[]>(),
     getFeatureColor: null,
     featureOrder: []

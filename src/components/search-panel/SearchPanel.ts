@@ -299,6 +299,7 @@ export class SearchPanel {
 
     // Store the tree height map in the store
     this.searchStoreValue.treeHeightMap = treeHeightMap;
+    this.searchStoreValue.treeMinSampleMap = minSampleLeafMap;
     this.searchStoreValue.treeDepthFeaturesMap = treeDepthFeaturesMap;
     this.searchStore.set(this.searchStoreValue);
 
@@ -721,7 +722,7 @@ export class SearchPanel {
     const upperArea = underArea.clone(true).classed('selected', true);
 
     // Create a clip path
-    this.densityClip = histGroup
+    this.minSampleDensityClip = histGroup
       .append('clipPath')
       .attr('id', 'min-sample-density-clip')
       .append('rect')
@@ -943,8 +944,8 @@ export class SearchPanel {
       .style('width', `${rangeWidth}px`);
 
     // Move the clip in the density plot
-    if (this.densityClip !== null) {
-      this.densityClip
+    if (this.minSampleDensityClip !== null) {
+      this.minSampleDensityClip
         .attr('x', this.minSampleXScale(this.curMinSampleLow))
         .attr(
           'width',

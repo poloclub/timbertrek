@@ -39,6 +39,7 @@ export interface NotebookEvent extends Event {
  */
 export interface SelectedTrees {
   accuracy: Set<number>;
+  minSample: Set<number>;
   height: Set<number>;
   depth: Set<number>;
 }

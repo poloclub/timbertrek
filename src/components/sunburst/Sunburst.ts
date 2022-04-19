@@ -35,6 +35,7 @@ import {
 } from './SunburstEvent';
 import {
   syncAccuracyRange,
+  syncMinSampleRange,
   syncHeightRange,
   syncDepthFeatures,
   updateSunburst,
@@ -102,6 +103,8 @@ export class Sunburst {
   // Properties for tree filtering
   localAccuracyLow: number;
   localAccuracyHigh: number;
+  localMinSampleLow: number;
+  localMinSampleHigh: number;
   localHeightRange: Set<number>;
   localDepthFeatures: Map<number, Set<number>>;
   viewInitialized = false;
@@ -178,6 +181,7 @@ export class Sunburst {
 
   // ===== Methods implemented in SunburstFilter.ts ====
   syncAccuracyRange = syncAccuracyRange;
+  syncMinSampleRange = syncMinSampleRange;
   updateSunburst = updateSunburst;
   updateSunburstWithAnimation = updateSunburstWithAnimation;
   syncHeightRange = syncHeightRange;
@@ -300,12 +304,15 @@ export class Sunburst {
     this.searchStoreValue = getSearchStoreDefaultValue();
     this.localAccuracyLow = this.searchStoreValue.curAccuracyLow;
     this.localAccuracyHigh = this.searchStoreValue.curAccuracyHigh;
+    this.localMinSampleLow = this.searchStoreValue.curMinSampleLow;
+    this.localMinSampleHigh = this.searchStoreValue.curMinSampleHigh;
     this.localHeightRange = new Set([...this.searchStoreValue.curHeightRange]);
     this.localDepthFeatures = deepCopyDepthFeatures(
       this.searchStoreValue.curDepthFeatures
     );
     this.selectedTrees = {
       accuracy: new Set(this.treeMapMap.keys()),
+      minSample: new Set(this.treeMapMap.keys()),
       height: new Set(this.treeMapMap.keys()),
       depth: new Set(this.treeMapMap.keys())
     };
@@ -773,7 +780,7 @@ export class Sunburst {
     this.searchStore.subscribe(value => {
       this.searchStoreValue = value;
 
-      // Need to update the view if user changes the accuracy range
+      // (1) Need to update the view if user changes the accuracy range
       if (
         this.viewInitialized &&
         this.searchStoreValue.shown &&
@@ -788,7 +795,22 @@ export class Sunburst {
         this.localAccuracyLow = this.searchStoreValue.curAccuracyLow;
       }
 
-      // Need to update the view if user changes the height range
+      // (1) Need to update the view if user changes the min sample range
+      if (
+        this.viewInitialized &&
+        this.searchStoreValue.shown &&
+        (this.searchStoreValue.curMinSampleHigh !== this.localMinSampleHigh ||
+          this.searchStoreValue.curMinSampleLow !== this.localMinSampleLow)
+      ) {
+        this.localMinSampleHigh = this.searchStoreValue.curMinSampleHigh;
+        this.localMinSampleLow = this.searchStoreValue.curMinSampleLow;
+        this.syncMinSampleRange();
+      } else {
+        this.localMinSampleHigh = this.searchStoreValue.curMinSampleHigh;
+        this.localMinSampleLow = this.searchStoreValue.curMinSampleLow;
+      }
+
+      // (3) Need to update the view if user changes the height range
       const heightRangeNotChanged =
         [...this.localHeightRange].every(d =>
           this.searchStoreValue.curHeightRange.has(d)
@@ -810,7 +832,7 @@ export class Sunburst {
         ]);
       }
 
-      // Need to update the view if user changes any depth features
+      // (4) Need to update the view if user changes any depth features
       const depthFeaturesNotChanged = [
         ...this.searchStoreValue.curDepthFeatures.entries()
       ].every(pair => {
