@@ -30,7 +30,8 @@
     Accuracy,
     Height,
     MinSample,
-    Depth
+    Depth,
+    AllFeatures
   }
 
   const formatter = d3.format(',.3f');
@@ -93,6 +94,11 @@
         if (depth !== null) {
           searchPanel.refreshDepth(depth);
         }
+        break;
+      }
+
+      case RefreshLocation.AllFeatures: {
+        searchPanel.refreshAllFeatures();
         break;
       }
 
@@ -284,6 +290,45 @@
         <div class="height-checkboxes" />
       </div>
     </div>
+
+    {#if data}
+      <div
+        class="row level-row level-row-all"
+        id="level-row-0"
+        class:show-detail={depthWithDetails.has(0)}
+      >
+        <div class="row-title">
+          <span>Features</span>
+          <div class="title-icons">
+            <span
+              class="title-icon refresh-button"
+              title="Reset the filter"
+              on:click={e => refreshClicked(e, RefreshLocation.AllFeatures)}
+            >
+              {@html refreshIcon}
+            </span>
+
+            <span
+              class="title-icon detail-button"
+              title="Show details"
+              data-detail="false"
+              on:click={e => detailClicked(e, 0)}
+            >
+              {@html downIcon}
+            </span>
+          </div>
+        </div>
+        <div class="level-summary">
+          {searchStoreValue.curAllFeatures.size ===
+          Object.keys(data?.featureMap).length
+            ? 'Include all features'
+            : `Include ${searchStoreValue.curAllFeatures.size} out of ${
+                Object.keys(data?.featureMap).length
+              } features`}
+        </div>
+        <div class="level-content" />
+      </div>
+    {/if}
 
     {#each [...searchStoreValue.curDepthFeatures.keys()] as depth}
       <div

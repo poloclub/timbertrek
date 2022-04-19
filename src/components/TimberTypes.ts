@@ -42,6 +42,7 @@ export interface SelectedTrees {
   minSample: Set<number>;
   height: Set<number>;
   depth: Set<number>;
+  allFeature: Set<number>;
 }
 
 /**

@@ -38,6 +38,7 @@ import {
   syncMinSampleRange,
   syncHeightRange,
   syncDepthFeatures,
+  syncAllFeatures,
   updateSunburst,
   updateSunburstWithAnimation
 } from './SunburstFilter';
@@ -107,6 +108,7 @@ export class Sunburst {
   localMinSampleHigh: number;
   localHeightRange: Set<number>;
   localDepthFeatures: Map<number, Set<number>>;
+  localAllFeatures: Set<number>;
   viewInitialized = false;
   selectedTrees: SelectedTrees;
 
@@ -186,6 +188,7 @@ export class Sunburst {
   updateSunburstWithAnimation = updateSunburstWithAnimation;
   syncHeightRange = syncHeightRange;
   syncDepthFeatures = syncDepthFeatures;
+  syncAllFeatures = syncAllFeatures;
 
   /**
    * The radius is determined by the number of levels to show.
@@ -310,11 +313,13 @@ export class Sunburst {
     this.localDepthFeatures = deepCopyDepthFeatures(
       this.searchStoreValue.curDepthFeatures
     );
+    this.localAllFeatures = new Set([...this.searchStoreValue.curAllFeatures]);
     this.selectedTrees = {
       accuracy: new Set(this.treeMapMap.keys()),
       minSample: new Set(this.treeMapMap.keys()),
       height: new Set(this.treeMapMap.keys()),
-      depth: new Set(this.treeMapMap.keys())
+      depth: new Set(this.treeMapMap.keys()),
+      allFeature: new Set(this.treeMapMap.keys())
     };
     this.#initSearchStore();
 
@@ -856,6 +861,27 @@ export class Sunburst {
           this.searchStoreValue.curDepthFeatures
         );
       }
+
+      // (5) Need to update the view if user changes features in the all depth row
+      const allFeaturesNotChanged = setsAreEqual(
+        this.localAllFeatures,
+        this.searchStoreValue.curAllFeatures
+      );
+
+      if (
+        this.viewInitialized &&
+        this.searchStoreValue.shown &&
+        !allFeaturesNotChanged
+      ) {
+        this.localAllFeatures = new Set([
+          ...this.searchStoreValue.curAllFeatures
+        ]);
+        this.syncAllFeatures();
+      } else {
+        this.localAllFeatures = new Set([
+          ...this.searchStoreValue.curAllFeatures
+        ]);
+      }
     });
 
     // Pass the color scale to search store
@@ -869,6 +895,11 @@ export class Sunburst {
       const allFeatureIDs = new Set([...this.featureMap.keys()].map(k => k));
       this.searchStoreValue.curDepthFeatures.set(i, allFeatureIDs);
     }
+
+    // Also initialize the all depth feature row
+    const allFeatureIDs = new Set([...this.featureMap.keys()].map(k => k));
+    this.searchStoreValue.curAllFeatures = allFeatureIDs;
+
     this.searchStore.set(this.searchStoreValue);
   }
 

@@ -1174,10 +1174,12 @@ export class SearchPanel {
     for (const depth of this.searchStoreValue.curDepthFeatures.keys()) {
       this.#initDepthCheckboxes(depth);
     }
+
+    this.#initDepthCheckboxes(0);
   }
 
   /**
-   * Event handler for height check boxes
+   * Event handler for depth check boxes
    */
   #depthCheckboxChanged(e: Event, depth: number, f: number) {
     e.preventDefault();
@@ -1198,6 +1200,27 @@ export class SearchPanel {
     }
 
     this.searchStoreValue.curDepthFeatures.set(depth, curFeatureIDs);
+    this.searchStore.set(this.searchStoreValue);
+  }
+
+  /**
+   * Event handler for depth check boxes (across all depths)
+   */
+  #allDepthCheckboxChanged(e: Event, f: number) {
+    e.preventDefault();
+
+    const checkbox = e.target as HTMLInputElement;
+
+    // Trigger filtering in sunburst
+    const curFeatureIDs = this.searchStoreValue.curAllFeatures;
+
+    if (checkbox.checked) {
+      curFeatureIDs.add(f);
+    } else {
+      curFeatureIDs.delete(f);
+    }
+
+    this.searchStoreValue.curAllFeatures = curFeatureIDs;
     this.searchStore.set(this.searchStoreValue);
   }
 
@@ -1232,7 +1255,9 @@ export class SearchPanel {
       label.append('span').text(`${featureInfo[2]} ${featureInfo[1]}`);
       label.attr(
         'title',
-        `Show/hide trees using "${featureInfo[0]} ${featureInfo[1]}" at depth ${depth}`
+        depth === 0
+          ? `Show/hide trees using "${featureInfo[0]} ${featureInfo[1]}" at all depths`
+          : `Show/hide trees using "${featureInfo[0]} ${featureInfo[1]}" at depth ${depth}`
       );
 
       // Change checkbox color
@@ -1244,9 +1269,13 @@ export class SearchPanel {
       checkbox.style('accent-color', boxColor);
 
       // Bind event listeners
-      checkbox.on('change', e =>
-        this.#depthCheckboxChanged(e as Event, depth, f)
-      );
+      checkbox.on('change', e => {
+        if (depth === 0) {
+          this.#allDepthCheckboxChanged(e as Event, f);
+        } else {
+          this.#depthCheckboxChanged(e as Event, depth, f);
+        }
+      });
     });
   }
 
@@ -1277,6 +1306,32 @@ export class SearchPanel {
     }
 
     this.searchStoreValue.curDepthFeatures.set(depth, curFeatureIDs);
+    this.searchStore.set(this.searchStoreValue);
+  };
+
+  /**
+   * Reset the filter for the all features row
+   */
+  refreshAllFeatures = () => {
+    const checkboxes = d3
+      .select(this.component)
+      .select(`#level-row-0 .level-content`);
+
+    const curFeatureIDs = this.searchStoreValue.curAllFeatures;
+
+    // Check the unchecked checkboxes
+    for (const f of this.searchStoreValue.featureOrder) {
+      const checkbox = checkboxes
+        .select(`#depth-check-box-label-0-${f}`)
+        .select('.depth-checkbox');
+
+      if (!checkbox.property('checked')) {
+        checkbox.property('checked', true);
+        curFeatureIDs.add(f);
+      }
+    }
+
+    this.searchStoreValue.curAllFeatures = curFeatureIDs;
     this.searchStore.set(this.searchStoreValue);
   };
 }

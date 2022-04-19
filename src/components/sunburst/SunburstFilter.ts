@@ -28,6 +28,7 @@ export function syncAccuracyRange(this: Sunburst) {
     if (
       this.selectedTrees.depth.has(treeID) &&
       this.selectedTrees.minSample.has(treeID) &&
+      this.selectedTrees.allFeature.has(treeID) &&
       this.selectedTrees.height.has(treeID)
     ) {
       selectedTreeIDs.add(treeID);
@@ -101,6 +102,7 @@ export function syncMinSampleRange(this: Sunburst) {
     if (
       this.selectedTrees.depth.has(treeID) &&
       this.selectedTrees.minSample.has(treeID) &&
+      this.selectedTrees.allFeature.has(treeID) &&
       this.selectedTrees.height.has(treeID)
     ) {
       selectedTreeIDs.add(treeID);
@@ -171,6 +173,7 @@ export function syncHeightRange(this: Sunburst) {
     if (
       this.selectedTrees.depth.has(treeID) &&
       this.selectedTrees.minSample.has(treeID) &&
+      this.selectedTrees.allFeature.has(treeID) &&
       this.selectedTrees.height.has(treeID)
     ) {
       selectedTreeIDs.add(treeID);
@@ -258,6 +261,95 @@ export function syncDepthFeatures(this: Sunburst) {
     if (
       this.selectedTrees.depth.has(treeID) &&
       this.selectedTrees.minSample.has(treeID) &&
+      this.selectedTrees.allFeature.has(treeID) &&
+      this.selectedTrees.height.has(treeID)
+    ) {
+      selectedTreeIDs.add(treeID);
+    }
+  }
+
+  // Step 2: Traverse the rule nodes to mark unused leaf
+  this.dataRoot.eachBefore(d => {
+    // Store the current (x0, x1) before any changes
+    const dh = d as HierarchyNode;
+    dh.previous = { x0: dh.x0, x1: dh.x1, y0: dh.y0, y1: dh.y1, data: dh.data };
+
+    if (d.data.t !== undefined) {
+      if (selectedTreeIDs.has(d.data.t)) {
+        d.data.u = true;
+      } else {
+        d.data.u = false;
+      }
+    }
+  });
+
+  // Step 3: Update the node sum at each level (only count used leaves)
+  this.dataRoot = this.dataRoot.sum(d => (d.u !== undefined && d.u ? 1 : 0));
+
+  // Update the partition data
+  const partition = d3.partition()(this.dataRoot) as HierarchyNode;
+
+  // Update the tree count to filter out unselected trees
+  partition.eachAfter(d => {
+    if (d.data.u !== undefined && d.data.u) {
+      d.uniqueTreeIDs = new Set([d.data.t!]);
+    } else {
+      const curIDs = new Set<number>();
+      d.children?.forEach(c => {
+        c.uniqueTreeIDs?.forEach(id => {
+          curIDs.add(id);
+        });
+      });
+      d.uniqueTreeIDs = curIDs;
+    }
+  });
+
+  // Transfer the ID set to its length at each node
+  partition.each(d => {
+    d.treeNum = d.uniqueTreeIDs?.size || 0;
+    d.uniqueTreeIDs = null;
+  });
+
+  this.partition = partition;
+
+  this.updateSunburstWithAnimation();
+}
+
+/**
+ * Sync the sunburst chart with the selected height range
+ * @param this Sunburst
+ */
+export function syncAllFeatures(this: Sunburst) {
+  if (this.searchStoreValue.treeDepthFeaturesMap === null) return;
+
+  // Step 1: traverse the tree map to find which trees that meet selected features
+  for (const [treeID, depthFeatures] of this.searchStoreValue
+    .treeDepthFeaturesMap) {
+    let treeSelected = true;
+
+    oneTreeLoop: for (const [depth, featureIDs] of depthFeatures) {
+      for (const featureID of featureIDs) {
+        if (!this.localAllFeatures.has(featureID)) {
+          treeSelected = false;
+          break oneTreeLoop;
+        }
+      }
+    }
+
+    if (treeSelected) {
+      this.selectedTrees.allFeature.add(treeID);
+    } else {
+      this.selectedTrees.allFeature.delete(treeID);
+    }
+  }
+
+  // The selected trees are the intersection of three filters
+  const selectedTreeIDs = new Set<number>();
+  for (const treeID of this.selectedTrees.accuracy) {
+    if (
+      this.selectedTrees.depth.has(treeID) &&
+      this.selectedTrees.minSample.has(treeID) &&
+      this.selectedTrees.allFeature.has(treeID) &&
       this.selectedTrees.height.has(treeID)
     ) {
       selectedTreeIDs.add(treeID);
