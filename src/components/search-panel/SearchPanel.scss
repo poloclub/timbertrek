@@ -178,6 +178,17 @@ $color-chart-secondary: $green-100;
   }
 }
 
+.min-sample-row {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+
+  .min-sample-content {
+    width: 100%;
+    position: relative;
+  }
+}
+
 .feature-hist {
   position: relative;
   width: 100%;
@@ -185,7 +196,7 @@ $color-chart-secondary: $green-100;
 
 .feature-slider {
   position: absolute;
-  top: 60px;
+  top: 50px;
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -306,7 +317,8 @@ $color-chart-secondary: $green-100;
   }
 }
 
-.svg-accuracy {
+.svg-accuracy,
+.svg-min-sample {
   :global(.area-path) {
     fill: $gray-300;
   }

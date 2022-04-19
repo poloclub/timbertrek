@@ -33,6 +33,7 @@
   }
 
   const formatter = d3.format(',.3f');
+  const sampleFormatter = d3.format('d');
 
   onMount(() => {
     mounted = true;
@@ -195,6 +196,64 @@
 
         <div class="feature-hist">
           <svg class="svg-accuracy" />
+        </div>
+      </div>
+    </div>
+
+    <div class="row min-sample-row">
+      <div class="row-title">
+        <span>Minimum Leaf Sample</span>
+        <div class="title-icons">
+          <span
+            class="title-icon refresh-button"
+            title="Reset the filter"
+            on:click={e => refreshClicked(e, RefreshLocation.Accuracy)}
+          >
+            {@html refreshIcon}
+          </span>
+        </div>
+      </div>
+      <div class="min-sample-content">
+        <div
+          class="feature-slider"
+          on:click={e => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
+        >
+          <div class="track">
+            <div class="range-track" />
+            <div
+              id="slider-left-thumb"
+              tabindex="-1"
+              style="left: 0px"
+              class="svg-icon icon-range-thumb-left thumb"
+            >
+              {@html thumbLeftIcon}
+              <div class="thumb-label thumb-label-left">
+                <span class="thumb-label-span"
+                  >{sampleFormatter(searchPanel?.curMinSampleLow)}</span
+                >
+              </div>
+            </div>
+            <div
+              id="slider-right-thumb"
+              tabindex="-1"
+              style="left: 0px"
+              class="svg-icon icon-range-thumb-right thumb"
+            >
+              {@html thumbRightIcon}
+              <div class="thumb-label thumb-label-right">
+                <span class="thumb-label-span"
+                  >{sampleFormatter(searchPanel?.curMinSampleHigh)}</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="feature-hist">
+          <svg class="svg-min-sample" />
         </div>
       </div>
     </div>

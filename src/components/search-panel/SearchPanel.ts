@@ -8,6 +8,8 @@ import { getSearchStoreDefaultValue } from '../../stores';
 import type { HierarchyJSON, Point, TreeNode } from '../TimberTypes';
 
 const formatter = d3.format(',.3~f');
+const histHeight = 45;
+
 const LEFT_THUMB_ID = 'slider-left-thumb';
 const RIGHT_THUMB_ID = 'slider-right-thumb';
 const PANEL_WIDTH = 268;
@@ -27,17 +29,32 @@ export class SearchPanel {
   accuracySVG: d3.Selection<d3.BaseType, unknown, null, undefined> | null =
     null;
 
+  minSampleRow: d3.Selection<d3.BaseType, unknown, null, undefined>;
+  minSampleSVG: d3.Selection<d3.BaseType, unknown, null, undefined> | null =
+    null;
+
   heightRow: d3.Selection<d3.BaseType, unknown, null, undefined>;
   heightSVG: d3.Selection<d3.BaseType, unknown, null, undefined> | null = null;
 
   data: HierarchyJSON;
   treeMapMap: Map<number, [TreeNode, number, number]>;
+
   accuracyDensities: Point[];
   heightDensities: Point[];
+  minSampleDensities: Point[];
 
   accuracyXScale: d3.ScaleLinear<number, number, never>;
   accuracyYScale: d3.ScaleLinear<number, number, never>;
   densityClip: d3.Selection<SVGRectElement, unknown, null, undefined> | null;
+
+  minSampleXScale: d3.ScaleLinear<number, number, never>;
+  minSampleYScale: d3.ScaleLinear<number, number, never>;
+  minSampleDensityClip: d3.Selection<
+    SVGRectElement,
+    unknown,
+    null,
+    undefined
+  > | null;
 
   heightXScale: d3.ScaleBand<number>;
   heightYScale: d3.ScaleLinear<number, number, never>;
@@ -49,6 +66,11 @@ export class SearchPanel {
   curAccuracyHigh: number;
   accuracyLow: number;
   accuracyHigh: number;
+
+  curMinSampleLow: number;
+  curMinSampleHigh: number;
+  minSampleLow: number;
+  minSampleHigh: number;
 
   searchUpdated: () => void;
 
@@ -74,6 +96,7 @@ export class SearchPanel {
 
     // Bind different sub elements as D3 selections
     this.accuracyRow = d3.select(component).select('.accuracy-row');
+    this.minSampleRow = d3.select(component).select('.min-sample-row');
     this.heightRow = d3.select(component).select('.height-row');
 
     // Initialize the accuracy row (will be updated in processData())
@@ -81,6 +104,12 @@ export class SearchPanel {
     this.curAccuracyHigh = 1;
     this.accuracyLow = 0;
     this.accuracyHigh = 1;
+
+    // Initialize the minSample row (will be updated in processData())
+    this.curMinSampleLow = 0;
+    this.curMinSampleHigh = 1;
+    this.minSampleLow = 0;
+    this.minSampleHigh = 1;
 
     // Process the input data
     this.data = data;
@@ -94,6 +123,7 @@ export class SearchPanel {
     const result = this.#processData();
     this.accuracyDensities = result.accuracyDensities;
     this.heightDensities = result.heightDensities;
+    this.minSampleDensities = result.minSampleDensities;
 
     // Put placeholder in the scales
     this.accuracyXScale = d3.scaleLinear();
@@ -103,6 +133,15 @@ export class SearchPanel {
     // Initialize the accuracy svg
     this.accuracySVG = this.#initAccuracySVG();
     this.#initSlider();
+
+    // Put placeholder in the scales
+    this.minSampleXScale = d3.scaleLinear();
+    this.minSampleYScale = d3.scaleLinear();
+    this.minSampleDensityClip = null;
+
+    // Initialize the minSample svg
+    this.minSampleSVG = this.#initMinSampleSVG();
+    this.#initMinSampleSlider();
 
     // Put placeholder in the scales
     this.heightXScale = d3.scaleBand<number>();
@@ -176,10 +215,16 @@ export class SearchPanel {
     });
 
     // (3) Identify features used at each depth for each tree
+    // (4) Identify min sample leaf of each tree
     const treeDepthFeaturesMap = new Map<number, Map<number, Set<number>>>();
+    const minSampleLeafMap = new Map<number, number>();
+    const minSampleLeaves: number[] = [];
+
     for (const [treeID, v] of this.treeMapMap) {
       const curDepthFeatures = new Map<number, Set<number>>();
       const curTree = d3.hierarchy(v[0], d => d.c);
+      let curMinSampleLeaf = Infinity;
+
       curTree.each(d => {
         if (d.data.f[0] !== '+' && d.data.f[0] !== '-') {
           if (!curDepthFeatures.has(d.depth + 1)) {
@@ -187,11 +232,18 @@ export class SearchPanel {
           } else {
             curDepthFeatures.get(d.depth + 1)!.add(parseInt(d.data.f[0]));
           }
+        } else {
+          // Track the min sale leaf on decision leaves
+          curMinSampleLeaf = Math.min(curMinSampleLeaf, d.data.f[1]);
         }
       });
+
       treeDepthFeaturesMap.set(treeID, curDepthFeatures);
+      minSampleLeafMap.set(treeID, curMinSampleLeaf);
+      minSampleLeaves.push(curMinSampleLeaf);
     }
 
+    // Compute the height density for the plot
     const heightCountMap = new Map<number, number>();
     Array.from(treeHeightMap.values()).forEach(h => {
       if (heightCountMap.has(h)) {
@@ -212,12 +264,45 @@ export class SearchPanel {
 
     heightDensities.sort((a, b) => a.x - b.x);
 
+    // (5) Compute the min sample leaf distribution
+    const sampleBinNum = 50;
+    const sampleBins = d3.bin().thresholds(sampleBinNum)(minSampleLeaves);
+
+    // Compute the density in each bin
+    const minSampleDensities: Point[] = [];
+    sampleBins.forEach(b => {
+      minSampleDensities.push({
+        x: b.x0 === undefined ? 0 : b.x0,
+        y: b.length / count
+      });
+    });
+
+    // Add start and end to make sure the path starts and ends at 0
+    const minSampleDensityGap =
+      minSampleDensities[1].x - minSampleDensities[0].x;
+
+    minSampleDensities.unshift({
+      x: Math.max(0, minSampleDensities[0].x - minSampleDensityGap),
+      y: 0
+    });
+
+    minSampleDensities.push({
+      x: minSampleDensities.slice(-1)[0].x + minSampleDensityGap,
+      y: 0
+    });
+
+    // Update the minSample min and max
+    this.curMinSampleLow = minSampleDensities[0].x;
+    this.curMinSampleHigh = minSampleDensities.slice(-1)[0].x;
+    this.minSampleLow = this.curMinSampleLow;
+    this.minSampleHigh = this.curMinSampleHigh;
+
     // Store the tree height map in the store
     this.searchStoreValue.treeHeightMap = treeHeightMap;
     this.searchStoreValue.treeDepthFeaturesMap = treeDepthFeaturesMap;
     this.searchStore.set(this.searchStoreValue);
 
-    return { accuracyDensities, heightDensities };
+    return { accuracyDensities, heightDensities, minSampleDensities };
   }
 
   /**
@@ -226,7 +311,6 @@ export class SearchPanel {
   #initAccuracySVG() {
     const width = PANEL_WIDTH - PANEL_H_GAP * 2;
     const tickHeight = 30;
-    const histHeight = 55;
     const vGap = 15;
     const height = histHeight + vGap + tickHeight;
 
@@ -565,12 +649,356 @@ export class SearchPanel {
   };
 
   /**
+   * Draw the SVG for the min sample slider
+   */
+  #initMinSampleSVG() {
+    const width = PANEL_WIDTH - PANEL_H_GAP * 2;
+    const tickHeight = 30;
+    const vGap = 15;
+    const height = histHeight + vGap + tickHeight;
+
+    const minSampleSVG = this.minSampleRow
+      .select('.svg-min-sample')
+      .attr('width', width)
+      .attr('height', height);
+
+    // Offset the range thumb to align with the track
+    const padding = {
+      top: 0,
+      left: THUMB_WIDTH,
+      right: THUMB_WIDTH,
+      bottom: 0,
+      histTop: 2
+    };
+
+    const totalWidth = width - padding.left - padding.right;
+
+    // Draw a bounding box for this density plot
+    minSampleSVG
+      .append('g')
+      .attr('class', 'border-group')
+      .attr('transform', `translate(${0}, ${padding.top})`)
+      .append('rect')
+      .attr('width', width)
+      .attr('height', histHeight - padding.top)
+      .style('fill', 'none')
+      .style('stroke', config.colors['gray-300']);
+
+    // Add density plot
+    const histGroup = minSampleSVG
+      .append('g')
+      .attr('class', 'hist-group')
+      .attr('transform', `translate(${THUMB_WIDTH}, ${padding.top})`);
+
+    // Create the axis scales
+    this.minSampleXScale = d3
+      .scaleLinear()
+      .domain([
+        this.minSampleDensities[0].x,
+        this.minSampleDensities.slice(-1)[0].x
+      ])
+      .range([0, totalWidth]);
+
+    const maxDensity = Math.max(...this.minSampleDensities.map(d => d.y));
+    this.minSampleYScale = d3
+      .scaleLinear()
+      .domain([0, maxDensity])
+      .range([histHeight - padding.bottom - padding.top, padding.histTop]);
+
+    const curve = d3
+      .line<Point>()
+      .curve(d3.curveBasis)
+      .x(d => this.minSampleXScale(d.x))
+      .y(d => this.minSampleYScale(d.y));
+
+    // Draw the area curve
+    const underArea = histGroup
+      .append('path')
+      .attr('class', 'area-path')
+      .datum(this.minSampleDensities)
+      .attr('d', curve);
+
+    const upperArea = underArea.clone(true).classed('selected', true);
+
+    // Create a clip path
+    this.densityClip = histGroup
+      .append('clipPath')
+      .attr('id', 'min-sample-density-clip')
+      .append('rect')
+      .style('fill', 'hsla(100, 50%, 50%, 0.1)')
+      .attr('x', this.minSampleXScale(this.curMinSampleLow))
+      .attr(
+        'width',
+        this.minSampleXScale(this.curMinSampleHigh) -
+          this.minSampleXScale(this.curMinSampleLow)
+      )
+      .attr('height', histHeight);
+
+    upperArea.attr('clip-path', 'url(#min-sample-density-clip)');
+
+    // Initialize the ticks below the slider
+    const tickGroup = minSampleSVG
+      .append('g')
+      .attr('class', 'tick-group')
+      .attr('transform', `translate(${THUMB_WIDTH}, ${histHeight + vGap})`);
+
+    const tickBackGroup = tickGroup
+      .append('g')
+      .attr('class', 'tick-back-group');
+
+    const tickTopGroup = tickGroup.append('g').attr('class', 'tick-top-group');
+
+    const tickCount = 30;
+    const tickArray = [];
+    const minSampleGap =
+      this.minSampleDensities[1].x - this.minSampleDensities[0].x;
+    const trueMinSampleLow = this.minSampleLow + minSampleGap;
+    const trueMinSampleHigh = this.minSampleHigh;
+    for (let i = 0; i <= tickCount; i++) {
+      tickArray.push(
+        trueMinSampleLow +
+          ((trueMinSampleHigh - trueMinSampleLow) * i) / tickCount
+      );
+    }
+
+    tickTopGroup
+      .selectAll('g.tick')
+      .data(tickArray)
+      .join('g')
+      .attr('class', 'tick')
+      .attr('transform', d => `translate(${this.minSampleXScale(d)}, 0)`)
+      .append('line')
+      .attr('y2', TICK_HEIGHTS.default);
+
+    // Initialize the style
+    this.#syncTicks();
+
+    // Add labels for the min and max value
+    tickBackGroup
+      .append('text')
+      .attr('class', 'label-min-value')
+      .attr('x', -4)
+      .attr('y', TICK_HEIGHTS.default * 2.2)
+      .style('text-anchor', 'start')
+      .style('dominant-baseline', 'hanging')
+      .style('font-size', '0.9em')
+      .style('fill', config.colors['gray-500'])
+      .text(formatter(this.minSampleLow));
+
+    tickBackGroup
+      .append('text')
+      .attr('class', 'label-max-value')
+      .attr('x', totalWidth + 4)
+      .attr('y', TICK_HEIGHTS.default * 2.2)
+      .style('text-anchor', 'end')
+      .style('dominant-baseline', 'hanging')
+      .style('font-size', '0.9em')
+      .style('fill', config.colors['gray-500'])
+      .text(formatter(this.minSampleHigh));
+
+    return minSampleSVG;
+  }
+
+  /**
+   * Initialize the slider.
+   */
+  #initMinSampleSlider() {
+    // Move two range thumbs to the left and right ends
+    this.#minSampleMoveThumb(LEFT_THUMB_ID, this.curMinSampleLow);
+    this.#minSampleMoveThumb(RIGHT_THUMB_ID, this.curMinSampleHigh);
+
+    // Register event listeners
+    this.minSampleRow
+      .select(`#${LEFT_THUMB_ID}`)
+      .on('mousedown', e => this.#minSampleMouseDownHandler(e as MouseEvent));
+    this.minSampleRow
+      .select(`#${RIGHT_THUMB_ID}`)
+      .on('mousedown', e => this.#minSampleMouseDownHandler(e as MouseEvent));
+
+    this.#syncRangeTrack();
+  }
+
+  /**
+   * Move the specified thumb to the given value on the slider.
+   * @param{string} thumbID The ID of the thumb element.
+   * @param{number} value The target value to move the thumb to.
+   */
+  #minSampleMoveThumb(thumbID: string, value: number) {
+    // Make sure we are only moving within the range of the state.feature value
+    value = Math.min(Math.max(value, this.minSampleLow), this.minSampleHigh);
+    value = round(value, 3);
+
+    // Special rules based on the thumb type
+    switch (thumbID) {
+      case 'slider-left-thumb':
+        value = Math.min(this.curMinSampleHigh, value);
+        break;
+
+      case 'slider-right-thumb':
+        value = Math.max(this.curMinSampleLow, value);
+        break;
+
+      default:
+        console.warn('Unknown thumb type in moveThumb()');
+        break;
+    }
+
+    // Save the current value to the HTML element
+    const thumb = this.minSampleRow
+      .select(`#${thumbID}`)
+      .attr('data-curValue', value);
+
+    // Compute the position to move the thumb to
+    const trackWidth = PANEL_WIDTH - 2 * PANEL_H_GAP - 2 * THUMB_WIDTH;
+    let xPos =
+      ((value - this.minSampleLow) / (this.minSampleHigh - this.minSampleLow)) *
+      trackWidth;
+
+    // Need to offset the xPos based on the thumb type
+    // Also register different values based on the thumb type
+    switch (thumbID) {
+      case 'slider-left-thumb':
+        xPos -= THUMB_WIDTH;
+        this.curMinSampleLow = value;
+        this.searchStoreValue.curMinSampleLow = this.curMinSampleLow;
+        break;
+
+      case 'slider-right-thumb':
+        this.curMinSampleHigh = value;
+        this.searchStoreValue.curMinSampleHigh = this.curMinSampleHigh;
+        break;
+
+      default:
+        console.warn('Unknown thumb type in moveThumb()');
+        break;
+    }
+
+    this.searchStore.set(this.searchStoreValue);
+
+    // syncTooltips(component, state);
+    thumb.style('left', `${xPos}px`);
+    this.#minSampleSyncRangeTrack();
+    this.#minSampleSyncTicks();
+    this.searchUpdated();
+  }
+
+  /**
+   * Handling the mousedown event for thumbs on the slider.
+   * @param e Event
+   */
+  #minSampleMouseDownHandler(e: MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const thumb = e.target as HTMLElement;
+    if (thumb === null || !thumb.id.includes('thumb')) {
+      return;
+    }
+
+    const track = thumb.parentNode as HTMLElement;
+    const trackWidth = track.getBoundingClientRect().width;
+    thumb.focus();
+
+    const mouseMoveHandler = (e: MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const deltaX = e.pageX - track.getBoundingClientRect().x;
+      let newValue =
+        this.minSampleLow +
+        ((this.minSampleHigh - this.minSampleLow) * deltaX) / trackWidth;
+      newValue = round(newValue, 0);
+
+      this.#minSampleMoveThumb(thumb.id, newValue);
+    };
+
+    const mouseUpHandler = () => {
+      document.removeEventListener('mousemove', mouseMoveHandler);
+      document.removeEventListener('mouseup', mouseUpHandler);
+      document.body.style.cursor = 'default';
+      thumb.blur();
+    };
+
+    // Listen to mouse move on the whole page (users can drag outside of the
+    // thumb, track, or even TimberTrek!)
+    document.addEventListener('mousemove', mouseMoveHandler);
+    document.addEventListener('mouseup', mouseUpHandler);
+    document.body.style.cursor = 'grabbing';
+  }
+
+  /**
+   * Sync the background range track with the current min & max range
+   */
+  #minSampleSyncRangeTrack() {
+    const leftThumb = this.minSampleRow.select('#slider-left-thumb');
+    const rightThumb = this.minSampleRow.select('#slider-right-thumb');
+
+    const leftThumbLeft = parseFloat(leftThumb.style('left'));
+    const rightThumbLeft = parseFloat(rightThumb.style('left'));
+    const rangeWidth = rightThumbLeft - leftThumbLeft;
+
+    this.minSampleRow
+      .select('.track .range-track')
+      .style('left', `${leftThumbLeft + THUMB_WIDTH}px`)
+      .style('width', `${rangeWidth}px`);
+
+    // Move the clip in the density plot
+    if (this.densityClip !== null) {
+      this.densityClip
+        .attr('x', this.minSampleXScale(this.curMinSampleLow))
+        .attr(
+          'width',
+          this.minSampleXScale(this.curMinSampleHigh) -
+            this.minSampleXScale(this.curMinSampleLow)
+        );
+    }
+  }
+
+  /**
+   * Sync up ticks with the current min & max range
+   */
+  #minSampleSyncTicks() {
+    if (this.minSampleSVG === null) return;
+
+    const topTicks = this.minSampleSVG
+      .select('g.tick-top-group')
+      .selectAll('g.tick') as d3.Selection<
+      SVGGElement,
+      number,
+      SVGGElement,
+      unknown
+    >;
+
+    topTicks
+      .filter(d => d >= this.curMinSampleLow && d <= this.curMinSampleHigh)
+      .classed('out-range', false);
+
+    topTicks
+      .filter(d => d < this.curMinSampleLow || d > this.curMinSampleHigh)
+      .classed('out-range', true);
+
+    if (this.curMinSampleHigh === this.curMinSampleLow) {
+      this.minSampleSVG
+        .select('g.tick-top-group')
+        .selectAll('g.tick')
+        .classed('out-range', true);
+    }
+  }
+
+  /**
+   * Reset the filter for the minSample row
+   */
+  refreshMinSample = () => {
+    this.#minSampleMoveThumb('slider-left-thumb', this.minSampleLow);
+    this.#minSampleMoveThumb('slider-right-thumb', this.minSampleHigh);
+  };
+
+  /**
    * Draw the SVG for the height row
    */
   #initHeightSVG() {
     const width = PANEL_WIDTH - PANEL_H_GAP * 2;
     const tickHeight = 0;
-    const histHeight = 55;
     const vGap = 0;
     const height = histHeight + vGap + tickHeight;
 
