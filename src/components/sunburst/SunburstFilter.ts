@@ -261,7 +261,6 @@ export function updateSunburstWithAnimation(this: Sunburst, duration = 500) {
     d.x0 = d.node.x0;
     d.x1 = d.node.x1;
   });
-  this.xScale.domain([this.curHeadNode.x0, this.curHeadNode.x1]);
 
   const paths = content
     .select('.arc-group')
@@ -283,8 +282,18 @@ export function updateSunburstWithAnimation(this: Sunburst, duration = 500) {
         y1: d.y1,
         data: d.data
       };
-      const i = d3.interpolate(d.previous!, target);
-      return t => (d.previous = i(t));
+      const dataInterpolator = d3.interpolate(d.previous!, target);
+
+      // Also need to interpolate the xScale domain at the same time
+      const xInterpolator = d3.interpolate(this.xScale.domain(), [
+        this.curHeadNode.x0,
+        this.curHeadNode.x1
+      ]);
+
+      return (t: number) => {
+        this.xScale.domain(xInterpolator(t));
+        d.previous = dataInterpolator(t);
+      };
     })
     .style('display', d => {
       if (d.data.f === ';') {
