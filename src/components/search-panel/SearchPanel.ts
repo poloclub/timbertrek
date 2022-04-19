@@ -1232,31 +1232,104 @@ export class SearchPanel {
       .select(this.component)
       .select(`#level-row-${depth} .level-content`);
 
-    this.searchStoreValue.featureOrder.forEach(f => {
-      const label = checkboxes
-        .append('label')
-        .attr('class', 'depth-checkbox-label')
-        .attr('id', `depth-check-box-label-${depth}-${f}`);
-
-      // Init checkbox
-      const checkbox = label
-        .append('input')
-        .attr('type', 'checkbox')
-        .property('checked', true)
-        .attr('class', 'depth-checkbox');
-
-      // Add feature label
+    // Look for duplicate feature names
+    const duplicateFeatureNames = new Set<string>([]);
+    const tempFeatureNames = new Set<string>([]);
+    for (const f of this.searchStoreValue.featureOrder) {
       let featureInfo = this.searchStoreValue.featureMap.get(f);
       if (featureInfo === undefined) {
         featureInfo = ['', '', ''];
         console.error(`Cannot find feature ${f} in featureMap`);
       }
 
-      label.append('span').text(`${featureInfo[2]} ${featureInfo[1]}`);
+      if (tempFeatureNames.has(featureInfo[2])) {
+        duplicateFeatureNames.add(featureInfo[2]);
+      } else {
+        tempFeatureNames.add(featureInfo[2]);
+      }
+    }
+
+    let curFeatureDIV: d3.Selection<
+      HTMLDivElement,
+      unknown,
+      null,
+      undefined
+    > | null = null;
+    let curFeatureName: string | null = null;
+
+    for (const f of this.searchStoreValue.featureOrder) {
+      let featureInfo = this.searchStoreValue.featureMap.get(f);
+      if (featureInfo === undefined) {
+        featureInfo = ['', '', ''];
+        console.error(`Cannot find feature ${f} in featureMap`);
+      }
+
+      let container:
+        | d3.Selection<d3.BaseType, unknown, null, undefined>
+        | d3.Selection<HTMLDivElement, unknown, null, undefined> = checkboxes;
+
+      // End the previous div
+      if (curFeatureDIV !== null && featureInfo[2] !== curFeatureName) {
+        curFeatureName = null;
+        curFeatureDIV = null;
+      }
+
+      if (duplicateFeatureNames.has(featureInfo[2])) {
+        // Start a a new div
+        if (curFeatureDIV === null) {
+          const wrapper = checkboxes
+            .append('div')
+            .attr('class', 'depth-checkbox-row');
+
+          wrapper
+            .append('div')
+            .attr('class', 'depth-checkbox-row-title')
+            .text(featureInfo[2]);
+
+          curFeatureDIV = wrapper
+            .append('div')
+            .attr('class', 'depth-checkbox-row-checkboxes');
+
+          curFeatureName = featureInfo[2];
+        }
+
+        // Add to the current div
+        container = curFeatureDIV
+          .append('div')
+          .attr('class', 'checkbox-wrapper');
+      } else {
+        container = checkboxes
+          .append('div')
+          .attr('class', 'depth-checkbox-single-row')
+          .append('div')
+          .attr('class', 'checkbox-wrapper');
+      }
+
+      // Init checkbox
+      const checkbox = container
+        .append('input')
+        .attr('type', 'checkbox')
+        .property('checked', true)
+        .attr('class', 'depth-checkbox')
+        .attr('id', `depth-check-box-label-${depth}-${f}`);
+
+      const label = container
+        .append('label')
+        .attr('class', 'depth-checkbox-label')
+        .attr('for', `depth-check-box-label-${depth}-${f}`);
+
+      // Add feature label
+      let labelText = `${featureInfo[2]} ${featureInfo[1]}`;
+
+      if (featureInfo[2] === curFeatureName) {
+        labelText = `${featureInfo[1]}`;
+      }
+
+      label.append('span').text(labelText);
       label.attr(
         'title',
         depth === 0
-          ? `Show/hide trees using "${featureInfo[0]} ${featureInfo[1]}" at all depths`
+          ? `Show/hide trees using "${featureInfo[0]} ${featureInfo[1]}"`
           : `Show/hide trees using "${featureInfo[0]} ${featureInfo[1]}" at depth ${depth}`
       );
 
@@ -1276,7 +1349,7 @@ export class SearchPanel {
           this.#depthCheckboxChanged(e as Event, depth, f);
         }
       });
-    });
+    }
   }
 
   /**
@@ -1295,9 +1368,9 @@ export class SearchPanel {
 
     // Check the unchecked checkboxes
     for (const f of this.searchStoreValue.featureOrder) {
-      const checkbox = checkboxes
-        .select(`#depth-check-box-label-${depth}-${f}`)
-        .select('.depth-checkbox');
+      const checkbox = checkboxes.select(
+        `#depth-check-box-label-${depth}-${f}`
+      );
 
       if (!checkbox.property('checked')) {
         checkbox.property('checked', true);
@@ -1321,9 +1394,7 @@ export class SearchPanel {
 
     // Check the unchecked checkboxes
     for (const f of this.searchStoreValue.featureOrder) {
-      const checkbox = checkboxes
-        .select(`#depth-check-box-label-0-${f}`)
-        .select('.depth-checkbox');
+      const checkbox = checkboxes.select(`#depth-check-box-label-0-${f}`);
 
       if (!checkbox.property('checked')) {
         checkbox.property('checked', true);

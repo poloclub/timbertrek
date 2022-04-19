@@ -24,7 +24,7 @@
   let searchPanel: SearchPanel | null = null;
 
   let searchStoreValue = getSearchStoreDefaultValue();
-  let depthWithDetails = new Set<number>();
+  let depthWithDetails = new Set<number>([]);
 
   enum RefreshLocation {
     Accuracy,

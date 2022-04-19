@@ -409,10 +409,10 @@ $color-chart-secondary: $green-100;
 
   .level-content {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     column-gap: 9px;
     row-gap: 7px;
-    flex-wrap: wrap;
+    // flex-wrap: wrap;
     font-size: $font-d3;
 
     padding: 6px 0 12px 0;
@@ -423,13 +423,55 @@ $color-chart-secondary: $green-100;
     }
 
     :global(.depth-checkbox-label) {
-      line-height: 1.2;
+      line-height: 1;
     }
 
     :global(.depth-checkbox-label span) {
-      padding-left: 4px;
       line-height: 1;
       color: $gray-700;
+    }
+
+    $row-padding: 1px 0 1px 6px;
+    $row-left-border: 3px solid $gray-300;
+
+    :global(.depth-checkbox-row) {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+
+      padding: $row-padding;
+      border-left: $row-left-border;
+    }
+
+    :global(.depth-checkbox-row-title) {
+      line-height: 1;
+      color: $gray-700;
+      font-weight: 400;
+    }
+
+    :global(.depth-checkbox-row-checkboxes) {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    :global(.depth-checkbox-single-row) {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 4px;
+
+      padding: $row-padding;
+      border-left: $row-left-border;
+    }
+
+    :global(.checkbox-wrapper) {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 4px;
     }
   }
 
