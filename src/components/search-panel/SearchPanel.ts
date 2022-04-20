@@ -497,7 +497,6 @@ export class SearchPanel {
   #moveThumb(thumbID: string, value: number) {
     // Make sure we are only moving within the range of the state.feature value
     value = Math.min(Math.max(value, this.accuracyLow), this.accuracyHigh);
-    value = round(value, 3);
 
     // Special rules based on the thumb type
     switch (thumbID) {
@@ -841,7 +840,6 @@ export class SearchPanel {
   #minSampleMoveThumb(thumbID: string, value: number) {
     // Make sure we are only moving within the range of the state.feature value
     value = Math.min(Math.max(value, this.minSampleLow), this.minSampleHigh);
-    value = round(value, 3);
 
     // Special rules based on the thumb type
     switch (thumbID) {
@@ -1402,7 +1400,7 @@ export class SearchPanel {
   refreshAllFeatures = () => {
     const checkboxes = d3
       .select(this.component)
-      .select(`#level-row-0 .level-content`);
+      .select('#level-row-0 .level-content');
 
     const curFeatureIDs = this.searchStoreValue.curAllFeatures;
 
@@ -1497,16 +1495,19 @@ export class SearchPanel {
         y: b.length / count
       });
     });
+
     // Add start and end to make sure the path starts and ends at 0
-    const densityGap = accuracyDensities[1].x - accuracyDensities[0].x;
-    accuracyDensities.unshift({
-      x: accuracyDensities[0].x - densityGap,
-      y: 0
-    });
-    accuracyDensities.push({
-      x: accuracyDensities.slice(-1)[0].x + densityGap,
-      y: 0
-    });
+    if (accuracyDensities.length > 2) {
+      const densityGap = accuracyDensities[1].x - accuracyDensities[0].x;
+      accuracyDensities.unshift({
+        x: accuracyDensities[0].x - densityGap,
+        y: 0
+      });
+      accuracyDensities.push({
+        x: accuracyDensities.slice(-1)[0].x + densityGap,
+        y: 0
+      });
+    }
 
     const minSampleDensities: Point[] = [];
     const sampleBins = binGen(minSampleLeaves);
@@ -1518,18 +1519,20 @@ export class SearchPanel {
     });
 
     // Add start and end to make sure the path starts and ends at 0
-    const minSampleDensityGap =
-      minSampleDensities[1].x - minSampleDensities[0].x;
+    if (minSampleDensities.length > 2) {
+      const minSampleDensityGap =
+        minSampleDensities[1].x - minSampleDensities[0].x;
 
-    minSampleDensities.unshift({
-      x: Math.max(0, minSampleDensities[0].x - minSampleDensityGap),
-      y: 0
-    });
+      minSampleDensities.unshift({
+        x: Math.max(0, minSampleDensities[0].x - minSampleDensityGap),
+        y: 0
+      });
 
-    minSampleDensities.push({
-      x: minSampleDensities.slice(-1)[0].x + minSampleDensityGap,
-      y: 0
-    });
+      minSampleDensities.push({
+        x: minSampleDensities.slice(-1)[0].x + minSampleDensityGap,
+        y: 0
+      });
+    }
 
     // Compute height density
     const heightDensities: Point[] = [];
