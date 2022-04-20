@@ -543,7 +543,12 @@ export class PinnedTreeWindow {
           backTextColor
         };
 
-        leftX = node.x + nodeR + labelGap + rightWidth;
+        if (node.data.f[0] !== '+' && node.data.f[0] !== '-') {
+          leftX = node.x + nodeR + labelGap + rightWidth;
+        } else {
+          leftX = node.x + nodeR + labelGap;
+        }
+
         rightX = this.width - internalHPadding;
       }
 

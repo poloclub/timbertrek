@@ -490,7 +490,7 @@ export function leafArcClickHandler(
 
 // TODO: Remove this function
 export function tempShowPinnedTree(this: Sunburst) {
-  const treeID = 322;
+  const treeID = 412;
   const treeTuple = this.treeWindowStoreValue.treeMap.get(treeID);
 
   if (treeTuple !== undefined) {
