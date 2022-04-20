@@ -90,6 +90,7 @@ export class Sunburst {
   dataRoot: d3.HierarchyNode<RuleNode>;
   treeMapMap: Map<number, [TreeNode, number, number]>;
   partition: HierarchyNode;
+  totalTreeNum: number;
 
   featureCount: Map<string, number>;
   featureValueCount: Map<string, Map<string, number>>;
@@ -287,6 +288,7 @@ export class Sunburst {
 
     // The initial head node is the root
     this.curHeadNode = this.partition;
+    this.totalTreeNum = this.partition.treeNum;
 
     // Figure out how many levels to show at the beginning
     // If `level` is not given, we show all the levels by default

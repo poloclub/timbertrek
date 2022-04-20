@@ -87,6 +87,10 @@
     )}
   >
     <span class="rule-stat">{sunburst?.curHeadNode.value | 0} paths</span>
-    <span class="tree-stat">{sunburst?.curHeadNode.treeNum | 0} trees</span>
+    <span class="tree-stat">
+      {sunburst?.curHeadNode.treeNum === sunburst?.totalTreeNum
+        ? `${sunburst?.curHeadNode.treeNum | 0}`
+        : `${sunburst?.curHeadNode.treeNum | 0}/${sunburst?.totalTreeNum}`} trees</span
+    >
   </div>
 </div>
