@@ -5,7 +5,12 @@ import { round } from '../../utils/utils';
 import { config } from '../../config';
 import type { SearchStoreValue } from '../../stores';
 import { getSearchStoreDefaultValue } from '../../stores';
-import type { HierarchyJSON, Point, TreeNode } from '../TimberTypes';
+import type {
+  HierarchyJSON,
+  Point,
+  TreeNode,
+  SelectedTrees
+} from '../TimberTypes';
 
 const formatter = d3.format(',.3~f');
 const histHeight = 45;
@@ -153,6 +158,14 @@ export class SearchPanel {
 
     // Initialize the depth rows
     this.#initDepthRows();
+
+    this.searchStoreValue.updatePlots = (
+      selectedTrees: SelectedTrees,
+      animation: boolean
+    ) => {
+      this.updatePlots(selectedTrees, animation);
+    };
+    this.searchStore.set(this.searchStoreValue);
   }
 
   /**
@@ -169,7 +182,8 @@ export class SearchPanel {
 
     const count = accuracies.length;
     const binNum = 50;
-    const bins = d3.bin().thresholds(binNum)(accuracies);
+    const binGen = d3.bin().thresholds(binNum);
+    const bins = binGen(accuracies);
 
     // Compute the density in each bin
     const accuracyDensities: Point[] = [];
@@ -1404,5 +1418,224 @@ export class SearchPanel {
 
     this.searchStoreValue.curAllFeatures = curFeatureIDs;
     this.searchStore.set(this.searchStoreValue);
+  };
+
+  /**
+   * Update the accuracy and min sample density plots as well as the height
+   * bar chart based on the current selection
+   * @param selectedTrees Selected trees
+   */
+  updatePlots = (selectedTrees: SelectedTrees, animation = false) => {
+    const accuracies: number[] = [];
+    const minSampleLeaves: number[] = [];
+    const heightCountMap = new Map<number, number>();
+
+    if (this.searchStoreValue.treeHeightMap) {
+      for (const [height, count] of this.searchStoreValue.treeHeightMap) {
+        heightCountMap.set(height, 0);
+      }
+    }
+
+    let count = 1;
+    if (this.searchStoreValue.treeHeightMap) {
+      count = this.searchStoreValue.treeHeightMap.size;
+    }
+
+    const trans = d3
+      .transition('updatePlot')
+      .duration(500) as unknown as d3.Transition<
+      d3.BaseType,
+      Point[],
+      null,
+      undefined
+    >;
+
+    // Construct new accuracies and minSamples
+    for (const treeID in this.data.treeMap) {
+      const t = parseInt(treeID);
+      if (
+        selectedTrees.allFeature.has(t) &&
+        selectedTrees.depth.has(t) &&
+        selectedTrees.height.has(t) &&
+        selectedTrees.minSample.has(t)
+      ) {
+        accuracies.push(this.data.treeMap[treeID][2]);
+      }
+
+      if (
+        selectedTrees.allFeature.has(t) &&
+        selectedTrees.depth.has(t) &&
+        selectedTrees.height.has(t) &&
+        selectedTrees.accuracy.has(t) &&
+        this.searchStoreValue.treeMinSampleMap !== null
+      ) {
+        minSampleLeaves.push(this.searchStoreValue.treeMinSampleMap.get(t)!);
+      }
+
+      if (
+        selectedTrees.allFeature.has(t) &&
+        selectedTrees.depth.has(t) &&
+        selectedTrees.minSample.has(t) &&
+        selectedTrees.accuracy.has(t) &&
+        this.searchStoreValue.treeHeightMap !== null
+      ) {
+        const curHeight = this.searchStoreValue.treeHeightMap.get(t)!;
+        const oldCount = heightCountMap.get(curHeight)!;
+        heightCountMap.set(curHeight, oldCount + 1);
+      }
+    }
+
+    // Compute the density in each bin
+    const binNum = 50;
+    const binGen = d3.bin().thresholds(binNum);
+    const bins = binGen(accuracies);
+
+    const accuracyDensities: Point[] = [];
+    bins.forEach(b => {
+      accuracyDensities.push({
+        x: b.x0 === undefined ? 0 : b.x0,
+        y: b.length / count
+      });
+    });
+    // Add start and end to make sure the path starts and ends at 0
+    const densityGap = accuracyDensities[1].x - accuracyDensities[0].x;
+    accuracyDensities.unshift({
+      x: accuracyDensities[0].x - densityGap,
+      y: 0
+    });
+    accuracyDensities.push({
+      x: accuracyDensities.slice(-1)[0].x + densityGap,
+      y: 0
+    });
+
+    const minSampleDensities: Point[] = [];
+    const sampleBins = binGen(minSampleLeaves);
+    sampleBins.forEach(b => {
+      minSampleDensities.push({
+        x: b.x0 === undefined ? 0 : b.x0,
+        y: b.length / count
+      });
+    });
+
+    // Add start and end to make sure the path starts and ends at 0
+    const minSampleDensityGap =
+      minSampleDensities[1].x - minSampleDensities[0].x;
+
+    minSampleDensities.unshift({
+      x: Math.max(0, minSampleDensities[0].x - minSampleDensityGap),
+      y: 0
+    });
+
+    minSampleDensities.push({
+      x: minSampleDensities.slice(-1)[0].x + minSampleDensityGap,
+      y: 0
+    });
+
+    // Compute height density
+    const heightDensities: Point[] = [];
+    heightCountMap.forEach((v, k) => {
+      heightDensities.push({
+        x: k,
+        y: v / count
+      });
+    });
+
+    heightDensities.sort((a, b) => a.x - b.x);
+
+    // Update the accuracy plot
+    const histGroup = this.accuracySVG?.select('g.hist-group');
+
+    const curve = d3
+      .line<Point>()
+      .curve(d3.curveBasis)
+      .x(d => this.accuracyXScale(d.x))
+      .y(d => this.accuracyYScale(d.y));
+
+    if (animation) {
+      histGroup
+        ?.select('path.area-path')
+        .datum(accuracyDensities)
+        .transition(trans)
+        .attr('d', curve);
+
+      histGroup
+        ?.select('path.area-path.selected')
+        .datum(accuracyDensities)
+        .transition(trans)
+        .attr('d', curve);
+    } else {
+      histGroup
+        ?.select('path.area-path')
+        .datum(accuracyDensities)
+        .attr('d', curve);
+
+      histGroup
+        ?.select('path.area-path.selected')
+        .datum(accuracyDensities)
+        .attr('d', curve);
+    }
+
+    // Update the minSample plot
+    const minSampleHistGroup = this.minSampleSVG?.select('g.hist-group');
+    const minSampleCurve = d3
+      .line<Point>()
+      .curve(d3.curveBasis)
+      .x(d => this.minSampleXScale(d.x))
+      .y(d => this.minSampleYScale(d.y));
+
+    if (animation) {
+      minSampleHistGroup
+        ?.select('path.area-path')
+        .datum(minSampleDensities)
+        .transition(trans)
+        .attr('d', minSampleCurve);
+
+      minSampleHistGroup
+        ?.select('path.area-path.selected')
+        .datum(minSampleDensities)
+        .transition(trans)
+        .attr('d', minSampleCurve);
+    } else {
+      minSampleHistGroup
+        ?.select('path.area-path')
+        .datum(minSampleDensities)
+        .attr('d', minSampleCurve);
+
+      minSampleHistGroup
+        ?.select('path.area-path.selected')
+        .datum(minSampleDensities)
+        .attr('d', minSampleCurve);
+    }
+
+    // Update the height plot
+    const heightHistGroup = this.heightSVG?.select('g.hist-group');
+    const barGroups = heightHistGroup?.selectAll('g.bar').data(heightDensities);
+
+    if (animation) {
+      barGroups
+        ?.select('rect')
+        .transition(trans)
+        .attr('y', d => this.heightYScale(d.y))
+        .attr('height', d => this.heightYScale(0) - this.heightYScale(d.y));
+
+      // Add text on top of the bar
+      barGroups
+        ?.select('text')
+        .transition(trans)
+        .attr('y', d => this.heightYScale(d.y) - 5);
+    } else {
+      barGroups
+        ?.select('rect')
+        .attr('y', d => this.heightYScale(d.y))
+        .attr('height', d => this.heightYScale(0) - this.heightYScale(d.y));
+
+      // Add text on top of the bar
+      barGroups?.select('text').attr('y', d => this.heightYScale(d.y) - 5);
+    }
+
+    barGroups?.select('tspan').text(d => `(${d3.format('.0%')(d.y)})`);
+    barGroups
+      ?.select('title')
+      .text(d => `Height: ${d.x} (${d3.format('.4%')(d.y)})`);
   };
 }

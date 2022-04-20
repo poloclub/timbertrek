@@ -75,6 +75,10 @@ export function syncAccuracyRange(this: Sunburst) {
 
   this.partition = partition;
   this.updateSunburst();
+
+  if (this.searchStoreValue.updatePlots !== null) {
+    this.searchStoreValue.updatePlots(this.selectedTrees, false);
+  }
 }
 
 /**
@@ -149,6 +153,10 @@ export function syncMinSampleRange(this: Sunburst) {
 
   this.partition = partition;
   this.updateSunburst();
+
+  if (this.searchStoreValue.updatePlots !== null) {
+    this.searchStoreValue.updatePlots(this.selectedTrees, false);
+  }
 }
 
 /**
@@ -225,6 +233,10 @@ export function syncHeightRange(this: Sunburst) {
   this.partition = partition;
 
   this.updateSunburstWithAnimation();
+
+  if (this.searchStoreValue.updatePlots !== null) {
+    this.searchStoreValue.updatePlots(this.selectedTrees, true);
+  }
 }
 
 /**
@@ -313,6 +325,10 @@ export function syncDepthFeatures(this: Sunburst) {
   this.partition = partition;
 
   this.updateSunburstWithAnimation();
+
+  if (this.searchStoreValue.updatePlots !== null) {
+    this.searchStoreValue.updatePlots(this.selectedTrees, true);
+  }
 }
 
 /**
@@ -401,6 +417,10 @@ export function syncAllFeatures(this: Sunburst) {
   this.partition = partition;
 
   this.updateSunburstWithAnimation();
+
+  if (this.searchStoreValue.updatePlots !== null) {
+    this.searchStoreValue.updatePlots(this.selectedTrees, true);
+  }
 }
 
 /**

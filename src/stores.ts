@@ -3,7 +3,8 @@ import type {
   PinnedTree,
   TreeNode,
   FavPinnedTree,
-  FeatureInfo
+  FeatureInfo,
+  SelectedTrees
 } from './components/TimberTypes';
 
 export interface FavoritesStoreValue {
@@ -32,6 +33,9 @@ export interface SearchStoreValue {
   featureMap: Map<number, string[]>;
   getFeatureColor: null | ((f: string) => string);
   featureOrder: number[];
+  updatePlots:
+    | null
+    | ((selectedTrees: SelectedTrees, animation: boolean) => void);
 }
 
 export interface SunburstStoreValue {
@@ -116,7 +120,8 @@ export const getSearchStoreDefaultValue = (): SearchStoreValue => {
     treeMinSampleMap: null,
     featureMap: new Map<number, string[]>(),
     getFeatureColor: null,
-    featureOrder: []
+    featureOrder: [],
+    updatePlots: null
   };
 };
 
