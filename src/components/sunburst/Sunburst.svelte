@@ -71,6 +71,14 @@
 </style>
 
 <div class="sunburst" bind:this={component}>
+  <div class="no-tree-message" class:show={sunburst?.curHeadNode.treeNum === 0}>
+    <span>
+      {'No tree meets the current constraints :('}
+    </span>
+    <span>
+      {'Try to relax the filtering in the Search Panel'}
+    </span>
+  </div>
   <svg class="sunburst-svg" />
   <div
     class="stat-overlay"
