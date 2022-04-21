@@ -1080,10 +1080,12 @@ export class Sunburst {
       .selectAll('.arc')
       .attrTween('d', d => () => this.arc(d as d3.DefaultArcObject))
       .style('fill-opacity', d =>
-        (d as HierarchyNode).y0 >= newDomain.y1 ? 0.2 : 1
+        (d as HierarchyNode).depth > this.sunburstStoreValue.depthHigh ? 0.2 : 1
       )
       .style('pointer-events', d =>
-        (d as HierarchyNode).y0 >= newDomain.y1 ? 'none' : 'initial'
+        (d as HierarchyNode).depth > this.sunburstStoreValue.depthHigh
+          ? 'none'
+          : 'initial'
       )
       .style('display', d => {
         const cd = d as HierarchyNode;

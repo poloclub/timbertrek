@@ -375,7 +375,7 @@ export class PinnedTreeWindow {
       .attr('x', d => d.x)
       .attr('y', d => d.y + 3)
       .text((d, i) => (i === 0 ? 'true' : 'false'))
-      .style('display', firstPathData[0].source.height > 7 ? 'none' : 'unset');
+      .style('display', firstPathData[0].source.height > 6 ? 'none' : 'unset');
 
     // Add node text
     // Compute the label positions
@@ -850,7 +850,7 @@ export class PinnedTreeWindow {
       .attr('x', d => d.x)
       .attr('y', d => d.y + 3)
       .text((d, i) => (i === 0 ? 'true' : 'false'))
-      .style('display', firstPathData[0].source.height > 7 ? 'none' : 'unset');
+      .style('display', firstPathData[0].source.height > 6 ? 'none' : 'unset');
 
     // Add node text
     // Compute the label positions
