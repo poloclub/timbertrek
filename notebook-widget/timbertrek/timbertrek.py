@@ -226,6 +226,7 @@ def get_decision_rules(tree_strings):
     Returns:
         set: A set of decision rules
     """
+
     working_queue = deque()
 
     # Each queue item is a list [feature_id, previous_feature_ids]
@@ -279,8 +280,50 @@ def get_decision_rules(tree_strings):
                 else:
                     working_queue.append([s, cur_features])
 
+        elif len(cur_string_split) == 6:
+            # Case 3: there are six values: the first two correspond to the cur item
+            # and the last four correspond to the next two items in the queue
+            for j, s in enumerate(cur_string_split[:2]):
+
+                formated_cur_feature = cur_feature
+                formated_cur_feature += "t" if j == 0 else "f"
+                cur_features = pre_features + [formated_cur_feature]
+
+                if s == "-1" or s == "-2":
+                    decision_rules.add((tuple(cur_features), "+" if s == "-2" else "-"))
+                else:
+                    working_queue.append([s, cur_features])
+
+            # Load the next item in the queue
+            cur_feature, pre_features = working_queue.popleft()
+
+            for j, s in enumerate(cur_string_split[2:4]):
+
+                formated_cur_feature = cur_feature
+                formated_cur_feature += "t" if j == 0 else "f"
+                cur_features = pre_features + [formated_cur_feature]
+
+                if s == "-1" or s == "-2":
+                    decision_rules.add((tuple(cur_features), "+" if s == "-2" else "-"))
+                else:
+                    working_queue.append([s, cur_features])
+
+            # Load the next item in the queue
+            cur_feature, pre_features = working_queue.popleft()
+
+            for j, s in enumerate(cur_string_split[4:]):
+
+                formated_cur_feature = cur_feature
+                formated_cur_feature += "t" if j == 0 else "f"
+                cur_features = pre_features + [formated_cur_feature]
+
+                if s == "-1" or s == "-2":
+                    decision_rules.add((tuple(cur_features), "+" if s == "-2" else "-"))
+                else:
+                    working_queue.append([s, cur_features])
+
         else:
-            print("Error: encounter string size either 2 or 4")
+            raise ValueError("Error: encounter string size either 2 nor 4 nor 6")
 
         i += 1
 
@@ -332,8 +375,8 @@ def get_hierarchy_tree(tree_strings):
                     working_queue.append([s, new_sub_tree])
 
         elif len(cur_string_split) == 4:
-            # Case 2: there are four values: the first two correspond to the cur item
-            # and the last two correspond to the next item in the queue
+            # Case 2: there are four values: the first two corresponding to the cur item
+            # and the last two corresponding to the next item in the queue
             sub_tree["f"] = [cur_feature]
             sub_tree["c"] = []
 
@@ -360,8 +403,51 @@ def get_hierarchy_tree(tree_strings):
                     sub_tree["c"].append(new_sub_tree)
                     working_queue.append([s, new_sub_tree])
 
+        elif len(cur_string_split) == 6:
+            # Case 3: there are six values: the first two corresponding to the cur item
+            # and the last four corresponding to the next two items in the queue
+            sub_tree["f"] = [cur_feature]
+            sub_tree["c"] = []
+
+            for s in cur_string_split[:2]:
+                if s == "-1" or s == "-2":
+                    # We hit a decision node, add a leaf to this branch
+                    sub_tree["c"].append({"f": ["+"] if s == "-2" else ["-"]})
+                else:
+                    new_sub_tree = {}
+                    sub_tree["c"].append(new_sub_tree)
+                    working_queue.append([s, new_sub_tree])
+
+            # Load the next item in the queue
+            cur_feature, sub_tree = working_queue.popleft()
+            sub_tree["f"] = [cur_feature]
+            sub_tree["c"] = []
+
+            for s in cur_string_split[2:4]:
+                if s == "-1" or s == "-2":
+                    # We hit a decision node, add a leaf to this branch
+                    sub_tree["c"].append({"f": ["+"] if s == "-2" else ["-"]})
+                else:
+                    new_sub_tree = {}
+                    sub_tree["c"].append(new_sub_tree)
+                    working_queue.append([s, new_sub_tree])
+
+            # Load the next item in the queue
+            cur_feature, sub_tree = working_queue.popleft()
+            sub_tree["f"] = [cur_feature]
+            sub_tree["c"] = []
+
+            for s in cur_string_split[4:]:
+                if s == "-1" or s == "-2":
+                    # We hit a decision node, add a leaf to this branch
+                    sub_tree["c"].append({"f": ["+"] if s == "-2" else ["-"]})
+                else:
+                    new_sub_tree = {}
+                    sub_tree["c"].append(new_sub_tree)
+                    working_queue.append([s, new_sub_tree])
+
         else:
-            print("Error: encounter string size either 2 or 4")
+            raise ValueError("Error: encounter string size either 2 nor 4 nor 6")
 
         i += 1
 
@@ -480,6 +566,7 @@ def count_leaf_samples(root, x_all, y_all):
         x_all(np.array): Data sample values
         y_all(np.array): Data labels
     """
+
     y_pred = np.array([root["f"][0] + "l" + "0" for _ in range(x_all.shape[0])]).astype(
         object
     )
@@ -524,11 +611,7 @@ def count_leaf_samples(root, x_all, y_all):
         )[0]
         y_pred[list(false_indexes)] = cur_labels[1] + "r" + str(cur_dep + 1)
 
-        cur_node["f"] = [
-            cur_node["f"][0],
-            len(true_indexes) + len(false_indexes),
-            -1,
-        ]
+        cur_node["f"] = [cur_node["f"][0], len(true_indexes) + len(false_indexes), -1]
 
         # Update the sample # in the original tree on every node
         # Also compute the # of correctly classified samples on leaf node (

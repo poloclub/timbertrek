@@ -387,11 +387,11 @@ export class Sunburst {
     this.viewInitialized = true;
     console.timeEnd('Draw sunburst');
 
-    if (this.pinnedTreeStoreValue.pinnedTrees.length < 1) {
-      setTimeout(() => {
-        this.tempShowPinnedTree();
-      }, 500);
-    }
+    // if (this.pinnedTreeStoreValue.pinnedTrees.length < 1) {
+    //   setTimeout(() => {
+    //     this.tempShowPinnedTree();
+    //   }, 500);
+    // }
   }
 
   /**

@@ -24,6 +24,7 @@ export interface LabelPosition {
   textLong: string;
   frontTextColor: string;
   backTextColor: string;
+  index: number;
 }
 
 /**

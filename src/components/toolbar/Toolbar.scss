@@ -20,7 +20,7 @@ $depth-box-width: 24px;
 
 .depths {
   display: flex;
-  flex-shrink: 1;
+  flex-shrink: 0;
   min-width: 0px;
   flex-direction: row;
   justify-content: space-between;
@@ -31,7 +31,7 @@ $depth-box-width: 24px;
 
   .depth-label {
     min-width: 0px;
-    flex-shrink: 1;
+    flex-shrink: 0;
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
@@ -151,6 +151,10 @@ $depth-box-width: 24px;
       text-overflow: ellipsis;
       overflow: hidden;
       white-space: nowrap;
+
+      &.no-display {
+        display: none;
+      }
     }
 
     &.shown {

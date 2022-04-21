@@ -74,7 +74,9 @@
     }
   };
 
-  readDataFromFile();
+  if (!notebookMode) {
+    readDataFromFile();
+  }
 
   // Construct stores
   const favoritesStore = getFavoritesStore();
@@ -118,6 +120,7 @@
           <div
             class="logo-tag"
             title="Curating decision trees that align with human knowledge"
+            class:no-display={sunburstWidth < 400}
           >
             Curating decision trees that align with human knowledge
           </div>
@@ -150,7 +153,12 @@
         <Dropzone {initDataFromDropzone} width={sunburstWidth} />
       {:else}
         <div class="toolbar">
-          <Toolbar {favoritesStore} {sunburstStore} {searchStore} />
+          <Toolbar
+            {favoritesStore}
+            {sunburstStore}
+            {searchStore}
+            {sunburstWidth}
+          />
         </div>
 
         <div class="sunburst-wrapper">

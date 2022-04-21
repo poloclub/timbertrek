@@ -17,6 +17,7 @@
   export let favoritesStore: Writable<FavoritesStoreValue> | null = null;
   export let sunburstStore: Writable<SunburstStoreValue> | null = null;
   export let searchStore: Writable<SearchStoreValue> | null = null;
+  export let sunburstWidth = 650;
 
   let component: HTMLElement | null = null;
   let mounted = false;
@@ -55,7 +56,9 @@
 
 <div class="toolbar" bind:this={component}>
   <div class="depths">
-    <div class="depth-label">Show Depth</div>
+    <div class="depth-label">
+      {sunburstWidth < 600 ? 'Depth' : 'Show Depth'}
+    </div>
 
     <div class="depth-box-container">
       <div class="depth-box-lines">
@@ -97,7 +100,13 @@
           {@html iconHeartSolid}
         </div>
       </span>
-      <span class="button-text"> Favorites </span>
+      <span
+        class="button-text"
+        class:no-display={handler?.sunburstStoreValue.depthMax > 8 &&
+          sunburstWidth < 650}
+      >
+        Favorites
+      </span>
     </div>
 
     <div
@@ -110,7 +119,13 @@
       <span class="svg-icon">
         {@html iconSearch}
       </span>
-      <span class="button-text"> Search </span>
+      <span
+        class="button-text"
+        class:no-display={handler?.sunburstStoreValue.depthMax > 8 &&
+          sunburstWidth < 650}
+      >
+        Search
+      </span>
     </div>
   </div>
 </div>
