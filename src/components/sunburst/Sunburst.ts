@@ -496,7 +496,7 @@ export class Sunburst {
     /**
      * Step 2: Figure out the feature order (based on first split frequency)
      */
-    // Initialize the featureValueCount map
+    // Initialize the featureValueCount and featureCount map
     for (const [f, items] of this.featureMap) {
       if (this.featureValueCount.has(items[0])) {
         this.featureValueCount.get(items[0])!.set(items[1], 0);
@@ -504,6 +504,10 @@ export class Sunburst {
         const tempMap = new Map<string, number>();
         tempMap.set(items[1], 0);
         this.featureValueCount.set(items[0], tempMap);
+      }
+
+      if (!this.featureCount.has(items[0])) {
+        this.featureCount.set(items[0], 0);
       }
     }
 
@@ -513,14 +517,10 @@ export class Sunburst {
       ) as string[];
 
       // Check if this feature name is created
-      if (this.featureCount.has(featureName)) {
-        this.featureCount.set(
-          featureName,
-          this.featureCount.get(featureName)! + d.value!
-        );
-      } else {
-        this.featureCount.set(featureName, d.value!);
-      }
+      this.featureCount.set(
+        featureName,
+        this.featureCount.get(featureName)! + d.value!
+      );
 
       // Update the value count
       this.featureValueCount
@@ -555,7 +555,7 @@ export class Sunburst {
       if (aFeatureCount !== undefined && bFeatureCount !== undefined) {
         return bFeatureCount - aFeatureCount || aLightness - bLightness;
       } else {
-        console.warn(`Encountered unrecorded keys '${aName}', '${bName}'`);
+        // console.warn(`Encountered unrecorded keys '${aName}', '${bName}'`);
         return 0;
       }
     });

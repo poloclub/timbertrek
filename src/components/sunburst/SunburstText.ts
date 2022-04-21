@@ -468,6 +468,7 @@ export function drawSecondaryText(this: Sunburst, undrawnFs: Set<number>) {
   secondaryTexts.style('fill', d => getTextColor(this.getFeatureColor, d));
 
   // Add text path
+  const arcIndexes = new Set<number>([]);
   const secondaryTextPaths = secondaryTexts
     .style('font-size', `${curFontSize}rem`)
     .append('textPath')
@@ -487,6 +488,7 @@ export function drawSecondaryText(this: Sunburst, undrawnFs: Set<number>) {
       if (textWidth < sectorRadius) {
         return `#s-text-line-${i}`;
       } else if (this.doesTextFitArc(d, 16 * curFontSize, text, 10)) {
+        arcIndexes.add(i);
         return `#s-text-arc-${i}`;
       } else {
         return `#s-text-line-${i}`;
@@ -496,7 +498,7 @@ export function drawSecondaryText(this: Sunburst, undrawnFs: Set<number>) {
   // Only draw each text once
   const drawnTexts = new Set<string>();
 
-  secondaryTextPaths.text(d => {
+  secondaryTextPaths.text((d, i) => {
     if (drawnTexts.has(d.data.f)) return '';
 
     const featureInfo = this.getFeatureInfo(d.data.f);
@@ -519,20 +521,22 @@ export function drawSecondaryText(this: Sunburst, undrawnFs: Set<number>) {
     }
 
     // Width check (first check)
-    let textWidth = getLatoTextWidth(text, 16 * curFontSize);
-    if (textWidth > sectorRadius) {
-      // If the width is larger than the sector radius, then we try to use
-      // its short name
-      text = featureInfo.shortValue;
+    if (!arcIndexes.has(i)) {
+      let textWidth = getLatoTextWidth(text, 16 * curFontSize);
+      if (textWidth > sectorRadius) {
+        // If the width is larger than the sector radius, then we try to use
+        // its short name
+        text = featureInfo.shortValue;
 
-      // Check if the new width is okay, if not, replace the last portion
-      // of the string with ...
-      textWidth = getLatoTextWidth(text, 16 * curFontSize);
-      while (textWidth > sectorRadius) {
-        text = text.replace('...', '');
-        text = text.slice(0, text.length - 1);
-        text = `${text}...`;
+        // Check if the new width is okay, if not, replace the last portion
+        // of the string with ...
         textWidth = getLatoTextWidth(text, 16 * curFontSize);
+        while (textWidth > sectorRadius) {
+          text = text.replace('...', '');
+          text = text.slice(0, text.length - 1);
+          text = `${text}...`;
+          textWidth = getLatoTextWidth(text, 16 * curFontSize);
+        }
       }
     }
 
