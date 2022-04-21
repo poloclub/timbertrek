@@ -53,8 +53,8 @@
     // Init the model
 
     // const modelFile = 'compas_rules_0.01_0.05.json';
-    const modelFile = 'compas-rules-mul_0.05-reg_0.01-min_10.json';
-    // const modelFile = 'fico-rules-mul_0.05-reg_0.01.json';
+    // const modelFile = 'compas-rules-mul_0.05-reg_0.01-min_10.json';
+    const modelFile = 'fico-rules-mul_0.05-reg_0.01.json';
     // const modelFile = 'car-rules-mul_0.05-reg_0.01.json';
 
     const loadedData = await d3.json(

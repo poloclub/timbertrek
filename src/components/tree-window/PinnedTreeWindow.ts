@@ -374,7 +374,8 @@ export class PinnedTreeWindow {
       .classed('split-label-left', (d, i) => i === 0)
       .attr('x', d => d.x)
       .attr('y', d => d.y + 3)
-      .text((d, i) => (i === 0 ? 'true' : 'false'));
+      .text((d, i) => (i === 0 ? 'true' : 'false'))
+      .style('display', firstPathData[0].source.height > 7 ? 'none' : 'unset');
 
     // Add node text
     // Compute the label positions
@@ -411,7 +412,8 @@ export class PinnedTreeWindow {
         if (
           curData.y === nextData.y &&
           curData.pos === LabelPos.right &&
-          nextData.pos === LabelPos.right
+          nextData.pos === LabelPos.right &&
+          nextData.index === curData.index + 1
         ) {
           curData.width *= 2;
         }
@@ -524,7 +526,8 @@ export class PinnedTreeWindow {
           text: labelText,
           textLong: labelTextLong,
           frontTextColor,
-          backTextColor
+          backTextColor,
+          index: i
         };
 
         leftX = node.x + nodeR;
@@ -540,7 +543,8 @@ export class PinnedTreeWindow {
           text: labelText,
           textLong: labelTextLong,
           frontTextColor,
-          backTextColor
+          backTextColor,
+          index: i
         };
 
         if (node.data.f[0] !== '+' && node.data.f[0] !== '-') {
@@ -845,7 +849,8 @@ export class PinnedTreeWindow {
       .classed('split-label-left', (d, i) => i === 0)
       .attr('x', d => d.x)
       .attr('y', d => d.y + 3)
-      .text((d, i) => (i === 0 ? 'true' : 'false'));
+      .text((d, i) => (i === 0 ? 'true' : 'false'))
+      .style('display', firstPathData[0].source.height > 7 ? 'none' : 'unset');
 
     // Add node text
     // Compute the label positions
@@ -974,7 +979,8 @@ export class PinnedTreeWindow {
           text: labelText,
           textLong: labelTextLong,
           frontTextColor,
-          backTextColor
+          backTextColor,
+          index: i
         };
 
         leftX = node.x + node.width;
@@ -990,7 +996,8 @@ export class PinnedTreeWindow {
           text: labelText,
           textLong: labelTextLong,
           frontTextColor,
-          backTextColor
+          backTextColor,
+          index: i
         };
 
         leftX = node.x + node.width;
@@ -1006,7 +1013,8 @@ export class PinnedTreeWindow {
           text: labelText,
           textLong: labelTextLong,
           frontTextColor,
-          backTextColor
+          backTextColor,
+          index: i
         };
 
         leftX = node.x + node.width;

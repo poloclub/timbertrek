@@ -1159,8 +1159,6 @@ export class SearchPanel {
    * Reset the filter for the height row
    */
   refreshHeight = () => {
-    console.log('refreshing height');
-
     for (const h of this.heightXScale.domain()) {
       const curCheckbox = d3
         .select(this.component)
@@ -1247,6 +1245,7 @@ export class SearchPanel {
     // Look for duplicate feature names
     const duplicateFeatureNames = new Set<string>([]);
     const tempFeatureNames = new Set<string>([]);
+
     for (const f of this.searchStoreValue.featureOrder) {
       let featureInfo = this.searchStoreValue.featureMap.get(f);
       if (featureInfo === undefined) {

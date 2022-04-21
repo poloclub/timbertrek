@@ -230,9 +230,6 @@ export class Sunburst {
     searchStore: Writable<SearchStoreValue>;
     sunburstUpdated: () => void;
   }) {
-    // console.log('Init sunburst');
-    // console.log(data);
-
     // Set up view box
     this.svg = d3
       .select(component)
@@ -280,6 +277,7 @@ export class Sunburst {
     this.featureOrder = [];
     console.log(this.data);
     console.log(this.featureMap);
+
     this.dataRoot = d3
       .hierarchy(this.data, d => d.c)
       // Count the leaves (trees)
@@ -498,6 +496,17 @@ export class Sunburst {
     /**
      * Step 2: Figure out the feature order (based on first split frequency)
      */
+    // Initialize the featureValueCount map
+    for (const [f, items] of this.featureMap) {
+      if (this.featureValueCount.has(items[0])) {
+        this.featureValueCount.get(items[0])!.set(items[1], 0);
+      } else {
+        const tempMap = new Map<string, number>();
+        tempMap.set(items[1], 0);
+        this.featureValueCount.set(items[0], tempMap);
+      }
+    }
+
     this.dataRoot.children!.forEach(d => {
       const [featureName, featureValue] = this.getFeatureNameValue(
         d.data.f
@@ -509,25 +518,17 @@ export class Sunburst {
           featureName,
           this.featureCount.get(featureName)! + d.value!
         );
-
-        // Check if this value is created
-        if (this.featureValueCount.get(featureName)!.has(featureValue)) {
-          this.featureValueCount
-            .get(featureName)!
-            .set(
-              featureValue,
-              this.featureValueCount.get(featureName)!.get(featureValue)! +
-                d.value!
-            );
-        } else {
-          this.featureValueCount.get(featureName)!.set(featureValue, d.value!);
-        }
       } else {
         this.featureCount.set(featureName, d.value!);
-        const tempMap = new Map<string, number>();
-        tempMap.set(featureValue, d.value!);
-        this.featureValueCount.set(featureName, tempMap);
       }
+
+      // Update the value count
+      this.featureValueCount
+        .get(featureName)!
+        .set(
+          featureValue,
+          this.featureValueCount.get(featureName)!.get(featureValue)! + d.value!
+        );
     });
 
     // Handle leaf node
@@ -563,7 +564,13 @@ export class Sunburst {
     this.featureOrder = this.dataRoot.children!.map(d => parseInt(d.data.f));
     this.featureMap.forEach((v, k) => {
       if (!this.featureOrder.includes(k)) {
-        this.featureOrder.push(k);
+        const previousIndexes: number[] = [];
+        this.featureMap.forEach((vi, ki) => {
+          if (vi[0] === v[0] && this.featureOrder.indexOf(ki) !== -1) {
+            previousIndexes.push(this.featureOrder.indexOf(ki));
+          }
+        });
+        this.featureOrder.splice(Math.max(...previousIndexes) + 1, 0, k);
       }
     });
 
@@ -634,9 +641,14 @@ export class Sunburst {
       d3.lch(82.442, 65.798, 87.008), // yellow
       d3.lch(69.948, 22.911, 191.071), // sky
       d3.lch(57.703, 28.677, 334.556), // purple
-      d3.lch(52.777, 22.881, 53.64), // brown
-      d3.lch(75.303, 39.883, 16.269) // pink
+      d3.lch(52.777, 22.881, 53.64) // brown
+      // d3.lch(75.303, 39.883, 16.269) // pink
     ];
+
+    const colorChangedCountMap = new Map<number, [number, d3.HCLColor]>();
+    for (const [i, color] of tableau9.entries()) {
+      colorChangedCountMap.set(i, [0, color]);
+    }
 
     // Sort the feature by (1) feature name; (2) feature value by # of trees use
     // them in the first split
@@ -645,11 +657,26 @@ export class Sunburst {
       .sort((a, b) => this.featureCount.get(b)! - this.featureCount.get(a)!);
 
     sortedFeatureNames.forEach((featureName, i) => {
-      if (i > 8) {
-        console.error('Number of feature is greater than 9');
-      }
+      let curColor: d3.HCLColor;
+      let curColorIndex: number;
 
-      const curColor = d3.lch(d3.color(tableau9[i % 8]));
+      if (i > 7) {
+        console.warn('Number of feature is greater than 8:', featureName);
+        // Find the previous color with the fewest variants
+        let minIndex = -1;
+        let minCount = Infinity;
+        for (let j = 0; j < tableau9.length; j++) {
+          if (colorChangedCountMap.get(j)![0] < minCount) {
+            minIndex = j;
+            minCount = colorChangedCountMap.get(j)![0];
+          }
+        }
+        curColor = colorChangedCountMap.get(minIndex)![1];
+        curColorIndex = minIndex;
+      } else {
+        curColor = tableau9[i];
+        curColorIndex = i;
+      }
 
       // Get the number of values using this feature
       const sortedFeatureValues = Array.from(
@@ -664,10 +691,11 @@ export class Sunburst {
       const valueNum = sortedFeatureValues.length;
 
       // If there are not many values, we can just use the maxLGap to decrease L
+      let newFeatureColor: d3.HCLColor = curColor;
       if (curColor.l + valueNum * maxLGap <= maxL) {
         sortedFeatureValues.forEach((value, j) => {
           const newFeatureString = `${featureName}:${value}`;
-          const newFeatureColor = d3.lch(
+          newFeatureColor = d3.lch(
             curColor.l + j * maxLGap,
             curColor.c,
             curColor.h
@@ -680,7 +708,7 @@ export class Sunburst {
         const curLGap = (maxL - curColor.l) / valueNum;
         sortedFeatureValues.forEach((value, j) => {
           const newFeatureString = `${featureName}:${value}`;
-          const newFeatureColor = d3.lch(
+          newFeatureColor = d3.lch(
             curColor.l + j * curLGap,
             curColor.c,
             curColor.h
@@ -689,6 +717,18 @@ export class Sunburst {
           featureColors.push(newFeatureColor.formatHsl());
         });
       }
+
+      // Track the color count
+      const nextLighterColor = d3.lch(
+        newFeatureColor.l + 10,
+        newFeatureColor.c,
+        newFeatureColor.h
+      );
+
+      colorChangedCountMap.set(curColorIndex, [
+        colorChangedCountMap.get(curColorIndex)![0] + valueNum,
+        nextLighterColor
+      ]);
     });
 
     const mainColorScale = d3
