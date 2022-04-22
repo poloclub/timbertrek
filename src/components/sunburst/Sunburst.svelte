@@ -86,7 +86,11 @@
       `and ${sunburst?.curHeadNode.treeNum} decisions trees in the current selection.`
     )}
   >
-    <span class="rule-stat">{sunburst?.curHeadNode.value | 0} paths</span>
+    <span class="tree-stat">
+      {sunburst?.curHeadNode.value === sunburst?.totalPathNum
+        ? `${sunburst?.curHeadNode.value | 0}`
+        : `${sunburst?.curHeadNode.value | 0}/${sunburst?.totalPathNum}`} paths</span
+    >
     <span class="tree-stat">
       {sunburst?.curHeadNode.treeNum === sunburst?.totalTreeNum
         ? `${sunburst?.curHeadNode.treeNum | 0}`

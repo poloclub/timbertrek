@@ -180,6 +180,14 @@ export class SearchPanel {
       accuracies.push(this.data.treeMap[treeID][2]);
     }
 
+    // Compute mean and median accuracy
+    // console.log(accuracies.reduce((a, b) => a + b) / accuracies.length);
+    // console.log(
+    //   accuracies.slice(0, accuracies.length).sort((a, b) => a - b)[
+    //     Math.floor(accuracies.length / 2)
+    //   ]
+    // );
+
     const count = accuracies.length;
     const binNum = 50;
     const binGen = d3.bin().thresholds(binNum);

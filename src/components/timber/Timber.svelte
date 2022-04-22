@@ -52,9 +52,12 @@
   const readDataFromFile = async () => {
     // Init the model
 
-    // const modelFile = 'compas-rules-mul_0.05-reg_0.01.json';
+    const modelFile = 'compas-rules-mul_0.05-reg_0.01.json';
     // const modelFile = 'fico-rules-mul_0.05-reg_0.01.json';
-    const modelFile = 'car-rules-mul_0.15-reg_0.015.json';
+    // const modelFile = 'car-rules-mul_0.15-reg_0.015.json';
+    // const modelFile = 'car-rules-mul_0.15-reg_0.02.json';
+    // const modelFile = 'car-rules-mul_0.1-reg_0.01.json';
+    // const modelFile = 'car-rules-mul_0.05-reg_0.005.json';
 
     const loadedData = await d3.json(
       `${import.meta.env.BASE_URL}data/${modelFile}`

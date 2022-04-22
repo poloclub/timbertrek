@@ -90,6 +90,8 @@ export class Sunburst {
   dataRoot: d3.HierarchyNode<RuleNode>;
   treeMapMap: Map<number, [TreeNode, number, number]>;
   partition: HierarchyNode;
+
+  totalPathNum: number;
   totalTreeNum: number;
 
   featureCount: Map<string, number>;
@@ -287,6 +289,7 @@ export class Sunburst {
     // The initial head node is the root
     this.curHeadNode = this.partition;
     this.totalTreeNum = this.partition.treeNum;
+    this.totalPathNum = this.partition.value!;
 
     // Figure out how many levels to show at the beginning
     // If `level` is not given, we show all the levels by default
@@ -553,9 +556,16 @@ export class Sunburst {
       const bLightness = d3.lch(this.getFeatureColor(b.data.f)).l;
 
       if (aFeatureCount !== undefined && bFeatureCount !== undefined) {
-        return bFeatureCount - aFeatureCount || aLightness - bLightness;
+        // (1) feature count
+        // (2) if same feature count => name string
+        // (3) same feature count, same name => value count
+        return (
+          bFeatureCount - aFeatureCount ||
+          aName.localeCompare(bName) ||
+          aLightness - bLightness
+        );
       } else {
-        // console.warn(`Encountered unrecorded keys '${aName}', '${bName}'`);
+        console.warn(`Encountered unrecorded keys '${aName}', '${bName}'`);
         return 0;
       }
     });
