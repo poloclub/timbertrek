@@ -24,8 +24,13 @@
   import paperIcon from '../../imgs/icon-paper.svg?raw';
 
   export let notebookMode = false;
+  export let curDataset = 'compas';
+  export let timbertrekTransitioning = false;
 
   let component: HTMLElement | null = null;
+  let initialized = false;
+  let mounted = false;
+  let initDepthGap = 2;
 
   // Load the data and pass to child components
   let data: HierarchyJSON | null | undefined = null;
@@ -33,6 +38,13 @@
 
   let sunburstWidth = notebookMode ? 500 : 650;
   const devMode = false;
+
+  // Map of pre-included rashomon sets
+  const datasetMap = new Map<string, string>();
+  datasetMap.set('compas', 'compas-rules-mul_0.05-reg_0.01.json');
+  datasetMap.set('fico', 'fico-rules-mul_0.05-reg_0.01.json');
+  datasetMap.set('car evaluation', 'car-rules-mul_0.15-reg_0.015.json');
+  datasetMap.set('my own set', '');
 
   /**
    * Init data and feature map
@@ -49,20 +61,28 @@
   /**
    * Load the data file from /public
    */
-  const readDataFromFile = async () => {
+  const readDataFromFile = async (curDataset: string) => {
     // Init the model
-
-    const modelFile = 'compas-rules-mul_0.05-reg_0.01.json';
+    // const modelFile = 'compas-rules-mul_0.05-reg_0.01.json';
     // const modelFile = 'fico-rules-mul_0.05-reg_0.01.json';
     // const modelFile = 'car-rules-mul_0.15-reg_0.015.json';
     // const modelFile = 'car-rules-mul_0.15-reg_0.02.json';
     // const modelFile = 'car-rules-mul_0.1-reg_0.01.json';
     // const modelFile = 'car-rules-mul_0.05-reg_0.005.json';
-
-    const loadedData = await d3.json(
-      `${import.meta.env.BASE_URL}data/${modelFile}`
-    );
-    initData(loadedData as HierarchyJSON);
+    if (curDataset === 'my own dataset') return;
+    if (curDataset === 'car evaluation') {
+      initDepthGap = 4;
+    } else {
+      initDepthGap = 2;
+    }
+    if (datasetMap.has(curDataset)) {
+      initialized = true;
+      const modelFile = datasetMap.get(curDataset)!;
+      const loadedData = await d3.json(
+        `${import.meta.env.BASE_URL}data/${modelFile}`
+      );
+      initData(loadedData as HierarchyJSON);
+    }
   };
 
   /**
@@ -76,10 +96,6 @@
       featureMap.set(parseInt(k), v as string[]);
     }
   };
-
-  if (!notebookMode) {
-    readDataFromFile();
-  }
 
   // Construct stores
   const favoritesStore = getFavoritesStore();
@@ -104,7 +120,15 @@
         initData(loadedData);
       });
     }
+    mounted = true;
   });
+
+  $: !notebookMode &&
+    curDataset &&
+    !initialized &&
+    mounted &&
+    !timbertrekTransitioning &&
+    (() => readDataFromFile(curDataset))();
 </script>
 
 <style lang="scss">
@@ -153,7 +177,7 @@
 
     <div class="content">
       {#if data === null}
-        <Dropzone {initDataFromDropzone} width={sunburstWidth} />
+        <Dropzone {initDataFromDropzone} width={sunburstWidth} {curDataset} />
       {:else}
         <div class="toolbar">
           <Toolbar
@@ -167,6 +191,7 @@
         <div class="sunburst-wrapper">
           <Sunburst
             {data}
+            {initDepthGap}
             {sunburstStore}
             {treeWindowStore}
             {pinnedTreeStore}

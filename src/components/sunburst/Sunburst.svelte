@@ -17,6 +17,7 @@
   export let treeWindowStore: Writable<TreeWindowStoreValue> | null = null;
   export let pinnedTreeStore: Writable<PinnedTreeStoreValue> | null = null;
   export let searchStore: Writable<SearchStoreValue> | null = null;
+  export let initDepthGap = 2;
 
   let component: HTMLElement | null = null;
   let mounted = false;
@@ -47,6 +48,7 @@
       sunburst = new Sunburst({
         component,
         data,
+        initDepthGap,
         sunburstStore,
         treeWindowStore,
         pinnedTreeStore,

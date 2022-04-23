@@ -211,6 +211,7 @@ export class Sunburst {
    * @param args Named parameters
    * @param args.component Sunburst component
    * @param args.sunburstStore sunburstStore
+   * @param args.initDepthGap Initial depth gap
    * @param data Hierarchy data loaded from a JSON file
    * @param width SVG width
    * @param height SVG height
@@ -218,6 +219,7 @@ export class Sunburst {
   constructor({
     component,
     data,
+    initDepthGap = 2,
     sunburstStore,
     treeWindowStore,
     pinnedTreeStore,
@@ -226,6 +228,7 @@ export class Sunburst {
   }: {
     component: HTMLElement;
     data: HierarchyJSON;
+    initDepthGap: number;
     sunburstStore: Writable<SunburstStoreValue>;
     treeWindowStore: Writable<TreeWindowStoreValue>;
     pinnedTreeStore: Writable<PinnedTreeStoreValue>;
@@ -277,8 +280,6 @@ export class Sunburst {
     this.colorScale = d3.scaleOrdinal();
 
     this.featureOrder = [];
-    console.log(this.data);
-    console.log(this.featureMap);
 
     this.dataRoot = d3
       .hierarchy(this.data, d => d.c)
@@ -296,7 +297,7 @@ export class Sunburst {
     // Initialize the store
     this.sunburstStore = sunburstStore;
     this.sunburstStoreValue = getSunburstStoreDefaultValue();
-    this.#initSunburstStore();
+    this.#initSunburstStore(initDepthGap);
 
     this.treeWindowStore = treeWindowStore;
     this.treeWindowStoreValue = getTreeWindowStoreDefaultValue();
@@ -751,7 +752,7 @@ export class Sunburst {
   /**
    * Initialize the sunburst store
    */
-  #initSunburstStore() {
+  #initSunburstStore(initDepthGap: number) {
     this.sunburstStore.subscribe(value => {
       this.sunburstStoreValue = value;
 
@@ -790,7 +791,8 @@ export class Sunburst {
     // Figure out the height of the trie and initialize the depth
     this.sunburstStoreValue.depthMax = this.partition.height;
     this.sunburstStoreValue.depthLow = 1;
-    this.sunburstStoreValue.depthHigh = this.sunburstStoreValue.depthLow + 2;
+    this.sunburstStoreValue.depthHigh =
+      this.sunburstStoreValue.depthLow + initDepthGap;
     this.sunburstStoreValue.action = SunburstAction.None;
 
     // Initialize the depth colors with empty strings

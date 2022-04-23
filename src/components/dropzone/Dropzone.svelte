@@ -8,6 +8,7 @@
 
   export let initDataFromDropzone: (dropzoneData: HierarchyJSON) => void;
   export let width = 650;
+  export let curDataset = 'my own set';
 
   let component: HTMLElement | null = null;
   let inputElem: HTMLInputElement | null = null;
@@ -49,7 +50,7 @@
 
 <div
   class="dropzone-tab"
-  style={`width: ${width}px; height: ${width + config.layout.toolbarHeight}px;`}
+  style={`height: ${width + config.layout.toolbarHeight}px;`}
   bind:this={component}
 >
   <div
@@ -64,21 +65,26 @@
     <div class="svg-icon">
       {@html logoIcon}
     </div>
-    <div class="drop-message">
-      Drop a Rashomon trie file (.json) here to start
-    </div>
 
-    <div
-      class="help-message"
-      on:click={e => {
-        e.stopPropagation();
-      }}
-    >
-      <a
-        href="https://gist.github.com/xiaohk/875b5374840c66689eb42a4b8820c3b5"
-        target="_blank">How to generate this file?</a
+    {#if curDataset === 'my own set'}
+      <div class="drop-message">
+        Drop a Rashomon trie file (.json) here to start
+      </div>
+
+      <div
+        class="help-message"
+        on:click={e => {
+          e.stopPropagation();
+        }}
       >
-    </div>
+        <a
+          href="https://gist.github.com/xiaohk/875b5374840c66689eb42a4b8820c3b5"
+          target="_blank">How to generate this file?</a
+        >
+      </div>
+    {:else}
+      <div class="drop-message">Loading Rashomon set...</div>
+    {/if}
 
     <span class="error-message">
       {dropzone?.errorMessage}
