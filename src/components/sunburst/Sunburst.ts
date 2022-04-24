@@ -987,14 +987,26 @@ export class Sunburst {
         d => (d as HierarchyNode).data.nid!
       )
       .join('g')
-      .attr('class', d => `arc arc-${d.depth}`)
+      .attr(
+        'class',
+        d =>
+          `arc arc-${d.depth} ${
+            d.data.f === '_' ? 'leaf leaf-'.concat(String(d.data.t!)) : ''
+          }`
+      )
       .classed('leaf', d => d.data.f === '_');
 
     // Draw the background paths
     const arcs = arcGroups
       .append('path')
       .attr('class', 'arc')
-      .classed('leaf', d => d.data.f === '_')
+      .attr(
+        'class',
+        d =>
+          `arc arc-${d.depth} ${
+            d.data.f === '_' ? 'leaf leaf-'.concat(String(d.data.t!)) : ''
+          }`
+      )
       .attr('id', d => `arc-${d.data.nid}`)
       // @ts-ignore
       .attr('d', d => this.arc(d))

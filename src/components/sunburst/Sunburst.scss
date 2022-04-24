@@ -40,8 +40,16 @@
     stroke-width: 2px;
   }
 
+  :global(.arc.leaf.highlighted) {
+    fill: adjust-color($color: $gray-300, $lightness: -6%);
+  }
+
   :global(.arc.leaf) {
     fill: $gray-300;
+  }
+
+  :global(.arc.leaf.same-leaf-highlight) {
+    fill: adjust-color($color: $gray-300, $lightness: -5%);
   }
 
   :global(.text-arc) {

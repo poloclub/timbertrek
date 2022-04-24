@@ -216,6 +216,15 @@ export function leafArcMouseenterHandler(
 
     this.treeWindowStore.set(this.treeWindowStoreValue);
 
+    // Also highlight other leaf nodes linking to the same tree
+    if (this.curHeadNode.value && this.curHeadNode.value < 300) {
+      const arcGroup = this.svg.select('.arc-group');
+      arcGroup
+        .selectAll(`path.arc.leaf-${treeID}`)
+        .filter(o => (o as HierarchyNode).data.nid !== d.data.nid)
+        .classed('same-leaf-highlight', true);
+    }
+
     mouseenterTimeoutID = null;
   };
 
@@ -255,6 +264,14 @@ export function leafArcMouseleaveHandler(
 
   // Dehighlight the ancestors
   this.arcMouseleaveHandler(e, d);
+
+  // De-highlight leaves with the same tree
+  if (this.curHeadNode.value && this.curHeadNode.value < 300) {
+    const arcGroup = this.svg.select('.arc-group');
+    arcGroup
+      .selectAll(`path.arc.leaf-${d.data.t}`)
+      .classed('same-leaf-highlight', false);
+  }
 
   if (mouseenterTimeoutID !== null) {
     window.clearTimeout(mouseenterTimeoutID);
