@@ -27,11 +27,12 @@ tool:
 
 usage:
   p1: >
-    With a flexible interface design, there are two options to use TimberTrek to explore
-    your Rashomon sets. The first option is to select MY SET on the top of
-    this page, and then upload your Rashomon trie data by dragging it to
-    the interface (Video 2-1). You can follow the instruction in the tool to learn
-    how to generate the Rashomon JSON file.
+    With a flexible interface design, there are two options to use TimberTrek to
+    explore your Rashomon sets. The first option is to select <a href='#top'
+    style="font-variant: small-caps;">my set</a> on the top of this page, and
+    then upload your Rashomon trie data by dragging it to the interface (Video
+    2-1). You can follow the instruction in the tool to learn how to generate
+    the Rashomon JSON file.
 
   p2: >
     You can directly use TimberTrek in any computational notebooks (e.g.,
@@ -53,9 +54,45 @@ tutorial:
       name: Rashomon Overview
       descriptions:
         - >
-          TimberTrek's primary view is a Sunburst plot that summarizes all
-          decision trees in the Rashomon set.It groups decision trees based on
-          their decision paths.
+          TimberTrek's primary view is a <a
+          href='https://www.cc.gatech.edu/gvu/ii/sunburst/'
+          target='_blank'>Sunburst</a> that summarizes all decision trees in the
+          Rashomon set. We generate this Sunburst by extracting all decision
+          paths (path from the tree root to a leaf) from all decision trees in
+          the Rashomon set. The Sunburst has \(k\) rings, where \(k\) is the
+          height of the tallest tree in the Rashomon set. Each ring correspond
+          to a level of the decision path.
+        - >
+          Each ring is split into multiple sectors where each sector correspond
+          to a testing condition of the decision tree. We color code the sectors
+          based on the feature attributes. For example, <span class="feature-tag" style="color:
+          #4E79A7">number of prior crime</span>,  <span class="feature-tag" style="color:
+          #F28E2C">age</span>, and <span class="feature-tag" style="color:
+          #76B7B2">sex</span>. For features that have multiple values, we use color lightness
+          to encode different values. For example, <span class="feature-tag" style="color:
+          #4E79A7">prior > 3</span>,  <span class="feature-tag" style="color:
+          #6B95C4">prior = 0</span>, and <span class="feature-tag" style="color:
+          #88B1E2">prior = 1</span>. Finally, we use <span class="feature-tag" style="color:
+          hsl(0,0%, 60%)">gray</span> to color encode <span class="feature-tag"
+          style="color: hsl(0,0%, 60%)">leaf nodes</span> (end of a decision
+          path). Each <span class="feature-tag" style="color: hsl(0,0%,
+          60%)">leaf node</span> is linked to a decision tree that has the
+          corresponding decision path. Sectors are positioned based on their
+          hierarchical relationship in the decision rule. For example, if we
+          have two sectors aligned as <span class="feature-tag" style="color:
+          #4E79A7">prior > 3</span>,  <span class="feature-tag" style="color:
+          #F28E2C">age < 26</span>, it means all decision rules after these two sectors use <span class="feature-tag" style="color:
+          #4E79A7">prior > 3</span> as the first split and <span class="feature-tag" style="color:
+          #F28E2C">age < 26</span> as the second split.
+        - >
+          You can click a sector to "zoom into" a subset of decision trees with
+          the selected decision path patterns. It makes the Sunburst to only
+          display decision rules with a feature order up to the clicked sector.
+          You can hover over a <span class="feature-tag" style="color: hsl(0,0%,
+          60%)">leaf node</span> to see a preview of its linked decision tree.
+          Some Rashomon set can have very tall trees. Therefore, you can use the
+          depth menu (on the top left) to control how many levels to show in the
+          Sunburst; it is helpful to focus on a few levels at a time.
     - id: search
       name: Search Panel
       descriptions:
@@ -63,8 +100,8 @@ tutorial:
           TimberTrek's primary view is a Sunburst plot that summarizes all
           decision trees in the Rashomon set.It groups decision trees based on
           their decision paths.
-    - id: search
-      name: Search Panel
+    - id: tree
+      name: Tree Window
       descriptions:
         - >
           TimberTrek's primary view is a Sunburst plot that summarizes all

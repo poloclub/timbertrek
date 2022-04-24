@@ -30,6 +30,17 @@
   @import './Article.scss';
 </style>
 
+<svelte:head>
+  <!-- <script
+    id="MathJax-script"
+    async
+    src={`${import.meta.env.BASE_URL}data/mathjax/tex-chtml.js`}></script> -->
+  <script
+    id="MathJax-script"
+    async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3.2/es5/tex-mml-chtml.js"></script>
+</svelte:head>
+
 <div class="article-page">
   <div class="main-app" bind:this={component} tabindex="-1">
     <div class="timbertrek-app">
@@ -101,14 +112,15 @@
           <img
             src={`${import.meta.env.BASE_URL}data/jupyter-placeholder.png`}
           />
-          <span
+          <div
             class="button"
             on:click={() => {
               showIFrame = true;
             }}
-            ><span class="svg-icon">{@html iconRocket}</span>Launch Jupyter
-            Notebook</span
           >
+            <span class="svg-icon">{@html iconRocket}</span>Launch Jupyter
+            Notebook
+          </div>
         </div>
       {/if}
     </div>

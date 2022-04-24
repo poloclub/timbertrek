@@ -92,9 +92,23 @@ $header-color: currentcolor;
   grid-column: text-start / text-end;
 }
 
+:global(.article a) {
+  color: currentColor;
+  text-decoration: none;
+  border-bottom: 1px solid hsla(0, 0%, 0%, 0.4);
+
+  &:visited {
+    color: currentColor;
+  }
+
+  &:hover {
+    border-bottom: 1px solid hsla(0, 0%, 0%, 0.8);
+  }
+}
+
 .article a:hover,
 .article .video-link:hover {
-  text-decoration: underline;
+  text-decoration-color: $gray-900;
 }
 
 .article :global(code),
@@ -290,6 +304,7 @@ video {
       width: 100%;
       height: 100%;
       filter: blur(2px) grayscale(0.7);
+      pointer-events: none;
     }
 
     .button {
@@ -300,10 +315,12 @@ video {
 
       font-size: $font-u2;
       font-weight: 600;
+
       padding: 4px 12px;
       border-radius: 5px;
-      background-color: $teal-700;
+      background-color: $teal-500;
       color: $gray-light-background;
+      box-shadow: inset 0 2px 0 0 hsla(0, 0%, 100%, 0.4);
 
       transition: background-color 150ms $ease-cubic-in-out;
 
@@ -330,6 +347,13 @@ video {
       }
     }
   }
+}
+
+:global(.feature-tag) {
+  // padding: 1px 4px;
+  border-radius: 3px;
+  // color: white;
+  font-weight: 600;
 }
 
 @keyframes circling {
