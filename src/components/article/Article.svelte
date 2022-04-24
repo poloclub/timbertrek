@@ -4,6 +4,7 @@
   import { fade, fly } from 'svelte/transition';
 
   import iconLogo from '../../imgs/timbertrek-logo-light.svg?raw';
+  import iconRocket from '../../imgs/icon-rocket.svg?raw';
   import text from './ArticleText.yml';
 
   let component: HTMLElement | null = null;
@@ -104,7 +105,9 @@
             class="button"
             on:click={() => {
               showIFrame = true;
-            }}>Load Jupyter Notebook</span
+            }}
+            ><span class="svg-icon">{@html iconRocket}</span>Launch Jupyter
+            Notebook</span
           >
         </div>
       {/if}

@@ -300,16 +300,26 @@ video {
 
       font-size: $font-u2;
       font-weight: 600;
-      padding: 3px 10px;
+      padding: 4px 12px;
       border-radius: 5px;
-      background-color: $teal-600;
+      background-color: $teal-700;
       color: $gray-light-background;
 
       transition: background-color 150ms $ease-cubic-in-out;
 
+      display: flex;
+      gap: 7px;
+
       cursor: pointer;
       user-select: none;
       -webkit-user-select: none;
+
+      .svg-icon {
+        :global(svg) {
+          width: $font-u2;
+          height: $font-u2;
+        }
+      }
 
       &:hover {
         background-color: $teal-800;
