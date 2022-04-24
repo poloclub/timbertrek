@@ -299,14 +299,23 @@ video {
     justify-content: center;
     align-items: center;
     position: relative;
+    overflow: hidden;
 
     border-radius: 5px;
     border: 1px solid $gray-400;
 
+    .mask {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background-color: hsla(0, 0%, 0%, 0.2);
+      z-index: 1;
+    }
+
     img {
       width: 100%;
       height: 100%;
-      filter: blur(2px) grayscale(0.7);
+      filter: grayscale(0.75);
       pointer-events: none;
     }
 
@@ -315,6 +324,7 @@ video {
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
+      z-index: 2;
 
       font-size: $font-u2;
       font-weight: 600;

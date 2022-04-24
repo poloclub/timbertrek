@@ -108,7 +108,13 @@
           height="100%"
         />
       {:else}
-        <div class="demo-placeholder">
+        <div
+          class="demo-placeholder"
+          on:click={() => {
+            showIFrame = true;
+          }}
+        >
+          <div class="mask" />
           <img
             src={`${import.meta.env.BASE_URL}data/jupyter-placeholder.png`}
           />

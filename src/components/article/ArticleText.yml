@@ -109,6 +109,18 @@ tutorial:
           click the toggle switch on the bottom right to switch the tree
           visualization to a waterfall-like plot, where the size of each node is
           augmented by the training samples that pass through them.
+        - >
+          You can open multiple <em>Tree Windows</em> at once, and drag windows
+          into different locations. Arranging multiple windows side by side
+          could help you compare the structures and prediction patterns of
+          interested model candidates.
+      caption: >
+        A <em>Tree Windows</em> uses a node-link diagram to illustrate the
+        details of a decision tree. An alternative waterfall-like chart
+        augments node size with its sample size, helping users to better
+        understand each tree's robustness. To compare the structure and
+        prediction patterns of multiple decision trees, users can open multiple
+        windows and drag to reposition them side by side.
     - id: search
       name: Search Panel
       descriptions:
@@ -122,6 +134,13 @@ tutorial:
           to select what features to include in the tree or at a particular
           level. Adjusting the filtering setting would trigger the <em>Rashomon
           Overview</em> to animate to display/hide affected sectors.
+      caption: >
+        The <em>Search Panel</em> allows users to search for decision trees with
+        desired properties by applying different filtering tools. For example, a
+        user can drag the accuracy slider to hide decision trees with slightly
+        smaller accuracy scores. Similarly, a user can also click checkboxes under
+        "Depth 2" to search for trees that use specific features in their
+        second level.
     - id: favorite
       name: Favorite Panel
       descriptions:
@@ -137,6 +156,14 @@ tutorial:
           bookmarked trees with your comments. You can load these trees with
           TimberTrek's Python package. Your comments can also help you continue
           curating in the future.
+      caption: >
+        Users can use the <em>Favorite Panel</em> to keep track of all
+        bookmarked decision trees. This panel shows a thumbnail of each tree
+        along with a user-entered comment. The comment can document the model
+        curation motivation and context. Once satisfied with their curation, a
+        user can click the save button to download all bookmarked trees with
+        their documentation. It helps users deploy satisfactory models or
+        continue curation in the future.
 
 
 
