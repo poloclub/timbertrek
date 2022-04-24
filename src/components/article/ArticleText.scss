@@ -18,6 +18,7 @@ $header-color: currentcolor;
   margin-bottom: 12px;
   border-bottom: 1px solid #eaecef;
   grid-column: text-start / text-end;
+  line-height: 1.2;
 
   display: flex;
   // justify-content: space-between;
@@ -30,6 +31,7 @@ $header-color: currentcolor;
   margin-bottom: 10px;
   margin-top: 8px;
   grid-column: text-start / text-end;
+  line-height: 1.2;
 }
 
 .article h6 {
@@ -39,6 +41,7 @@ $header-color: currentcolor;
   margin-bottom: 8px;
   margin-top: 44px;
   grid-column: text-start / text-end;
+  line-height: 1.2;
 }
 
 .article p {

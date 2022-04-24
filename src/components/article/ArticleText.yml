@@ -18,18 +18,19 @@ tool:
     <em>thousands of inherently interpretable and almost-equally accurate
     models</em>, providing opportunities for users to choose ones that best
     align with their knowledge and needs (e.g., fairness, monotonicity,
-    simplicity). However, the large size and diversity of Rashomon sets pose
-    challenges for users to effectively explore and compare all these good
-    models. TimberTrek is the first interactive visualization tool designed to
-    tackle this critical challenge through <strong>summarizing the whole Rashomon
-    set</strong> of sparse decision trees and empowering users to <strong>curate
-    accurate and trustworthy models</strong>.
+    simplicity). However, the large size of Rashomon sets and the diversity of
+    contained models pose challenges for users to effectively explore and
+    compare all these good models. TimberTrek is the first interactive
+    visualization tool designed to tackle this critical challenge through
+    <strong>summarizing the whole Rashomon set</strong> of sparse decision trees
+    and empowering users to <strong>curate accurate and trustworthy
+    models</strong>.
 
 usage:
   p1: >
     With a flexible interface design, there are two options to use TimberTrek to
     explore your Rashomon sets. The first option is to select <a href='#top'
-    style="font-variant: small-caps;">my set</a> on the top of this page, and
+    style="font-variant: small-caps;">my own set</a> on the top of this page, and
     then upload your Rashomon trie data by dragging it to the interface (Video
     2-1). You can follow the instruction in the tool to learn how to generate
     the Rashomon JSON file.
@@ -57,11 +58,11 @@ tutorial:
           TimberTrek's primary view is a <a
           href='https://www.cc.gatech.edu/gvu/ii/sunburst/'
           target='_blank'>Sunburst</a> that summarizes all decision trees in the
-          Rashomon set. We generate this Sunburst by extracting all decision
-          paths (path from the tree root to a leaf) from all decision trees in
-          the Rashomon set. The Sunburst has \(k\) rings, where \(k\) is the
-          height of the tallest tree in the Rashomon set. Each ring correspond
-          to a level of the decision path.
+          Rashomon set. We generate this <em>Rashomon Overview</em> by
+          extracting all decision paths (path from the tree root to a leaf) from
+          all decision trees in the Rashomon set. The Sunburst has \(k\) rings,
+          where \(k\) is the height of the tallest tree in the Rashomon set.
+          Each ring corresponds to a level of the decision path.
         - >
           Each ring is split into multiple sectors where each sector correspond
           to a testing condition of the decision tree. We color code the sectors
@@ -74,46 +75,68 @@ tutorial:
           #6B95C4">prior = 0</span>, and <span class="feature-tag" style="color:
           #88B1E2">prior = 1</span>. Finally, we use <span class="feature-tag" style="color:
           hsl(0,0%, 60%)">gray</span> to color encode <span class="feature-tag"
-          style="color: hsl(0,0%, 60%)">leaf nodes</span> (end of a decision
+          style="color: hsl(0,0%, 60%)">leaf sectors</span> (end of a decision
           path). Each <span class="feature-tag" style="color: hsl(0,0%,
-          60%)">leaf node</span> is linked to a decision tree that has the
+          60%)">leaf sector</span> is linked to a decision tree that has the
           corresponding decision path. Sectors are positioned based on their
           hierarchical relationship in the decision rule. For example, if we
           have two sectors aligned as <span class="feature-tag" style="color:
           #4E79A7">prior > 3</span>,  <span class="feature-tag" style="color:
-          #F28E2C">age < 26</span>, it means all decision rules after these two sectors use <span class="feature-tag" style="color:
-          #4E79A7">prior > 3</span> as the first split and <span class="feature-tag" style="color:
-          #F28E2C">age < 26</span> as the second split.
+          #F28E2C">age < 26</span>, it means all decision rules after these two
+          #sectors use <span class="feature-tag" style="color: 4E79A7">prior >
+          #3</span> as the first split and <span class="feature-tag"
+          #style="color: F28E2C">age < 26</span> as the second split.
         - >
           You can click a sector to "zoom into" a subset of decision trees with
-          the selected decision path patterns. It makes the Sunburst to only
-          display decision rules with a feature order up to the clicked sector.
+          the selected decision path patterns; the Sunburst only
+          displays decision rules with a feature order up to the clicked sector.
           You can hover over a <span class="feature-tag" style="color: hsl(0,0%,
-          60%)">leaf node</span> to see a preview of its linked decision tree.
-          Some Rashomon set can have very tall trees. Therefore, you can use the
+          60%)">leaf sector</span> to see a preview of its linked decision tree.
+          Some Rashomon sets can have very tall trees. Therefore, you can use the
           depth menu (on the top left) to control how many levels to show in the
           Sunburst; it is helpful to focus on a few levels at a time.
-    - id: search
-      name: Search Panel
-      descriptions:
-        - >
-          TimberTrek's primary view is a Sunburst plot that summarizes all
-          decision trees in the Rashomon set.It groups decision trees based on
-          their decision paths.
     - id: tree
       name: Tree Window
       descriptions:
         - >
-          TimberTrek's primary view is a Sunburst plot that summarizes all
-          decision trees in the Rashomon set.It groups decision trees based on
-          their decision paths.
+          When you click a <span class="feature-tag" style="color: hsl(0,0%,
+          60%)">leaf sector</span>, a <em>Tree Window</em> appears to present
+          details for the linked decision tree. This window uses a node-link
+          diagram to visualize the tree structure by default. This window
+          uses stroke opacity to encode the accuracies of each leaf node in the
+          tree; when you hover over a leaf node, you can also inspect the number
+          of samples that the leaf node affects. In addition, you can
+          click the toggle switch on the bottom right to switch the tree
+          visualization to a waterfall-like plot, where the size of each node is
+          augmented by the training samples that pass through them.
+    - id: search
+      name: Search Panel
+      descriptions:
+        - >
+          Want to quickly identify trees with desired properties? The <em>Search
+          Panel</em> comes to the rescue! This panel provides a suite of
+          filtering tools that control what decision trees to include in the
+          Sunburst. For example, you can drag the "Minimum Leaf Sample" slider
+          to tell the <em>Rashomon Overview</em> to only display decision trees
+          whose leaves have more samples. Similarly, you can click the checkboxes
+          to select what features to include in the tree or at a particular
+          level. Adjusting the filtering setting would trigger the <em>Rashomon
+          Overview</em> to animate to display/hide affected sectors.
     - id: favorite
       name: Favorite Panel
       descriptions:
         - >
-          TimberTrek's primary view is a Sunburst plot that summarizes all
-          decision trees in the Rashomon set.It groups decision trees based on
-          their decision paths.
+          Once you have found decision trees that meet your needs, you can click
+          the heart button on the top right of the <em>Tree Window</em> to
+          bookmark them. You can see all bookmarked trees in the <em>Favorite
+          Panel</em>. You can also click the comment button on the <em>Tree
+          Window</em> to add a short comment to document why you choose this
+          decision tree. Alternatively, you can add or edit comments in the
+          <em>Favorite Panel</em> directly. Once you are satisfied with your
+          decision tree curation, you can click the download button to save all
+          bookmarked trees with your comments. You can load these trees with
+          TimberTrek's Python package. Your comments can also help you continue
+          curating in the future.
 
 
 
