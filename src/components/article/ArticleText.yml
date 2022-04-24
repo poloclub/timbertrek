@@ -1,0 +1,82 @@
+tool:
+  - >
+    It is essential to understand how machine learning (ML) models make
+    predictions in high-stakes settings such as healthcare, finance, and
+    criminal justice. ML researchers have made great strides in developing
+    interpretable models, and recent research focuses on
+    <strong>operationalizing interpretability</strong> — leveraging an understanding of
+    the domain to create more responsible and trustworthy ML systems.
+
+  - >
+    To help ML practitioners build trustworthy models, researchers have very
+    recently developed a technique to generate the set of almost-optimal sparse
+    interpretable decision trees. This set of high-performing models is called
+    the <a target="_blank" href="https://arxiv.org/abs/1908.01755">Rashomon
+    set</a>, named after the <a target="_blank"
+    href="https://projecteuclid.org/journals/statistical-science/volume-16/issue-3/Statistical-Modeling--The-Two-Cultures-with-comments-and-a/10.1214/ss/1009213726.full">Rashomon
+    effect</a> in statistics. A Rashomon set of sparse decision trees can have
+    <em>thousands of inherently interpretable and almost-equally accurate
+    models</em>, providing opportunities for users to choose ones that best
+    align with their knowledge and needs (e.g., fairness, monotonicity,
+    simplicity). However, the large size and diversity of Rashomon sets pose
+    challenges for users to effectively explore and compare all these good
+    models. TimberTrek is the first interactive visualization tool designed to
+    tackle this critical challenge through <strong>summarizing the whole Rashomon
+    set</strong> of sparse decision trees and empowering users to <strong>curate
+    accurate and trustworthy models</strong>.
+
+usage:
+  p1: >
+    With a flexible interface design, there are two options to use TimberTrek to explore
+    your Rashomon sets. The first option is to select MY SET on the top of
+    this page, and then upload your Rashomon trie data by dragging it to
+    the interface (Video 2-1). You can follow the instruction in the tool to learn
+    how to generate the Rashomon JSON file.
+
+  p2: >
+    You can directly use TimberTrek in any computational notebooks (e.g.,
+    Jupyter Notebook/Lab, Google Colab, and VS Code). To do that, you only need
+    to install TimberTrek's Python package via <code>pip install
+    timbertrek</code>. Then you can create a TimberTrek instance by passing your
+    Rashomon trie data. With <a href="https://github.com/xiaohk/stickyland"
+    target="_blank">Sticky Cells</a>, you can even create multiple
+    repositionable TimberTrek windows and compare different subsets of a
+    Rashomon set side by side! Try TimberTrek in the Jupyter Notebook below.
+
+tutorial:
+  p1: >
+    With multiple tightly integrated views, you can use TimberTrek to
+    <em>explore</em>, <em>compare</em>, and <em>curate</em> sparse decision
+    trees that align with your knowledge and values.
+  items:
+    - id: summary
+      name: Rashomon Overview
+      descriptions:
+        - >
+          TimberTrek's primary view is a Sunburst plot that summarizes all
+          decision trees in the Rashomon set.It groups decision trees based on
+          their decision paths.
+    - id: search
+      name: Search Panel
+      descriptions:
+        - >
+          TimberTrek's primary view is a Sunburst plot that summarizes all
+          decision trees in the Rashomon set.It groups decision trees based on
+          their decision paths.
+    - id: search
+      name: Search Panel
+      descriptions:
+        - >
+          TimberTrek's primary view is a Sunburst plot that summarizes all
+          decision trees in the Rashomon set.It groups decision trees based on
+          their decision paths.
+    - id: favorite
+      name: Favorite Panel
+      descriptions:
+        - >
+          TimberTrek's primary view is a Sunburst plot that summarizes all
+          decision trees in the Rashomon set.It groups decision trees based on
+          their decision paths.
+
+
+

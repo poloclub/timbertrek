@@ -115,6 +115,15 @@
     cursor: default;
     fill: unset;
 
+    transform: rotate(0deg);
+    animation: circling 3000ms linear 0ms infinite;
+    animation-play-state: paused;
+    animation-fill-mode: forwards;
+
+    &:hover {
+      animation-play-state: running;
+    }
+
     :global(svg) {
       width: 24px;
       height: 24px;
@@ -158,7 +167,7 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 100%;
+  // height: 100%;
 }
 
 .sunburst-wrapper {
@@ -215,4 +224,14 @@
 
 .pinned-tree-window-wrapper {
   z-index: 1;
+}
+
+@keyframes circling {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }

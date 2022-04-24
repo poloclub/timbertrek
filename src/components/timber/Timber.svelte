@@ -31,6 +31,7 @@
   let initialized = false;
   let mounted = false;
   let initDepthGap = 2;
+  let sidebarStyle = '';
 
   // Load the data and pass to child components
   let data: HierarchyJSON | null | undefined = null;
@@ -120,6 +121,15 @@
         initData(loadedData);
       });
     }
+
+    // Check if the screen is small; if so, we show side bars on top of the main
+    // window
+    const sidebarRoom = Math.floor((window.innerWidth - sunburstWidth) / 2);
+    if (sidebarRoom < 268) {
+      sidebarStyle = `transform: translateX(calc(100% - ${
+        268 - sidebarRoom + 5
+      }px))`;
+    }
     mounted = true;
   });
 
@@ -201,7 +211,7 @@
       {/if}
     </div>
 
-    <div class="sidebar">
+    <div class="sidebar" style={sidebarStyle}>
       <FavoritesPanel
         {favoritesStore}
         {pinnedTreeStore}
@@ -209,7 +219,7 @@
       />
     </div>
 
-    <div class="sidebar">
+    <div class="sidebar" style={sidebarStyle}>
       <SearchPanel {data} {searchStore} width={sunburstWidth} />
     </div>
   </div>
