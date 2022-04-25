@@ -5,6 +5,7 @@
 
   import iconLogo from '../../imgs/timbertrek-logo-light.svg?raw';
   import iconRocket from '../../imgs/icon-rocket.svg?raw';
+  import iconNote from '../../imgs/icon-note.svg?raw';
   import text from './ArticleText.yml';
 
   let component: HTMLElement | null = null;
@@ -98,7 +99,11 @@
 
     <h2 id="usage">How to Use TimberTrek?</h2>
     <p>{@html text.usage.p1}</p>
-    <p>{@html text.usage.p2}</p>
+    <p>
+      {@html text.usage.p2}(click the
+      <span class="svg-icon note-icon">{@html iconNote}</span> button to create sticky
+      cells).
+    </p>
 
     <div class="jupyter-demo">
       {#if showIFrame}
@@ -140,5 +145,8 @@
         <p>{@html p}</p>
       {/each}
     {/each}
+
+    <h2 id="usage">How is TimberTrek Developed?</h2>
+    <p>{@html text.development}</p>
   </div>
 </div>

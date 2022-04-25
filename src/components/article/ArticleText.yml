@@ -36,14 +36,14 @@ usage:
     the Rashomon JSON file.
 
   p2: >
-    You can directly use TimberTrek in any computational notebooks (e.g.,
-    Jupyter Notebook/Lab, Google Colab, and VS Code). To do that, you only need
-    to install TimberTrek's Python package via <code>pip install
+    You can directly use TimberTrek in any computational notebooks, such as
+    Jupyter Notebook & Lab, Google Colab, and VS Code Notebook. To do that, you
+    only need to install TimberTrek's Python package via <code>pip install
     timbertrek</code>. Then you can create a TimberTrek instance by passing your
     Rashomon trie data. With <a href="https://github.com/xiaohk/stickyland"
     target="_blank">Sticky Cells</a>, you can even create multiple
     repositionable TimberTrek windows and compare different subsets of a
-    Rashomon set side by side! Try TimberTrek in the Jupyter Notebook below.
+    Rashomon set side by side! Try TimberTrek in the Jupyter Notebook below
 
 tutorial:
   p1: >
@@ -83,8 +83,8 @@ tutorial:
           have two sectors aligned as <span class="feature-tag" style="color:
           #4E79A7">prior > 3</span>,  <span class="feature-tag" style="color:
           #F28E2C">age < 26</span>, it means all decision rules after these two
-          #sectors use <span class="feature-tag" style="color: 4E79A7">prior >
-          #3</span> as the first split and <span class="feature-tag"
+          sectors use <span class="feature-tag" style="color: 4E79A7">prior >
+          3</span> as the first split and <span class="feature-tag"
           #style="color: F28E2C">age < 26</span> as the second split.
         - >
           You can click a sector to "zoom into" a subset of decision trees with
@@ -165,5 +165,16 @@ tutorial:
         their documentation. It helps users deploy satisfactory models or
         continue curation in the future.
 
+development: >
+  TimberTrek is written in <a href='https://www.typescriptlang.org'
+  target='_blank'>Typescript</a> using <a href='https://svelte.dev'
+  target='_blank'>Svelte</a> as a framework and <a href='https://d3js.org'
+  target='_blank'>D3.js</a> for visualizations. The entire app runs locally and
+  privately in your web-browser, and your model and data would not leave your
+  machine. Anyone can access TimberTrek on their desktop or tablets, no need to
+  set up dedicated servers or writing code. With a flexible design, TimberTrek
+  supports all types of computational notebooks, such as Jupyter Notebook & Lab,
+  Google Colab, and VS Code Notebook. With a cross-platform support, we hope
+  TimberTrek will fit into your favorite ML development workflow.
 
 

@@ -7,7 +7,7 @@ $header-color: currentcolor;
   display: grid;
   grid-template-columns:
     [start] 1fr [long-start] calc((1000px - 78ch) / 2)
-    [text-start] 78ch [text-end] calc((1000px - 78ch) / 2) [long-end] 1fr [end];
+    [text-start] minmax(auto, 78ch) [text-end] calc((1000px - 78ch) / 2) [long-end] 1fr [end];
   color: $gray-800;
 }
 
@@ -252,7 +252,7 @@ video {
 }
 
 .svg-icon {
-  display: flex;
+  display: inline-flex;
   justify-content: center;
   align-items: center;
   fill: currentColor;
@@ -274,6 +274,14 @@ video {
 
     &:hover {
       animation-play-state: running;
+    }
+  }
+
+  &.note-icon {
+    transform: translateY(2px);
+    :global(svg) {
+      width: 16px;
+      height: 16px;
     }
   }
 }
@@ -302,13 +310,13 @@ video {
     overflow: hidden;
 
     border-radius: 5px;
-    border: 1px solid $gray-400;
+    border: 1px solid $gray-500;
 
     .mask {
       position: absolute;
       width: 100%;
       height: 100%;
-      background-color: hsla(0, 0%, 0%, 0.2);
+      background-color: hsla(0, 0%, 0%, 0.5);
       z-index: 1;
     }
 
@@ -319,6 +327,7 @@ video {
       pointer-events: none;
     }
 
+    $button-base-color: $orange-700;
     .button {
       position: absolute;
       top: 50%;
@@ -330,12 +339,16 @@ video {
       font-weight: 600;
 
       padding: 4px 12px;
-      border-radius: 5px;
-      background-color: $teal-500;
+      border-radius: 8px;
+      border: 1px solid
+        adjust-color($color: $button-base-color, $lightness: -3%);
+      background-color: $button-base-color;
       color: $gray-light-background;
-      box-shadow: inset 0 2px 0 0 hsla(0, 0%, 100%, 0.4);
+      box-shadow: inset 0 2px 0 0 hsla(0, 0%, 100%, 0.4),
+        0 4px 20px 0 hsla(0, 0%, 0%, 0.1);
 
-      transition: background-color 150ms $ease-cubic-in-out;
+      transition: background-color 150ms $ease-cubic-in-out,
+        box-shadow 150ms $ease-cubic-in-out, border 150ms $ease-cubic-in-out;
 
       display: flex;
       gap: 7px;
@@ -352,11 +365,25 @@ video {
       }
 
       &:hover {
-        background-color: $teal-800;
+        background-color: adjust-color(
+          $color: $button-base-color,
+          $lightness: -4%
+        );
+        box-shadow: inset 0 2px 0 0 hsla(0, 0%, 100%, 0.2),
+          0 4px 20px 0 hsla(0, 0%, 0%, 0.1);
+        border: 1px solid
+          adjust-color($color: $button-base-color, $lightness: -8%);
       }
 
       &:active {
-        background-color: $teal-900;
+        background-color: adjust-color(
+          $color: $button-base-color,
+          $lightness: -10%
+        );
+        box-shadow: inset 0 2px 0 0 hsla(0, 0%, 100%, 0.2),
+          0 4px 20px 0 hsla(0, 0%, 0%, 0.1);
+        border: 1px solid
+          adjust-color($color: $button-base-color, $lightness: -15%);
       }
     }
   }
