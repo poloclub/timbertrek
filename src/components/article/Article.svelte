@@ -87,7 +87,7 @@
     <h2 id="tool">
       <span>What is </span>
       <span class="svg-icon logo-icon">{@html iconLogo}</span>
-      <span>TimberTrek?</span>
+      <span><span class="tool-name">TimberTrek</span>?</span>
 
       <!-- <span>What is TimberTrek?</span>
       <span class="svg-icon logo-icon">{@html iconLogo}</span> -->
@@ -97,7 +97,7 @@
       <p>{@html p}</p>
     {/each}
 
-    <h2 id="usage">How to Use TimberTrek?</h2>
+    <h2 id="usage">How to Use <span class="tool-name">TimberTrek</span>?</h2>
     <p>{@html text.usage.p1}</p>
     <p>
       {@html text.usage.p2}(click the
@@ -136,17 +136,48 @@
       {/if}
     </div>
 
-    <h2 id="usage">What Can I do with TimberTrek?</h2>
+    <h2 id="usage">
+      What Can I do with <span class="tool-name">TimberTrek</span>?
+    </h2>
     <p>{@html text.tutorial.p1}</p>
 
-    {#each text.tutorial.items as item}
+    {#each text.tutorial.items as item, i}
       <h4 id={item.id}>{item.name}</h4>
-      {#each item.descriptions as p}
+      <p>{@html item.descriptions[0]}</p>
+      <div class="video" class:wide-video={item.isWide}>
+        <video autoplay loop muted playsinline>
+          <source src={`${import.meta.env.BASE_URL}video/${item.id}.mp4`} />
+          <track kind="captions" />
+        </video>
+        <div class="figure-caption">
+          Video {i + 1}. {@html item.caption}
+        </div>
+      </div>
+      {#each item.descriptions.slice(1) as p}
         <p>{@html p}</p>
       {/each}
     {/each}
 
-    <h2 id="usage">How is TimberTrek Developed?</h2>
+    <h2 id="usage">
+      How is <span class="tool-name" style="margin-right: 8px;">TimberTrek</span
+      > Developed?
+    </h2>
     <p>{@html text.development}</p>
+
+    <h2 id="team">Who Developed <span class="tool-name">TimberTrek</span>?</h2>
+    <p>{@html text.team}</p>
+
+    <h2 id="team">How Can I Contribute?</h2>
+    <p>{@html text.contribute[0]}</p>
+    <p>{@html text.contribute[1]}</p>
+  </div>
+
+  <div class="article-footer">
+    <div class="footer-main">
+      <div class="footer-cp">
+        <div>VIS'22 Submission</div>
+        <div>Thanks for reviewing our manuscript!</div>
+      </div>
+    </div>
   </div>
 </div>

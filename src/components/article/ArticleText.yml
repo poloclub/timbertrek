@@ -53,6 +53,7 @@ tutorial:
   items:
     - id: summary
       name: Rashomon Overview
+      isWide: false
       descriptions:
         - >
           TimberTrek's primary view is a <a
@@ -83,9 +84,9 @@ tutorial:
           have two sectors aligned as <span class="feature-tag" style="color:
           #4E79A7">prior > 3</span>,  <span class="feature-tag" style="color:
           #F28E2C">age < 26</span>, it means all decision rules after these two
-          sectors use <span class="feature-tag" style="color: 4E79A7">prior >
+          sectors use <span class="feature-tag" style="color: #4E79A7">prior >
           3</span> as the first split and <span class="feature-tag"
-          #style="color: F28E2C">age < 26</span> as the second split.
+          style="color: #F28E2C">age < 26</span> as the second split.
         - >
           You can click a sector to "zoom into" a subset of decision trees with
           the selected decision path patterns; the Sunburst only
@@ -95,8 +96,14 @@ tutorial:
           Some Rashomon sets can have very tall trees. Therefore, you can use the
           depth menu (on the top left) to control how many levels to show in the
           Sunburst; it is helpful to focus on a few levels at a time.
+      caption: The <em>Rashomon Overview</em> adapts Sunburst to summarize the
+        whole Rashomon set. It organizes decision trees based on their decision
+        paths. Users can click a sector to zoom into a specific subset of models
+        with similar prediction patterns. Users can also control the number of
+        levels to show in the Sunburst.
     - id: tree
       name: Tree Window
+      isWide: true
       descriptions:
         - >
           When you click a <span class="feature-tag" style="color: hsl(0,0%,
@@ -123,6 +130,7 @@ tutorial:
         windows and drag to reposition them side by side.
     - id: search
       name: Search Panel
+      isWide: true
       descriptions:
         - >
           Want to quickly identify trees with desired properties? The <em>Search
@@ -139,10 +147,11 @@ tutorial:
         desired properties by applying different filtering tools. For example, a
         user can drag the accuracy slider to hide decision trees with slightly
         smaller accuracy scores. Similarly, a user can also click checkboxes under
-        "Depth 2" to search for trees that use specific features in their
+        "Depth 3" to search for trees that use specific features in their
         second level.
     - id: favorite
       name: Favorite Panel
+      isWide: true
       descriptions:
         - >
           Once you have found decision trees that meet your needs, you can click
@@ -167,14 +176,45 @@ tutorial:
 
 development: >
   TimberTrek is written in <a href='https://www.typescriptlang.org'
-  target='_blank'>Typescript</a> using <a href='https://svelte.dev'
+  target='_blank'>TypeScript</a> using <a href='https://svelte.dev'
   target='_blank'>Svelte</a> as a framework and <a href='https://d3js.org'
-  target='_blank'>D3.js</a> for visualizations. The entire app runs locally and
-  privately in your web-browser, and your model and data would not leave your
-  machine. Anyone can access TimberTrek on their desktop or tablets, no need to
-  set up dedicated servers or writing code. With a flexible design, TimberTrek
-  supports all types of computational notebooks, such as Jupyter Notebook & Lab,
-  Google Colab, and VS Code Notebook. With a cross-platform support, we hope
-  TimberTrek will fit into your favorite ML development workflow.
+  target='_blank'>D3.js</a> for visualizations. The source code is available on
+  <a href='https://github.com/poloclub/timbertrek' target='_blank'>GitHub</a>.
+  The entire app runs locally and privately in your web-browser, and your model
+  and data would never leave your machine. Anyone can easily access TimberTrek
+  on their desktop or tablets, without a need of setting up dedicated servers or
+  writing code. With a flexible design, TimberTrek supports all types of
+  computational notebooks, such as Jupyter Notebook & Lab, Google Colab, and VS
+  Code Notebook. With the cross-platform support, we hope TimberTrek will fit into
+  your favorite ML development workflow.
 
+team: >
+  Led by <a href='https://zijie.wang/' target='_blank'>Jay Wang</a>, TimberTrek
+  is a result of a collaboration between ML and visualization researchers from
+  Georgia Tech, Duke University, Fujitsu Laboratories, and University of British
+  Columbia. TimberTrek is created by <a href='https://zijie.wang/'
+  target='_blank'>Jay Wang</a>, <a href='https://www.linkedin.com/in/chudizhong'
+  target='_blank'>Chudi Zhong</a>, <a
+  href='https://www.linkedin.com/in/rui-xin-8070181b9' target='_blank'>Rui
+  Xin</a>, <a
+  href='https://scholar.google.com/citations?user=9fY1WVIAAAAJ&hl=en'
+  target='_blank'>Takuya Takagi</a>, <a
+  href='https://users.cs.duke.edu/~zhichen/' target='_blank'>Zhi Chen</a>, <a
+  href='' target='_blank'>Polo Chau</a>, <a
+  href='https://users.cs.duke.edu/~cynthia/' target='_blank'>Cynthia Rudin</a>,
+  and <a href='https://www.seltzer.com/margo/' target='_blank'>Margo
+  Seltzer</a>.
 
+contribute:
+  - >
+    If you have any questions or feedback, feel free to <a
+    href='https://github.com/poloclub/timbertrek/issues' target='_blank'>open an
+    issue</a> or contact <a href='https://zijie.wang/' target='_blank'>Jay
+    Wang</a>.
+  - >
+    We’d love to hear your experience with TimberTrek! If you’d like to
+    share (e.g., what is your typical workflow to curate decision trees, what
+    features of TimberTrek you find most helpful), please reach out to us.
+    TimberTrek is an open-source project, and we welcome <a
+    href='https://github.com/poloclub/timbertrek/pulls' target='_blank'>pull
+    requests</a> for new feature implementations and bug fixes, etc.

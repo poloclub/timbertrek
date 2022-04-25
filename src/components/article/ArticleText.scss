@@ -15,10 +15,10 @@ $header-color: currentcolor;
   color: $header-color;
   font-size: 40px;
   font-weight: 600;
-  margin-bottom: 12px;
+  margin-bottom: 0;
+  margin-top: 20px;
   border-bottom: 1px solid #eaecef;
   grid-column: text-start / text-end;
-  line-height: 1.2;
 
   display: flex;
   // justify-content: space-between;
@@ -28,10 +28,10 @@ $header-color: currentcolor;
   color: $header-color;
   font-size: 32px;
   font-weight: 450;
-  margin-bottom: 10px;
-  margin-top: 8px;
+  margin-bottom: 0;
+  margin-top: 16px;
   grid-column: text-start / text-end;
-  line-height: 1.2;
+  line-height: 1.3;
 }
 
 .article h6 {
@@ -41,11 +41,10 @@ $header-color: currentcolor;
   margin-bottom: 8px;
   margin-top: 44px;
   grid-column: text-start / text-end;
-  line-height: 1.2;
 }
 
 .article p {
-  margin: 16px 0;
+  margin: 16px 0 0 0;
   grid-column: text-start / text-end;
 }
 
@@ -236,6 +235,8 @@ video {
 .video {
   width: 100%;
   grid-column: text-start / text-end;
+  margin: 16px 0 0 0;
+  padding: 5px 0;
 
   &.wide-video {
     grid-column: long-start / long-end;
@@ -266,7 +267,6 @@ video {
 
   &.logo-icon {
     margin-left: 12px;
-    margin-right: 8px;
     transform: rotate(0deg);
     animation: circling 3000ms linear 0ms infinite;
     animation-play-state: paused;
@@ -390,10 +390,41 @@ video {
 }
 
 :global(.feature-tag) {
-  // padding: 1px 4px;
   border-radius: 3px;
-  // color: white;
   font-weight: 600;
+}
+
+.tool-name {
+  font-variant: small-caps;
+  margin-left: 8px;
+}
+
+.article-footer {
+  background: $gray-800;
+  color: white;
+  padding: 2rem 0 2em 0;
+  margin-top: 1rem;
+  display: flex;
+  width: 100%;
+  justify-content: center;
+}
+
+.footer-main {
+  display: flex;
+  max-width: 100ch;
+  flex-direction: row;
+}
+
+.footer-cp {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.footer-logo {
+  display: flex;
+  margin-right: 30px;
+  gap: 30px;
 }
 
 @keyframes circling {
