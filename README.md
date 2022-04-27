@@ -1,10 +1,10 @@
 # TimberTrek <a href="https://poloclub.github.io/timbertrek/"><img align="right" src="src/imgs/timbertrek-logo-light.svg" height="38"></img></a>
 
-[![Github Actions Status](https://github.com/poloclub/timbertrek/workflows/Build/badge.svg)](https://github.com/poloclub/timbertrek/actions/workflows/build.yml)
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/poloclub/timbertrek/master?urlpath=lab/tree/examples/example-adult.ipynb)
+[![Github Actions Status](https://github.com/poloclub/timbertrek/workflows/build/badge.svg)](https://github.com/poloclub/timbertrek/actions/workflows/build.yml)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/poloclub/timbertrek/master?urlpath=lab/tree/notebook-widget/examples/campas.ipynb)
 [![Lite](https://gist.githubusercontent.com/xiaohk/9b9f7c8fa162b2c3bc3251a5c9a799b2/raw/a7fca1d0a2d62c2b49f60c0217dffbd0fe404471/lite-badge-launch-small.svg)](https://poloclub.github.io/timbertrek/notebook)
 [![pypi](https://img.shields.io/pypi/v/timbertrek?color=blue)](https://pypi.python.org/pypi/timbertrek)
-[![license](https://img.shields.io/badge/License-MIT-green)](https://github.com/xiaohk/stickyland/blob/master/LICENSE)
+[![license](https://img.shields.io/badge/License-MIT-green)](https://github.com/poloclub/timbertrek/blob/master/LICENSE)
 <!-- [![arxiv badge](https://img.shields.io/badge/arXiv-2202.11086-red)](https://arxiv.org/abs/2202.11086) -->
 <!-- [![DOI:10.1145/3491101.3519653](https://img.shields.io/badge/DOI-10.1145/3491101.3519653-blue)](https://doi.org/10.1145/3491101.3519653) -->
 
@@ -24,22 +24,26 @@ Curate decision trees that align with your knowledge and values!
 
 |<img src='https://i.imgur.com/t4qtPPX.png'>|
 |:---:|
-|<a href="https://youtu.be/OKaPmEBzEX0">📺 Demo Video for "TimberTrek: Exploring and Curating Decision Trees with Interactive Visualization"|
+|<a href="https://youtu.be/3gMTO07lyTs">📺 Demo Video for "TimberTrek: Exploring and Curating Decision Trees with Interactive Visualization"|
 
 
-## Live Demo
+## Web Demo
 
-For a live demo, visit: https://poloclub.github.io/timbertrek
+For a live web demo, visit: https://poloclub.github.io/timbertrek
 
-You can use the web demo to explore your own Rashomon Sets! You just need to choose the `my set` tab below the tool and upload a JSON file containing decision paths in your Rashomon Set. Check out this example notebook to see how to generate this JSON file.
+You can use the web demo to explore your own Rashomon Sets! You just need to choose the `my set` tab below the tool and upload a JSON file containing decision paths in your Rashomon Set.
+
+Check out this [example notebook](https://poloclub.github.io/timbertrek/notebook/retro/notebooks/?path=campas.ipynb) to see how to generate this JSON file.
 
 ## Notebook Demos
 
-You can directly use TimberTrek in your favorite computational notebooks (e.g. Jupyter Notebook/Lab, Google Colab, and VS Code Notebook). Check out the notebook demos below.
+You can directly use TimberTrek in your favorite computational notebooks (e.g. Jupyter Notebook/Lab, Google Colab, and VS Code Notebook).
+
+Check out three live notebook demos below.
 
 |Jupyter Lite|Binder|Google Colab|
 |:---:|:---:|:---:|
-|[![Lite](https://gist.githubusercontent.com/xiaohk/9b9f7c8fa162b2c3bc3251a5c9a799b2/raw/a7fca1d0a2d62c2b49f60c0217dffbd0fe404471/lite-badge-launch-small.svg)](https://xiaohk.github.io/stickyland/)|[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/xiaohk/stickyland/master?urlpath=lab/tree/examples/example-adult.ipynb)|[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1shCiDNCXy7-8XexJ65aMboZXxVBGhIZB?usp=sharing)|
+|[![Lite](https://gist.githubusercontent.com/xiaohk/9b9f7c8fa162b2c3bc3251a5c9a799b2/raw/a7fca1d0a2d62c2b49f60c0217dffbd0fe404471/lite-badge-launch-small.svg)](https://poloclub.github.io/timbertrek/notebook)|[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/poloclub/timbertrek/master?urlpath=lab/tree/notebook-widget/examples/campas.ipynb)|[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1shCiDNCXy7-8XexJ65aMboZXxVBGhIZB?usp=sharing)|
 
 ## Install
 
@@ -54,7 +58,7 @@ pip install timbertrek
 Clone or download this repository:
 
 ```bash
-git clone git@github.com:interpretml/gam-changer.git
+git clone git@github.com:poloclub/timbertrek.git
 ```
 
 Install the dependencies:
@@ -63,7 +67,7 @@ Install the dependencies:
 npm install
 ```
 
-Then run GAM Changer:
+Then run TimberTrek:
 
 ```
 npm run dev
