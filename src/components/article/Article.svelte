@@ -108,6 +108,7 @@
     <div class="jupyter-demo">
       {#if showIFrame}
         <iframe
+          title="Jupyter notebook"
           src="https://xiaohk.github.io/timbertrek/notebook/retro/notebooks/?path=campas.ipynb"
           width="100%"
           height="100%"
@@ -121,6 +122,7 @@
         >
           <div class="mask" />
           <img
+            alt="Jupyter notebook place holder"
             src={`${import.meta.env.BASE_URL}data/jupyter-placeholder.png`}
           />
           <div

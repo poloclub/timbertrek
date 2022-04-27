@@ -27,6 +27,7 @@ export default defineConfig(({ command, mode }) => {
             }
           },
           plugins: [
+            yaml(),
             svelte({
               emitCss: false
             }),
