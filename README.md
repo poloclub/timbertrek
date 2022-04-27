@@ -4,7 +4,7 @@
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/poloclub/timbertrek/master?urlpath=lab/tree/examples/example-adult.ipynb)
 [![Lite](https://gist.githubusercontent.com/xiaohk/9b9f7c8fa162b2c3bc3251a5c9a799b2/raw/a7fca1d0a2d62c2b49f60c0217dffbd0fe404471/lite-badge-launch-small.svg)](https://poloclub.github.io/timbertrek/notebook)
 [![pypi](https://img.shields.io/pypi/v/timbertrek?color=blue)](https://pypi.python.org/pypi/timbertrek)
-[![license](https://img.shields.io/badge/License-MIT-blue)](https://github.com/xiaohk/stickyland/blob/master/LICENSE)
+[![license](https://img.shields.io/badge/License-MIT-green)](https://github.com/xiaohk/stickyland/blob/master/LICENSE)
 <!-- [![arxiv badge](https://img.shields.io/badge/arXiv-2202.11086-red)](https://arxiv.org/abs/2202.11086) -->
 <!-- [![DOI:10.1145/3491101.3519653](https://img.shields.io/badge/DOI-10.1145/3491101.3519653-blue)](https://doi.org/10.1145/3491101.3519653) -->
 
@@ -71,10 +71,14 @@ npm run dev
 
 Navigate to localhost:3000. You should see TimberTrek running in your browser :)
 
+## Credits
+
+Led by <a href='https://zijie.wang/' target='_blank'>Jay Wang</a>, TimberTrek is a result of a collaboration between ML and visualization researchers from Georgia Tech, Duke University, Fujitsu Laboratories, and University of British Columbia. TimberTrek is created by <a href='https://zijie.wang/' target='_blank'>Jay Wang</a>, <a href='https://www.linkedin.com/in/chudizhong' target='_blank'>Chudi Zhong</a>, <a href='https://www.linkedin.com/in/rui-xin-8070181b9' target='_blank'>Rui Xin</a>, <a href='https://scholar.google.com/citations?user=9fY1WVIAAAAJ&hl=en' target='_blank'>Takuya Takagi</a>, <a href='https://users.cs.duke.edu/~zhichen/' target='_blank'>Zhi Chen</a>, <a href='' target='_blank'>Polo Chau</a>, <a href='https://users.cs.duke.edu/~cynthia/' target='_blank'>Cynthia Rudin</a>, and <a href='https://www.seltzer.com/margo/' target='_blank'>Margo Seltzer</a>.
+
 ## License
 
-The software is available under the [MIT License](https://github.com/xiaohk/stickyland/blob/master/LICENSE).
+The software is available under the [MIT License](https://github.com/poloclub/timbertrek/blob/master/LICENSE).
 
 ## Contact
 
-If you have any questions, feel free to [open an issue](https://github.com/xiaohk/stickyland/issues/new) or contact [Jay Wang](https://zijie.wang).
+If you have any questions, feel free to [open an issue](https://github.com/poloclub/timbertrek/issues/new) or contact [Jay Wang](https://zijie.wang).
