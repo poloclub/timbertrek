@@ -111,7 +111,7 @@
       {#if showIFrame}
         <iframe
           title="Jupyter notebook"
-          src="https://xiaohk.github.io/timbertrek/notebook/retro/notebooks/?path=campas.ipynb"
+          src="https://poloclub.github.io/timbertrek/notebook/retro/notebooks/?path=campas.ipynb"
           width="100%"
           height="100%"
         />
