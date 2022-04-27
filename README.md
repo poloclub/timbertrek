@@ -1,109 +1,80 @@
-*Psst — looking for a more complete solution? Check out [SvelteKit](https://kit.svelte.dev), the official framework for building web applications of all sizes, with a beautiful development experience and flexible filesystem-based routing.*
+# TimberTrek <a href="https://poloclub.github.io/timbertrek/"><img align="right" src="src/imgs/timbertrek-logo-light.svg" height="38"></img></a>
 
-*Looking for a shareable component template instead? You can [use SvelteKit for that as well](https://kit.svelte.dev/docs#packaging) or the older [sveltejs/component-template](https://github.com/sveltejs/component-template)*
+[![Github Actions Status](https://github.com/poloclub/timbertrek/workflows/Build/badge.svg)](https://github.com/poloclub/timbertrek/actions/workflows/build.yml)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/poloclub/timbertrek/master?urlpath=lab/tree/examples/example-adult.ipynb)
+[![Lite](https://gist.githubusercontent.com/xiaohk/9b9f7c8fa162b2c3bc3251a5c9a799b2/raw/a7fca1d0a2d62c2b49f60c0217dffbd0fe404471/lite-badge-launch-small.svg)](https://poloclub.github.io/timbertrek/notebook)
+[![pypi](https://img.shields.io/pypi/v/timbertrek?color=blue)](https://pypi.python.org/pypi/timbertrek)
+[![license](https://img.shields.io/badge/License-MIT-blue)](https://github.com/xiaohk/stickyland/blob/master/LICENSE)
+<!-- [![arxiv badge](https://img.shields.io/badge/arXiv-2202.11086-red)](https://arxiv.org/abs/2202.11086) -->
+<!-- [![DOI:10.1145/3491101.3519653](https://img.shields.io/badge/DOI-10.1145/3491101.3519653-blue)](https://doi.org/10.1145/3491101.3519653) -->
 
----
+Curate decision trees that align with your knowledge and values!
 
-# svelte app
+<!-- <table>
+  <tr>
+    <td colspan="1"><img src='https://i.imgur.com/FtmHafo.png'></td>
+  </tr>
+  <tr></tr>
+  <tr>
+    <td><a href="https://youtu.be/eMlTtloGyho">👨🏻‍🏫 Talk</a></td>
+    <td><a href="https://youtu.be/OKaPmEBzEX0">📺 Video</a></td>
+    <td><a href="https://arxiv.org/abs/2202.11086">📖 "StickyLand: breaking the linear presentation of computational Notebooks"</a></td>
+  </tr>
+</table> -->
 
-This is a project template for [Svelte](https://svelte.dev) apps. It lives at https://github.com/sveltejs/template.
+|<img src='https://i.imgur.com/t4qtPPX.png'>|
+|:---:|
+|<a href="https://youtu.be/OKaPmEBzEX0">📺 Demo Video for "TimberTrek: Exploring and Curating Decision Trees with Interactive Visualization"|
 
-To create a new project based on this template using [degit](https://github.com/Rich-Harris/degit):
+
+## Live Demo
+
+For a live demo, visit: https://poloclub.github.io/timbertrek
+
+You can use the web demo to explore your own Rashomon Sets! You just need to choose the `my set` tab below the tool and upload a JSON file containing decision paths in your Rashomon Set. Check out this example notebook to see how to generate this JSON file.
+
+## Notebook Demos
+
+You can directly use TimberTrek in your favorite computational notebooks (e.g. Jupyter Notebook/Lab, Google Colab, and VS Code Notebook). Check out the notebook demos below.
+
+|Jupyter Lite|Binder|Google Colab|
+|:---:|:---:|:---:|
+|[![Lite](https://gist.githubusercontent.com/xiaohk/9b9f7c8fa162b2c3bc3251a5c9a799b2/raw/a7fca1d0a2d62c2b49f60c0217dffbd0fe404471/lite-badge-launch-small.svg)](https://xiaohk.github.io/stickyland/)|[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/xiaohk/stickyland/master?urlpath=lab/tree/examples/example-adult.ipynb)|[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1shCiDNCXy7-8XexJ65aMboZXxVBGhIZB?usp=sharing)|
+
+## Install
+
+To use TimberTrek in a notebook, you would need to install TimberTrek with `pip`:
 
 ```bash
-npx degit sveltejs/template svelte-app
-cd svelte-app
+pip install timbertrek
 ```
 
-*Note that you will need to have [Node.js](https://nodejs.org) installed.*
+## Development
 
-
-## Get started
-
-Install the dependencies...
+Clone or download this repository:
 
 ```bash
-cd svelte-app
+git clone git@github.com:interpretml/gam-changer.git
+```
+
+Install the dependencies:
+
+```bash
 npm install
 ```
 
-...then start [Rollup](https://rollupjs.org):
+Then run GAM Changer:
 
-```bash
+```
 npm run dev
 ```
 
-Navigate to [localhost:8080](http://localhost:8080). You should see your app running. Edit a component file in `src`, save it, and reload the page to see your changes.
+Navigate to localhost:3000. You should see TimberTrek running in your browser :)
 
-By default, the server will only respond to requests from localhost. To allow connections from other computers, edit the `sirv` commands in package.json to include the option `--host 0.0.0.0`.
+## License
 
-If you're using [Visual Studio Code](https://code.visualstudio.com/) we recommend installing the official extension [Svelte for VS Code](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode). If you are using other editors you may need to install a plugin in order to get syntax highlighting and intellisense.
+The software is available under the [MIT License](https://github.com/xiaohk/stickyland/blob/master/LICENSE).
 
-## Building and running in production mode
+## Contact
 
-To create an optimised version of the app:
-
-```bash
-npm run build
-```
-
-You can run the newly built app with `npm run start`. This uses [sirv](https://github.com/lukeed/sirv), which is included in your package.json's `dependencies` so that the app will work when you deploy to platforms like [Heroku](https://heroku.com).
-
-
-## Single-page app mode
-
-By default, sirv will only respond to requests that match files in `public`. This is to maximise compatibility with static fileservers, allowing you to deploy your app anywhere.
-
-If you're building a single-page app (SPA) with multiple routes, sirv needs to be able to respond to requests for *any* path. You can make it so by editing the `"start"` command in package.json:
-
-```js
-"start": "sirv public --single"
-```
-
-## Using TypeScript
-
-This template comes with a script to set up a TypeScript development environment, you can run it immediately after cloning the template with:
-
-```bash
-node scripts/setupTypeScript.js
-```
-
-Or remove the script via:
-
-```bash
-rm scripts/setupTypeScript.js
-```
-
-If you want to use `baseUrl` or `path` aliases within your `tsconfig`, you need to set up `@rollup/plugin-alias` to tell Rollup to resolve the aliases. For more info, see [this StackOverflow question](https://stackoverflow.com/questions/63427935/setup-tsconfig-path-in-svelte).
-
-## Deploying to the web
-
-### With [Vercel](https://vercel.com)
-
-Install `vercel` if you haven't already:
-
-```bash
-npm install -g vercel
-```
-
-Then, from within your project folder:
-
-```bash
-cd public
-vercel deploy --name my-project
-```
-
-### With [surge](https://surge.sh/)
-
-Install `surge` if you haven't already:
-
-```bash
-npm install -g surge
-```
-
-Then, from within your project folder:
-
-```bash
-npm run build
-surge public my-project.surge.sh
-```
+If you have any questions, feel free to [open an issue](https://github.com/xiaohk/stickyland/issues/new) or contact [Jay Wang](https://zijie.wang).

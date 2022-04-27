@@ -78,7 +78,7 @@
         }}
       >
         <a
-          href="https://gist.github.com/xiaohk/875b5374840c66689eb42a4b8820c3b5"
+          href="https://github.com/poloclub/timbertrek#live-demo"
           target="_blank">How to generate this file?</a
         >
       </div>

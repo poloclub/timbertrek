@@ -169,7 +169,7 @@
           class="svg-icon paper-icon"
           title="Research paper"
           target="_blank"
-          href="https://arxiv.org/abs/1908.01755"
+          href="https://github.com/poloclub/timbertrek"
         >
           {@html paperIcon}
         </a>
@@ -178,7 +178,7 @@
           class="svg-icon"
           title="Open-source code"
           target="_blank"
-          href="https://arxiv.org/abs/1908.01755"
+          href="https://github.com/poloclub/timbertrek"
         >
           {@html githubIcon}
         </a>

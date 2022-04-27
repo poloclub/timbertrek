@@ -16,7 +16,7 @@ $header-color: currentcolor;
   font-size: 40px;
   font-weight: 600;
   margin-bottom: 0;
-  margin-top: 20px;
+  margin-top: 24px;
   border-bottom: 1px solid #eaecef;
   grid-column: text-start / text-end;
 
@@ -279,7 +279,7 @@ video {
 
 .jupyter-demo {
   grid-column: long-start / long-end;
-  margin-top: 20px;
+  margin-top: 24px;
   height: 800px;
 
   iframe {

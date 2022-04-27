@@ -317,6 +317,7 @@ $border-color: $gray-light-border;
   background-color: transparent;
   color: $gray-500;
   border: none;
+  white-space: nowrap;
 
   .switch-track {
     cursor: pointer;

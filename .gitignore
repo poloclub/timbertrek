@@ -11,6 +11,7 @@ pnpm-lock.yaml
 .vercel
 deploy-gh-page.sh
 publish.sh
+publish*
 dist
 gh-page
 lite

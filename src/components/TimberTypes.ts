@@ -2,6 +2,13 @@
  * Custom types for TimberTrek
  */
 
+export interface DragRegion {
+  minLeft: number;
+  maxLeft: number;
+  minTop: number;
+  maxTop: number;
+}
+
 /**
  * Where to put the label next to the node
  */

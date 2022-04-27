@@ -31,7 +31,7 @@
     });
   });
   function onPlayerReady(event) {
-    player.mute();
+    player.unMute();
   }
 </script>
 

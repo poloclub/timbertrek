@@ -11,7 +11,8 @@ import type {
   PinnedTree,
   Position,
   SankeyHierarchyPointNode,
-  LabelPosition
+  LabelPosition,
+  DragRegion
 } from '../TimberTypes';
 import { LabelPos } from '../TimberTypes';
 import type { PinnedTreeStoreValue, FavoritesStoreValue } from '../../stores';
@@ -30,6 +31,7 @@ export class PinnedTreeWindow {
   padding: Padding;
   width: number;
   height: number;
+  dragRegion: DragRegion;
 
   pinnedTreeStore: Writable<PinnedTreeStoreValue>;
   pinnedTreeStoreValue: PinnedTreeStoreValue;
@@ -71,6 +73,16 @@ export class PinnedTreeWindow {
     this.width = width;
     this.height = height;
     this.node = component;
+
+    // Figure out the dragging region for the window
+    const page = this.node.parentNode?.parentNode as HTMLElement;
+    const pageBBox = page.getBoundingClientRect();
+    this.dragRegion = {
+      minLeft: 0,
+      maxLeft: pageBBox.width - this.width,
+      minTop: 0,
+      maxTop: pageBBox.height - this.height - 50
+    };
 
     /**
      * When the user tries to pin a tree that is already pinned, jiggle to
@@ -1539,8 +1551,14 @@ export class PinnedTreeWindow {
       e.preventDefault();
       e.stopPropagation();
 
-      const newX = this.node.offsetLeft + e.pageX - lastMousePoint.x;
-      const newY = this.node.offsetTop + e.pageY - lastMousePoint.y;
+      let newX = this.node.offsetLeft + e.pageX - lastMousePoint.x;
+      let newY = this.node.offsetTop + e.pageY - lastMousePoint.y;
+
+      // Clamp the window inside the dragging region
+      newX = Math.max(this.dragRegion.minLeft, newX);
+      newX = Math.min(this.dragRegion.maxLeft, newX);
+      newY = Math.max(this.dragRegion.minTop, newY);
+      newY = Math.min(this.dragRegion.maxTop, newY);
 
       lastMousePoint.x = e.pageX;
       lastMousePoint.y = e.pageY;
