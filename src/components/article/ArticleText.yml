@@ -218,3 +218,32 @@ contribute:
     TimberTrek is an open-source project, and we welcome <a
     href='https://github.com/poloclub/timbertrek/pulls' target='_blank'>pull
     requests</a> for new feature implementations and bug fixes, etc.
+
+youtubeTimes:
+  - startTime: 0
+    name: Sparse decision tree
+    timestamp: (0:00-0:06)
+  - startTime: 6
+    name: Rashomon set
+    timestamp: (0:06-0:38)
+  - startTime: 38
+    name:  Introducing TimberTrek
+    timestamp: (0:38-0:45)
+  - startTime: 45
+    name: Rashomon overview
+    timestamp: (0:45-1:13)
+  - startTime: 73
+    name: Tree windows
+    timestamp: (1:13-1:33)
+  - startTime: 93
+    name: Search Panel
+    timestamp: (1:33-2:02)
+  - startTime: 122
+    name: Searching for fair models
+    timestamp: (2:02-2:41)
+  - startTime: 161
+    name: Computational notebook support
+    timestamp: (2:41-2:49)
+  - startTime: 129
+    name: Try TimberTrek
+    timestamp: (2:49-3:00)

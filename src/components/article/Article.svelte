@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import TimberTrek from '../timber/Timber.svelte';
+  import Youtube from './Youtube.svelte';
   import { fade, fly } from 'svelte/transition';
 
   import iconLogo from '../../imgs/timbertrek-logo-light.svg?raw';
@@ -9,6 +10,7 @@
   import text from './ArticleText.yml';
 
   let component: HTMLElement | null = null;
+  let currentPlayer = null;
   let curDataset = 'compas';
   let timbertrekTransitioning = false;
   let showIFrame = false;
@@ -146,7 +148,7 @@
     {#each text.tutorial.items as item, i}
       <h4 id={item.id}>{item.name}</h4>
       <p>{@html item.descriptions[0]}</p>
-      <div class="video" class:wide-video={item.isWide}>
+      <div class="video" class:wide-video={false}>
         <video autoplay loop muted playsinline>
           <source src={`${import.meta.env.BASE_URL}video/${item.id}.mp4`} />
           <track kind="captions" />
@@ -159,6 +161,25 @@
         <p>{@html p}</p>
       {/each}
     {/each}
+
+    <h2 id="youtube-video">Demo Video</h2>
+
+    <ul class="video-list">
+      {#each text.youtubeTimes as time, i}
+        <li class="video-link" on:click={currentPlayer.play(time.startTime)}>
+          {time.name}
+          <small>{time.timestamp}</small>
+        </li>
+      {/each}
+    </ul>
+
+    <div class="youtube-video">
+      <Youtube
+        videoId="3gMTO07lyTs"
+        playerId="demo_video"
+        bind:this={currentPlayer}
+      />
+    </div>
 
     <h2 id="usage">
       How is <span class="tool-name" style="margin-right: 8px;">TimberTrek</span
@@ -177,7 +198,7 @@
   <div class="article-footer">
     <div class="footer-main">
       <div class="footer-cp">
-        <div>VIS'22 Submission</div>
+        <div>VIS'22 Short Paper Submission</div>
         <div>Thanks for reviewing our manuscript!</div>
       </div>
     </div>
