@@ -2,6 +2,6 @@
 
 __author__ = """Jay Wang"""
 __email__ = "jayw@zijie.wang"
-__version__ = "0.1.4"
+__version__ = "0.1.5"
 
 from timbertrek.timbertrek import *
