@@ -175,7 +175,7 @@
 
     <div class="youtube-video">
       <Youtube
-        videoId="3gMTO07lyTs"
+        videoId="3eGqTmsStJM"
         playerId="demo_video"
         bind:this={currentPlayer}
       />

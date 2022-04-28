@@ -24,7 +24,7 @@ Curate decision trees that align with your knowledge and values!
 
 |<img src='https://i.imgur.com/t4qtPPX.png'>|
 |:---:|
-|<a href="https://youtu.be/3gMTO07lyTs">📺 Demo Video for "TimberTrek: Exploring and Curating Decision Trees with Interactive Visualization"|
+|<a href="https://youtu.be/3eGqTmsStJM">📺 Demo Video for "TimberTrek: Exploring and Curating Decision Trees with Interactive Visualization"|
 
 ## Web Demo
 

@@ -47,7 +47,9 @@ export default defineConfig(({ command, mode }) => {
                 );
 
                 // Delete all other generated files
-                fs.rmSync(options.dir, { recursive: true });
+                fs.rm(options.dir, { recursive: true }, error => {
+                  if (error) throw error;
+                });
               }
             }
           ]
