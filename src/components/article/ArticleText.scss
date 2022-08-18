@@ -412,11 +412,21 @@ video {
   align-items: center;
 }
 
-// .footer-logo {
-//   display: flex;
-//   margin-right: 30px;
-//   gap: 30px;
-// }
+.footer-logo {
+  display: flex;
+  gap: 45px;
+
+  :global(.svg-logo) {
+    height: 100%;
+    color: white;
+    display: inline-flex;
+    align-items: center;
+
+    :global(svg) {
+      height: 50px;
+    }
+  }
+}
 
 @keyframes circling {
   from {

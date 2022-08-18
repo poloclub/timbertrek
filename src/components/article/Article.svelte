@@ -7,6 +7,10 @@
   import iconLogo from '../../imgs/timbertrek-logo-light.svg?raw';
   import iconRocket from '../../imgs/icon-rocket.svg?raw';
   import iconNote from '../../imgs/icon-note.svg?raw';
+  import iconGT from '../../imgs/logo-gt.svg?raw';
+  import iconFujitsu from '../../imgs/logo-fujitsu.svg?raw';
+  import iconDuke from '../../imgs/logo-duke.svg?raw';
+  import iconUBC from '../../imgs/logo-ubc.svg?raw';
   import text from './ArticleText.yml';
 
   let component: HTMLElement | null = null;
@@ -197,9 +201,33 @@
 
   <div class="article-footer">
     <div class="footer-main">
-      <div class="footer-cp">
-        <div>VIS'22 Short Paper Submission</div>
-        <div>Thanks for reviewing our manuscript!</div>
+      <div class="footer-logo">
+        <a target="_blank" href="https://www.gatech.edu/">
+          <div class="svg-logo" title="Georgia Tech">
+            {@html iconGT}
+          </div>
+        </a>
+
+        <a target="_blank" href="https://www.duke.edu/">
+          <div class="svg-logo" title="Duke University">
+            {@html iconDuke}
+          </div>
+        </a>
+
+        <a
+          target="_blank"
+          href="https://www.fujitsu.com/global/about/research/"
+        >
+          <div class="svg-logo" title="Fujitsu Lab">
+            {@html iconFujitsu}
+          </div>
+        </a>
+
+        <a target="_blank" href="https://www.ubc.ca/">
+          <div class="svg-logo" title="The University of British Columbia">
+            {@html iconUBC}
+          </div>
+        </a>
       </div>
     </div>
   </div>
