@@ -11,6 +11,7 @@
   import iconFujitsu from '../../imgs/logo-fujitsu.svg?raw';
   import iconDuke from '../../imgs/logo-duke.svg?raw';
   import iconUBC from '../../imgs/logo-ubc.svg?raw';
+  import iconCopy from '../../imgs/icon-copy.svg?raw';
   import text from './ArticleText.yml';
 
   let component: HTMLElement | null = null;
@@ -194,9 +195,20 @@
     <h2 id="team">Who Developed <span class="tool-name">TimberTrek</span>?</h2>
     <p>{@html text.team}</p>
 
-    <h2 id="team">How Can I Contribute?</h2>
+    <h2 id="contribute">How Can I Contribute?</h2>
     <p>{@html text.contribute[0]}</p>
     <p>{@html text.contribute[1]}</p>
+
+    <h2 id="cite">How can I learn more about TimberTrek?</h2>
+
+    <p>{@html text.cite['intro']}</p>
+    <div class="bibtex-block">
+      {@html text.cite['bibtex']}
+      <div class="block-overlay">
+        <span class="svg-icon">{@html iconCopy}</span>
+        <span>Click to copy</span>
+      </div>
+    </div>
   </div>
 
   <div class="article-footer">

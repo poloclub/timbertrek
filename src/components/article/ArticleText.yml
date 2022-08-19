@@ -247,3 +247,17 @@ youtubeTimes:
   - startTime: 129
     name: Try TimberTrek
     timestamp: (2:49-3:00)
+
+cite:
+  intro: >
+    To learn more about TimberTrek, please read our research paper (published at
+    <a href='https://ieeevis.org/year/2022/welcome' target='_blank'>IEEE VIS
+    2022</a>). If you find TimberTrek useful for your research, please consider
+    citing our paper. Thanks!
+  bibtex: >
+    @inproceedings{wangTimberTrekExploringCurating2022,
+      title = {{{TimberTrek}}: {{Exploring}} and {{Curating Trustworthy Decision Trees}} with {{Interactive Visualization}}},
+      booktitle = {2022 {{IEEE Visualization Conference}} ({{VIS}})},
+      author = {Wang, Zijie J. and Zhong, Chudi and Xin, Rui and Takagi, Takuya and Chen, Zhi and Chau, Duen Horng and Rudin, Cynthia and Seltzer, Margo},
+      year = {2022}
+    }
