@@ -12,6 +12,7 @@
   import iconDuke from '../../imgs/logo-duke.svg?raw';
   import iconUBC from '../../imgs/logo-ubc.svg?raw';
   import iconCopy from '../../imgs/icon-copy.svg?raw';
+  import iconCheckBox from '../../imgs/icon-check-box.svg?raw';
   import text from './ArticleText.yml';
 
   let component: HTMLElement | null = null;
@@ -19,6 +20,7 @@
   let curDataset = 'compas';
   let timbertrekTransitioning = false;
   let showIFrame = false;
+  let bibtexCopied = false;
 
   const datasets = ['compas', 'fico', 'car evaluation', 'my own set'];
 
@@ -204,9 +206,26 @@
     <p>{@html text.cite['intro']}</p>
     <div class="bibtex-block">
       {@html text.cite['bibtex']}
-      <div class="block-overlay">
-        <span class="svg-icon">{@html iconCopy}</span>
-        <span>Click to copy</span>
+      <div
+        class="block-overlay"
+        on:click={() => {
+          navigator.clipboard.writeText(text.cite['bibtex']).then(() => {
+            bibtexCopied = true;
+          });
+        }}
+        on:mouseleave={() => {
+          setTimeout(() => {
+            bibtexCopied = false;
+          }, 500);
+        }}
+      >
+        {#if bibtexCopied}
+          <span class="svg-icon">{@html iconCheckBox}</span>
+          <span>Copied!</span>
+        {:else}
+          <span class="svg-icon">{@html iconCopy}</span>
+          <span>Click to copy</span>
+        {/if}
       </div>
     </div>
   </div>
