@@ -200,7 +200,7 @@ team: >
   href='https://scholar.google.com/citations?user=9fY1WVIAAAAJ&hl=en'
   target='_blank'>Takuya Takagi</a>, <a
   href='https://users.cs.duke.edu/~zhichen/' target='_blank'>Zhi Chen</a>, <a
-  href='' target='_blank'>Polo Chau</a>, <a
+  href='https://www.cc.gatech.edu/~dchau' target='_blank'>Polo Chau</a>, <a
   href='https://users.cs.duke.edu/~cynthia/' target='_blank'>Cynthia Rudin</a>,
   and <a href='https://www.seltzer.com/margo/' target='_blank'>Margo
   Seltzer</a>.
@@ -261,3 +261,29 @@ cite:
       author = {Wang, Zijie J. and Zhong, Chudi and Xin, Rui and Takagi, Takuya and Chen, Zhi and Chau, Duen Horng and Rudin, Cynthia and Seltzer, Margo},
       year = {2022}
     }
+  title: >
+    TimberTrek: Exploring and Curating Sparse Decision Trees with Interactive
+    Visualization
+  paperLink: >
+    https://poloclub.github.io/timbertrek
+  venue: >
+    IEEE Visualization Conference (VIS) 2022
+  venueLink: >
+    https://ieeevis.org/year/2022/welcome
+  authors:
+    - name: Zijie J. Wang
+      url: 'https://zijie.wang/'
+    - name: Chudi Zhong
+      url: 'https://www.linkedin.com/in/chudizhong'
+    - name: Rui Xin
+      url: 'https://www.linkedin.com/in/rui-xin-8070181b9'
+    - name: Takuya Takagi
+      url: 'https://scholar.google.com/citations?user=9fY1WVIAAAAJ&hl=en'
+    - name: Zhi Chen
+      url: 'https://users.cs.duke.edu/~zhichen/'
+    - name: Polo Chau
+      url: 'https://www.cc.gatech.edu/~dchau'
+    - name: Cynthia Rudin
+      url: 'https://users.cs.duke.edu/~cynthia/'
+    - name: Margo Seltzer
+      url: 'https://www.seltzer.com/margo/'

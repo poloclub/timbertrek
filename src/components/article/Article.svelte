@@ -203,7 +203,30 @@
 
     <h2 id="cite">How can I learn more about TimberTrek?</h2>
 
-    <p>{@html text.cite['intro']}</p>
+    <p>{@html text.cite.intro}</p>
+
+    <div class="paper-info">
+      <div class="left">
+        <a target="_blank" href={text.cite.paperLink}
+          ><img src="/paper-preview.png" /></a
+        >
+      </div>
+      <div class="right">
+        <a target="_blank" href={text.cite.paperLink}
+          ><span class="paper-title">{text.cite.title}</span></a
+        >
+        <a target="_blank" href={text.cite.venueLink}
+          ><span class="paper-venue">{text.cite.venue}</span></a
+        >
+        <div class="paper-authors">
+          {#each text.cite.authors as author, i}
+            <a href={author.url} target="_blank"
+              >{author.name}{i === text.cite.authors.length - 1 ? '' : ','}</a
+            >
+          {/each}
+        </div>
+      </div>
+    </div>
     <div class="bibtex-block">
       {@html text.cite['bibtex']}
       <div
