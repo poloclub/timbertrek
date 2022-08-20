@@ -396,18 +396,19 @@ video {
   display: flex;
   gap: 20px;
   flex-direction: row;
-  align-items: flex-start;
+  align-items: center;
 
   .left {
     border-radius: 5px;
     cursor: pointer;
     box-shadow: 0px 0px 12px hsla(0, 0%, 0%, 0.13),
       0px 0px 1px hsla(0, 0%, 0%, 0.14);
-    transition: box-shadow 150ms;
+    transition: transform 150ms;
+    transform-origin: center;
 
     img {
       border-radius: 5px;
-      width: 150px;
+      width: 120px;
       aspect-ratio: 255 / 330;
     }
 
@@ -417,8 +418,7 @@ video {
     }
 
     &:hover {
-      box-shadow: 0px 0px 14px hsla(0, 0%, 0%, 0.2),
-        0px 0px 1px hsla(0, 0%, 0%, 0.14);
+      transform: scale(1.05);
     }
   }
 
@@ -435,11 +435,11 @@ video {
       line-height: 1.3;
 
       &:hover {
-        color: $gray-500;
+        color: $blue-600;
       }
 
       &:active {
-        color: $gray-600;
+        color: $blue-800;
       }
     }
   }
@@ -470,14 +470,17 @@ video {
     grid-column: text-start / text-end;
     margin-top: 10px;
 
-    font-size: 0.85em;
-    line-height: 1.45;
-    overflow: auto;
-    white-space: pre;
-    background-color: $blue-gray-50;
     border-radius: 5px;
-    padding: 16px;
     position: relative;
+
+    .bibtex {
+      padding: 16px;
+      font-size: 0.85em;
+      line-height: 1.45;
+      overflow: auto;
+      white-space: pre;
+      background-color: $blue-gray-50;
+    }
 
     .block-overlay {
       position: absolute;

@@ -228,7 +228,10 @@
       </div>
     </div>
     <div class="bibtex-block">
-      {@html text.cite['bibtex']}
+      <div class="bibtex">
+        {@html text.cite['bibtex']}
+      </div>
+
       <div
         class="block-overlay"
         on:click={() => {
