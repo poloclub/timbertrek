@@ -469,11 +469,10 @@ video {
     font-family: monospace;
     grid-column: text-start / text-end;
     margin-top: 10px;
-
-    border-radius: 5px;
     position: relative;
 
     .bibtex {
+      border-radius: 3px;
       padding: 16px;
       font-size: 0.85em;
       line-height: 1.45;
