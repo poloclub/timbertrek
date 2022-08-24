@@ -8,7 +8,8 @@ html {
   scroll-behavior: smooth;
 }
 
-html, body {
+html,
+body {
   position: relative;
   width: 100%;
   height: 100%;
@@ -18,19 +19,22 @@ body {
   margin: 0px;
   padding: 0px;
   box-sizing: border-box;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
   color: hsl(0, 0%, 29%);
   font-size: 1em;
   font-weight: 400;
   line-height: 1.5;
 }
 
-*, ::after, ::before {
+*,
+::after,
+::before {
   box-sizing: inherit;
 }
 
 a {
-  color: rgb(0,100,200);
+  color: rgb(0, 100, 200);
   text-decoration: none;
 }
 
@@ -39,14 +43,17 @@ a:hover {
 }
 
 a:visited {
-  color: rgb(0,80,160);
+  color: rgb(0, 80, 160);
 }
 
 label {
   display: block;
 }
 
-input, button, select, textarea {
+input,
+button,
+select,
+textarea {
   font-family: inherit;
   font-size: inherit;
   -webkit-padding: 0.4em 0;
@@ -82,8 +89,8 @@ button:focus {
 :root {
   --ease-cubic-in-out: cubic-bezier(0.645, 0.045, 0.355, 1);
 
-  --md-red-50: hsl(350, 100.0%, 96.08%);
-  --md-red-100: hsl(354, 100.0%, 90.2%);
+  --md-red-50: hsl(350, 100%, 96.08%);
+  --md-red-100: hsl(354, 100%, 90.2%);
   --md-red-200: hsl(0, 72.65%, 77.06%);
   --md-red-300: hsl(0, 68.67%, 67.45%);
   --md-red-400: hsl(1, 83.25%, 62.55%);
@@ -92,12 +99,12 @@ button:focus {
   --md-red-700: hsl(0, 65.08%, 50.59%);
   --md-red-800: hsl(0, 66.39%, 46.67%);
   --md-red-900: hsl(0, 73.46%, 41.37%);
-  --md-red-a100: hsl(4, 100.0%, 75.1%);
-  --md-red-a200: hsl(0, 100.0%, 66.08%);
-  --md-red-a400: hsl(348, 100.0%, 54.51%);
-  --md-red-a700: hsl(0, 100.0%, 41.76%);
+  --md-red-a100: hsl(4, 100%, 75.1%);
+  --md-red-a200: hsl(0, 100%, 66.08%);
+  --md-red-a400: hsl(348, 100%, 54.51%);
+  --md-red-a700: hsl(0, 100%, 41.76%);
 
-  --md-pink-50: hsl(340, 80.0%, 94.12%);
+  --md-pink-50: hsl(340, 80%, 94.12%);
   --md-pink-100: hsl(339, 81.33%, 85.29%);
   --md-pink-200: hsl(339, 82.11%, 75.88%);
   --md-pink-300: hsl(339, 82.56%, 66.27%);
@@ -107,9 +114,9 @@ button:focus {
   --md-pink-700: hsl(336, 77.98%, 42.75%);
   --md-pink-800: hsl(333, 79.27%, 37.84%);
   --md-pink-900: hsl(328, 81.33%, 29.41%);
-  --md-pink-a100: hsl(339, 100.0%, 75.1%);
-  --md-pink-a200: hsl(339, 100.0%, 62.55%);
-  --md-pink-a400: hsl(338, 100.0%, 48.04%);
+  --md-pink-a100: hsl(339, 100%, 75.1%);
+  --md-pink-a200: hsl(339, 100%, 62.55%);
+  --md-pink-a400: hsl(338, 100%, 48.04%);
   --md-pink-a700: hsl(333, 84.11%, 41.96%);
 
   --md-purple-50: hsl(292, 44.44%, 92.94%);
@@ -121,11 +128,11 @@ button:focus {
   --md-purple-600: hsl(287, 65.05%, 40.39%);
   --md-purple-700: hsl(282, 67.88%, 37.84%);
   --md-purple-800: hsl(277, 70.17%, 35.49%);
-  --md-purple-900: hsl(267, 75.0%, 31.37%);
+  --md-purple-900: hsl(267, 75%, 31.37%);
   --md-purple-a100: hsl(291, 95.38%, 74.51%);
   --md-purple-a200: hsl(291, 95.9%, 61.76%);
-  --md-purple-a400: hsl(291, 100.0%, 48.82%);
-  --md-purple-a700: hsl(280, 100.0%, 50.0%);
+  --md-purple-a400: hsl(291, 100%, 48.82%);
+  --md-purple-a700: hsl(280, 100%, 50%);
 
   --md-deep-purple-50: hsl(264, 45.45%, 93.53%);
   --md-deep-purple-100: hsl(261, 45.68%, 84.12%);
@@ -137,22 +144,22 @@ button:focus {
   --md-deep-purple-700: hsl(257, 57.75%, 41.76%);
   --md-deep-purple-800: hsl(254, 60.8%, 39.02%);
   --md-deep-purple-900: hsl(251, 68.79%, 33.92%);
-  --md-deep-purple-a100: hsl(261, 100.0%, 76.67%);
-  --md-deep-purple-a200: hsl(255, 100.0%, 65.1%);
-  --md-deep-purple-a400: hsl(258, 100.0%, 56.08%);
-  --md-deep-purple-a700: hsl(265, 100.0%, 45.88%);
+  --md-deep-purple-a100: hsl(261, 100%, 76.67%);
+  --md-deep-purple-a200: hsl(255, 100%, 65.1%);
+  --md-deep-purple-a400: hsl(258, 100%, 56.08%);
+  --md-deep-purple-a700: hsl(265, 100%, 45.88%);
 
   --md-indigo-50: hsl(231, 43.75%, 93.73%);
-  --md-indigo-100: hsl(231, 45.0%, 84.31%);
+  --md-indigo-100: hsl(231, 45%, 84.31%);
   --md-indigo-200: hsl(230, 44.36%, 73.92%);
   --md-indigo-300: hsl(230, 44.09%, 63.53%);
   --md-indigo-400: hsl(230, 44.25%, 55.69%);
   --md-indigo-500: hsl(230, 48.36%, 47.84%);
-  --md-indigo-600: hsl(231, 50.0%, 44.71%);
+  --md-indigo-600: hsl(231, 50%, 44.71%);
   --md-indigo-700: hsl(231, 53.62%, 40.59%);
   --md-indigo-800: hsl(232, 57.22%, 36.67%);
   --md-indigo-900: hsl(234, 65.79%, 29.8%);
-  --md-indigo-a100: hsl(230, 100.0%, 77.45%);
+  --md-indigo-a100: hsl(230, 100%, 77.45%);
   --md-indigo-a200: hsl(230, 98.84%, 66.08%);
   --md-indigo-a400: hsl(230, 98.97%, 61.76%);
   --md-indigo-a700: hsl(230, 99.04%, 59.22%);
@@ -167,10 +174,10 @@ button:focus {
   --md-blue-700: hsl(209, 78.72%, 46.08%);
   --md-blue-800: hsl(211, 80.28%, 41.76%);
   --md-blue-900: hsl(216, 85.06%, 34.12%);
-  --md-blue-a100: hsl(217, 100.0%, 75.49%);
-  --md-blue-a200: hsl(217, 100.0%, 63.33%);
-  --md-blue-a400: hsl(217, 100.0%, 58.04%);
-  --md-blue-a700: hsl(224, 100.0%, 58.04%);
+  --md-blue-a100: hsl(217, 100%, 75.49%);
+  --md-blue-a200: hsl(217, 100%, 63.33%);
+  --md-blue-a400: hsl(217, 100%, 58.04%);
+  --md-blue-a700: hsl(224, 100%, 58.04%);
 
   --md-light-blue-50: hsl(198, 93.55%, 93.92%);
   --md-light-blue-100: hsl(198, 92.41%, 84.51%);
@@ -182,40 +189,40 @@ button:focus {
   --md-light-blue-700: hsl(201, 98.1%, 41.37%);
   --md-light-blue-800: hsl(202, 97.91%, 37.45%);
   --md-light-blue-900: hsl(206, 98.72%, 30.59%);
-  --md-light-blue-a100: hsl(198, 100.0%, 75.1%);
-  --md-light-blue-a200: hsl(198, 100.0%, 62.55%);
-  --md-light-blue-a400: hsl(198, 100.0%, 50.0%);
-  --md-light-blue-a700: hsl(202, 100.0%, 45.88%);
+  --md-light-blue-a100: hsl(198, 100%, 75.1%);
+  --md-light-blue-a200: hsl(198, 100%, 62.55%);
+  --md-light-blue-a400: hsl(198, 100%, 50%);
+  --md-light-blue-a700: hsl(202, 100%, 45.88%);
 
   --md-cyan-50: hsl(186, 72.22%, 92.94%);
   --md-cyan-100: hsl(186, 71.11%, 82.35%);
   --md-cyan-200: hsl(186, 71.62%, 70.98%);
   --md-cyan-300: hsl(186, 71.15%, 59.22%);
   --md-cyan-400: hsl(186, 70.87%, 50.2%);
-  --md-cyan-500: hsl(186, 100.0%, 41.57%);
-  --md-cyan-600: hsl(186, 100.0%, 37.84%);
-  --md-cyan-700: hsl(185, 100.0%, 32.75%);
-  --md-cyan-800: hsl(185, 100.0%, 28.04%);
-  --md-cyan-900: hsl(182, 100.0%, 19.61%);
-  --md-cyan-a100: hsl(180, 100.0%, 75.88%);
-  --md-cyan-a200: hsl(180, 100.0%, 54.71%);
-  --md-cyan-a400: hsl(186, 100.0%, 50.0%);
-  --md-cyan-a700: hsl(187, 100.0%, 41.57%);
+  --md-cyan-500: hsl(186, 100%, 41.57%);
+  --md-cyan-600: hsl(186, 100%, 37.84%);
+  --md-cyan-700: hsl(185, 100%, 32.75%);
+  --md-cyan-800: hsl(185, 100%, 28.04%);
+  --md-cyan-900: hsl(182, 100%, 19.61%);
+  --md-cyan-a100: hsl(180, 100%, 75.88%);
+  --md-cyan-a200: hsl(180, 100%, 54.71%);
+  --md-cyan-a400: hsl(186, 100%, 50%);
+  --md-cyan-a700: hsl(187, 100%, 41.57%);
 
   --md-teal-50: hsl(176, 40.91%, 91.37%);
   --md-teal-100: hsl(174, 41.28%, 78.63%);
   --md-teal-200: hsl(174, 41.9%, 64.9%);
   --md-teal-300: hsl(174, 41.83%, 50.78%);
-  --md-teal-400: hsl(174, 62.75%, 40.0%);
-  --md-teal-500: hsl(174, 100.0%, 29.41%);
-  --md-teal-600: hsl(173, 100.0%, 26.86%);
-  --md-teal-700: hsl(173, 100.0%, 23.73%);
-  --md-teal-800: hsl(172, 100.0%, 20.59%);
-  --md-teal-900: hsl(169, 100.0%, 15.1%);
-  --md-teal-a100: hsl(166, 100.0%, 82.75%);
-  --md-teal-a200: hsl(165, 100.0%, 69.61%);
+  --md-teal-400: hsl(174, 62.75%, 40%);
+  --md-teal-500: hsl(174, 100%, 29.41%);
+  --md-teal-600: hsl(173, 100%, 26.86%);
+  --md-teal-700: hsl(173, 100%, 23.73%);
+  --md-teal-800: hsl(172, 100%, 20.59%);
+  --md-teal-900: hsl(169, 100%, 15.1%);
+  --md-teal-a100: hsl(166, 100%, 82.75%);
+  --md-teal-a200: hsl(165, 100%, 69.61%);
   --md-teal-a400: hsl(165, 82.26%, 51.37%);
-  --md-teal-a700: hsl(171, 100.0%, 37.45%);
+  --md-teal-a700: hsl(171, 100%, 37.45%);
 
   --md-green-50: hsl(124, 39.39%, 93.53%);
   --md-green-100: hsl(121, 37.5%, 84.31%);
@@ -229,22 +236,22 @@ button:focus {
   --md-green-900: hsl(124, 55.37%, 23.73%);
   --md-green-a100: hsl(136, 77.22%, 84.51%);
   --md-green-a200: hsl(150, 81.82%, 67.65%);
-  --md-green-a400: hsl(150, 100.0%, 45.1%);
-  --md-green-a700: hsl(144, 100.0%, 39.22%);
+  --md-green-a400: hsl(150, 100%, 45.1%);
+  --md-green-a700: hsl(144, 100%, 39.22%);
 
   --md-light-green-50: hsl(88, 51.72%, 94.31%);
   --md-light-green-100: hsl(87, 50.68%, 85.69%);
-  --md-light-green-200: hsl(88, 50.0%, 76.47%);
-  --md-light-green-300: hsl(87, 50.0%, 67.06%);
+  --md-light-green-200: hsl(88, 50%, 76.47%);
+  --md-light-green-300: hsl(87, 50%, 67.06%);
   --md-light-green-400: hsl(87, 50.24%, 59.8%);
   --md-light-green-500: hsl(87, 50.21%, 52.75%);
   --md-light-green-600: hsl(89, 46.12%, 48.04%);
   --md-light-green-700: hsl(92, 47.91%, 42.16%);
   --md-light-green-800: hsl(95, 49.46%, 36.47%);
   --md-light-green-900: hsl(103, 55.56%, 26.47%);
-  --md-light-green-a100: hsl(87, 100.0%, 78.24%);
-  --md-light-green-a200: hsl(87, 100.0%, 67.45%);
-  --md-light-green-a400: hsl(92, 100.0%, 50.59%);
+  --md-light-green-a100: hsl(87, 100%, 78.24%);
+  --md-light-green-a200: hsl(87, 100%, 67.45%);
+  --md-light-green-a400: hsl(92, 100%, 50.59%);
   --md-light-green-a700: hsl(96, 81.15%, 47.84%);
 
   --md-lime-50: hsl(65, 71.43%, 94.51%);
@@ -256,71 +263,71 @@ button:focus {
   --md-lime-600: hsl(63, 59.68%, 49.61%);
   --md-lime-700: hsl(62, 61.43%, 43.73%);
   --md-lime-800: hsl(59, 62.89%, 38.04%);
-  --md-lime-900: hsl(53, 69.93%, 30.0%);
-  --md-lime-a100: hsl(65, 100.0%, 75.29%);
-  --md-lime-a200: hsl(65, 100.0%, 62.75%);
-  --md-lime-a400: hsl(73, 100.0%, 50.0%);
-  --md-lime-a700: hsl(75, 100.0%, 45.88%);
+  --md-lime-900: hsl(53, 69.93%, 30%);
+  --md-lime-a100: hsl(65, 100%, 75.29%);
+  --md-lime-a200: hsl(65, 100%, 62.75%);
+  --md-lime-a400: hsl(73, 100%, 50%);
+  --md-lime-a700: hsl(75, 100%, 45.88%);
 
-  --md-yellow-50: hsl(55, 100.0%, 95.29%);
-  --md-yellow-100: hsl(53, 100.0%, 88.43%);
-  --md-yellow-200: hsl(53, 100.0%, 80.78%);
-  --md-yellow-300: hsl(53, 100.0%, 73.14%);
-  --md-yellow-400: hsl(53, 100.0%, 67.25%);
-  --md-yellow-500: hsl(53, 100.0%, 61.57%);
-  --md-yellow-600: hsl(48, 98.04%, 60.0%);
+  --md-yellow-50: hsl(55, 100%, 95.29%);
+  --md-yellow-100: hsl(53, 100%, 88.43%);
+  --md-yellow-200: hsl(53, 100%, 80.78%);
+  --md-yellow-300: hsl(53, 100%, 73.14%);
+  --md-yellow-400: hsl(53, 100%, 67.25%);
+  --md-yellow-500: hsl(53, 100%, 61.57%);
+  --md-yellow-600: hsl(48, 98.04%, 60%);
   --md-yellow-700: hsl(42, 96.26%, 58.04%);
   --md-yellow-800: hsl(37, 94.64%, 56.08%);
   --md-yellow-900: hsl(28, 91.74%, 52.55%);
-  --md-yellow-a100: hsl(60, 100.0%, 77.65%);
-  --md-yellow-a200: hsl(60, 100.0%, 50.0%);
-  --md-yellow-a400: hsl(55, 100.0%, 50.0%);
-  --md-yellow-a700: hsl(50, 100.0%, 50.0%);
+  --md-yellow-a100: hsl(60, 100%, 77.65%);
+  --md-yellow-a200: hsl(60, 100%, 50%);
+  --md-yellow-a400: hsl(55, 100%, 50%);
+  --md-yellow-a700: hsl(50, 100%, 50%);
 
-  --md-amber-50: hsl(46, 100.0%, 94.12%);
-  --md-amber-100: hsl(45, 100.0%, 85.1%);
-  --md-amber-200: hsl(45, 100.0%, 75.49%);
-  --md-amber-300: hsl(45, 100.0%, 65.49%);
-  --md-amber-400: hsl(45, 100.0%, 57.84%);
-  --md-amber-500: hsl(45, 100.0%, 51.37%);
-  --md-amber-600: hsl(42, 100.0%, 50.0%);
-  --md-amber-700: hsl(37, 100.0%, 50.0%);
-  --md-amber-800: hsl(33, 100.0%, 50.0%);
-  --md-amber-900: hsl(26, 100.0%, 50.0%);
-  --md-amber-a100: hsl(47, 100.0%, 74.9%);
-  --md-amber-a200: hsl(47, 100.0%, 62.55%);
-  --md-amber-a400: hsl(46, 100.0%, 50.0%);
-  --md-amber-a700: hsl(40, 100.0%, 50.0%);
+  --md-amber-50: hsl(46, 100%, 94.12%);
+  --md-amber-100: hsl(45, 100%, 85.1%);
+  --md-amber-200: hsl(45, 100%, 75.49%);
+  --md-amber-300: hsl(45, 100%, 65.49%);
+  --md-amber-400: hsl(45, 100%, 57.84%);
+  --md-amber-500: hsl(45, 100%, 51.37%);
+  --md-amber-600: hsl(42, 100%, 50%);
+  --md-amber-700: hsl(37, 100%, 50%);
+  --md-amber-800: hsl(33, 100%, 50%);
+  --md-amber-900: hsl(26, 100%, 50%);
+  --md-amber-a100: hsl(47, 100%, 74.9%);
+  --md-amber-a200: hsl(47, 100%, 62.55%);
+  --md-amber-a400: hsl(46, 100%, 50%);
+  --md-amber-a700: hsl(40, 100%, 50%);
 
-  --md-orange-50: hsl(36, 100.0%, 93.92%);
-  --md-orange-100: hsl(35, 100.0%, 84.9%);
-  --md-orange-200: hsl(35, 100.0%, 75.1%);
-  --md-orange-300: hsl(35, 100.0%, 65.1%);
-  --md-orange-400: hsl(35, 100.0%, 57.45%);
-  --md-orange-500: hsl(35, 100.0%, 50.0%);
-  --md-orange-600: hsl(33, 100.0%, 49.22%);
-  --md-orange-700: hsl(30, 100.0%, 48.04%);
-  --md-orange-800: hsl(27, 100.0%, 46.86%);
-  --md-orange-900: hsl(21, 100.0%, 45.1%);
-  --md-orange-a100: hsl(38, 100.0%, 75.1%);
-  --md-orange-a200: hsl(33, 100.0%, 62.55%);
-  --md-orange-a400: hsl(34, 100.0%, 50.0%);
-  --md-orange-a700: hsl(25, 100.0%, 50.0%);
+  --md-orange-50: hsl(36, 100%, 93.92%);
+  --md-orange-100: hsl(35, 100%, 84.9%);
+  --md-orange-200: hsl(35, 100%, 75.1%);
+  --md-orange-300: hsl(35, 100%, 65.1%);
+  --md-orange-400: hsl(35, 100%, 57.45%);
+  --md-orange-500: hsl(35, 100%, 50%);
+  --md-orange-600: hsl(33, 100%, 49.22%);
+  --md-orange-700: hsl(30, 100%, 48.04%);
+  --md-orange-800: hsl(27, 100%, 46.86%);
+  --md-orange-900: hsl(21, 100%, 45.1%);
+  --md-orange-a100: hsl(38, 100%, 75.1%);
+  --md-orange-a200: hsl(33, 100%, 62.55%);
+  --md-orange-a400: hsl(34, 100%, 50%);
+  --md-orange-a700: hsl(25, 100%, 50%);
 
   --md-deep-orange-50: hsl(5, 71.43%, 94.51%);
-  --md-deep-orange-100: hsl(14, 100.0%, 86.86%);
-  --md-deep-orange-200: hsl(14, 100.0%, 78.43%);
-  --md-deep-orange-300: hsl(14, 100.0%, 69.8%);
-  --md-deep-orange-400: hsl(14, 100.0%, 63.14%);
-  --md-deep-orange-500: hsl(14, 100.0%, 56.67%);
+  --md-deep-orange-100: hsl(14, 100%, 86.86%);
+  --md-deep-orange-200: hsl(14, 100%, 78.43%);
+  --md-deep-orange-300: hsl(14, 100%, 69.8%);
+  --md-deep-orange-400: hsl(14, 100%, 63.14%);
+  --md-deep-orange-500: hsl(14, 100%, 56.67%);
   --md-deep-orange-600: hsl(14, 90.68%, 53.73%);
-  --md-deep-orange-700: hsl(14, 80.39%, 50.0%);
+  --md-deep-orange-700: hsl(14, 80.39%, 50%);
   --md-deep-orange-800: hsl(14, 82.28%, 46.47%);
   --md-deep-orange-900: hsl(14, 88.18%, 39.8%);
-  --md-deep-orange-a100: hsl(14, 100.0%, 75.1%);
-  --md-deep-orange-a200: hsl(14, 100.0%, 62.55%);
-  --md-deep-orange-a400: hsl(14, 100.0%, 50.0%);
-  --md-deep-orange-a700: hsl(11, 100.0%, 43.33%);
+  --md-deep-orange-a100: hsl(14, 100%, 75.1%);
+  --md-deep-orange-a200: hsl(14, 100%, 62.55%);
+  --md-deep-orange-a400: hsl(14, 100%, 50%);
+  --md-deep-orange-a700: hsl(11, 100%, 43.33%);
 
   --md-brown-50: hsl(19, 15.79%, 92.55%);
   --md-brown-100: hsl(16, 15.79%, 81.37%);
@@ -333,16 +340,16 @@ button:focus {
   --md-brown-800: hsl(11, 25.81%, 24.31%);
   --md-brown-900: hsl(8, 27.84%, 19.02%);
 
-  --md-gray-50: hsl(0, 0.0%, 98.04%);
-  --md-gray-100: hsl(0, 0.0%, 96.08%);
-  --md-gray-200: hsl(0, 0.0%, 93.33%);
-  --md-gray-300: hsl(0, 0.0%, 87.84%);
-  --md-gray-400: hsl(0, 0.0%, 74.12%);
-  --md-gray-500: hsl(0, 0.0%, 61.96%);
-  --md-gray-600: hsl(0, 0.0%, 45.88%);
-  --md-gray-700: hsl(0, 0.0%, 38.04%);
-  --md-gray-800: hsl(0, 0.0%, 25.88%);
-  --md-gray-900: hsl(0, 0.0%, 12.94%);
+  --md-gray-50: hsl(0, 0%, 98.04%);
+  --md-gray-100: hsl(0, 0%, 96.08%);
+  --md-gray-200: hsl(0, 0%, 93.33%);
+  --md-gray-300: hsl(0, 0%, 87.84%);
+  --md-gray-400: hsl(0, 0%, 74.12%);
+  --md-gray-500: hsl(0, 0%, 61.96%);
+  --md-gray-600: hsl(0, 0%, 45.88%);
+  --md-gray-700: hsl(0, 0%, 38.04%);
+  --md-gray-800: hsl(0, 0%, 25.88%);
+  --md-gray-900: hsl(0, 0%, 12.94%);
 
   --md-blue-gray-50: hsl(204, 15.15%, 93.53%);
   --md-blue-gray-100: hsl(198, 15.66%, 83.73%);
