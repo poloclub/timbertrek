@@ -477,7 +477,7 @@ video {
       padding: 16px;
       font-size: 0.85em;
       line-height: 1.45;
-      overflow: auto;
+      overflow: hidden;
       white-space: pre;
       background-color: $blue-gray-50;
     }
@@ -533,9 +533,18 @@ video {
   display: flex;
   width: 100%;
   justify-content: center;
+
+  display: grid;
+  grid-template-columns:
+    [start] 1fr [long-start] calc((1000px - 78ch) / 2) [text-start] minmax(
+      auto,
+      78ch
+    )
+    [text-end] calc((1000px - 78ch) / 2) [long-end] 1fr [end];
 }
 
 .footer-main {
+  grid-column: text-start / text-end;
   display: flex;
   max-width: 100ch;
   flex-direction: row;
@@ -548,8 +557,9 @@ video {
 }
 
 .footer-logo {
+  width: 100%;
   display: flex;
-  gap: 45px;
+  justify-content: space-between;
 
   :global(.svg-logo) {
     height: 100%;
@@ -559,6 +569,7 @@ video {
 
     :global(svg) {
       height: 50px;
+      width: unset;
     }
   }
 }

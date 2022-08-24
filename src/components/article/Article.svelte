@@ -208,7 +208,7 @@
     <div class="paper-info">
       <div class="left">
         <a target="_blank" href={text.cite.paperLink}
-          ><img src="/paper-preview.png" /></a
+          ><img src="paper-preview.png" /></a
         >
       </div>
       <div class="right">
