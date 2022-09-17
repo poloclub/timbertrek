@@ -7,7 +7,7 @@
     "build:r": "rollup -c",
     "dev:r": "rollup -c -w",
     "start:r": "sirv public --no-clear --port 5005",
-    "dev": "vite",
+    "dev": "vite --port 3000",
     "build": "vite build",
     "build:lite": "source publish-lite.sh",
     "build:notebook": "vite build --mode notebook",

@@ -11,7 +11,7 @@
   import iconFujitsu from '../../imgs/logo-fujitsu.svg?raw';
   import iconDuke from '../../imgs/logo-duke.svg?raw';
   import iconUBC from '../../imgs/logo-ubc.svg?raw';
-  import iconCopy from '../../imgs/icon-copy.svg?raw';
+  import iconCopy from '../../imgs/icon-copy-box.svg?raw';
   import iconCheckBox from '../../imgs/icon-check-box.svg?raw';
   import text from './ArticleText.yml';
 
@@ -20,7 +20,9 @@
   let curDataset = 'compas';
   let timbertrekTransitioning = false;
   let showIFrame = false;
+
   let bibtexCopied = false;
+  let bibtexHovering = false;
 
   const datasets = ['compas', 'fico', 'car evaluation', 'my own set'];
 
@@ -201,7 +203,7 @@
     <p>{@html text.contribute[0]}</p>
     <p>{@html text.contribute[1]}</p>
 
-    <h2 id="cite">How can I learn more about TimberTrek?</h2>
+    <h2 id="cite">How to learn more?</h2>
 
     <p>{@html text.cite.intro}</p>
 
@@ -227,12 +229,43 @@
         </div>
       </div>
     </div>
-    <div class="bibtex-block">
+    <div
+      class="bibtex-block"
+      on:mouseenter={() => {
+        bibtexHovering = true;
+      }}
+      on:mouseleave={() => {
+        bibtexHovering = false;
+      }}
+    >
       <div class="bibtex">
         {@html text.cite['bibtex']}
       </div>
 
       <div
+        class="copy-button"
+        class:hide={!bibtexHovering}
+        on:click={() => {
+          navigator.clipboard.writeText(text.cite['bibtex']).then(() => {
+            bibtexCopied = true;
+          });
+        }}
+        on:mouseleave={() => {
+          setTimeout(() => {
+            bibtexCopied = false;
+          }, 500);
+        }}
+      >
+        {#if bibtexCopied}
+          <span class="svg-icon check">{@html iconCheckBox}</span>
+          <span class="copy-label check">Copied!</span>
+        {:else}
+          <span class="svg-icon copy">{@html iconCopy}</span>
+          <span class="copy-label copy">Copy</span>
+        {/if}
+      </div>
+
+      <!-- <div
         class="block-overlay"
         on:click={() => {
           navigator.clipboard.writeText(text.cite['bibtex']).then(() => {
@@ -252,7 +285,7 @@
           <span class="svg-icon">{@html iconCopy}</span>
           <span>Click to copy</span>
         {/if}
-      </div>
+      </div> -->
     </div>
   </div>
 
