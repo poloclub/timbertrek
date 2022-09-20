@@ -23,7 +23,7 @@ doi: 10.48550/arXiv.2209.09227
 date-released: 2022-09-19
 url: "https://github.com/poloclub/timbertrek"
 preferred-citation:
-  type: conference
+  type: article
   authors:
   - family-names: Wang
     given-names: Zijie J.
@@ -41,6 +41,7 @@ preferred-citation:
     given-names: Cynthia
   - family-names: Seltzer
     given-names: Margo
-  doi: "10.48550/arXiv.2209.09227"
-  booktitle: "IEEE Visualization Conference"
+  title: "TimberTrek: Exploring and Curating Sparse Decision Trees with Interactive Visualization"
+  doi: 10.48550/arXiv.2209.09227
+  journal: "IEEE Visualization Conference"
   year: 2022
