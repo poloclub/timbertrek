@@ -1,0 +1,46 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: Wang
+  given-names: Zijie J.
+- family-names: Zhong
+  given-names: Chudi
+- family-names: Xin
+  given-names: Rui
+- family-names: Takagi
+  given-names: Takuya
+- family-names: Chen
+  given-names: Zhi
+- family-names: Chau
+  given-names: Duen Horng
+- family-names: Rudin
+  given-names: Cynthia
+- family-names: Seltzer
+  given-names: Margo
+title: "TimberTrek: Exploring and Curating Sparse Decision Trees with Interactive Visualization"
+version: 0.1.5
+doi: 10.48550/arXiv.2209.09227
+date-released: 2022-09-19
+url: "https://github.com/poloclub/timbertrek"
+preferred-citation:
+  type: conference
+  authors:
+  - family-names: Wang
+    given-names: Zijie J.
+  - family-names: Zhong
+    given-names: Chudi
+  - family-names: Xin
+    given-names: Rui
+  - family-names: Takagi
+    given-names: Takuya
+  - family-names: Chen
+    given-names: Zhi
+  - family-names: Chau
+    given-names: Duen Horng
+  - family-names: Rudin
+    given-names: Cynthia
+  - family-names: Seltzer
+    given-names: Margo
+  doi: "10.48550/arXiv.2209.09227"
+  booktitle: "IEEE Visualization Conference"
+  year: 2022

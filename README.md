@@ -5,26 +5,26 @@
 [![Lite](https://gist.githubusercontent.com/xiaohk/9b9f7c8fa162b2c3bc3251a5c9a799b2/raw/a7fca1d0a2d62c2b49f60c0217dffbd0fe404471/lite-badge-launch-small.svg)](https://poloclub.github.io/timbertrek/notebook)
 [![pypi](https://img.shields.io/pypi/v/timbertrek?color=blue)](https://pypi.python.org/pypi/timbertrek)
 [![license](https://img.shields.io/badge/License-MIT-brightgreen)](https://github.com/poloclub/timbertrek/blob/master/LICENSE)
-<!-- [![arxiv badge](https://img.shields.io/badge/arXiv-2202.11086-red)](https://arxiv.org/abs/2202.11086) -->
+[![arxiv badge](https://img.shields.io/badge/arXiv-2209.09227-red)](https://arxiv.org/abs/2209.09227)
 <!-- [![DOI:10.1145/3491101.3519653](https://img.shields.io/badge/DOI-10.1145/3491101.3519653-blue)](https://doi.org/10.1145/3491101.3519653) -->
 
 Curate decision trees that align with your knowledge and values!
 
-<!-- <table>
+<table>
   <tr>
-    <td colspan="1"><img src='https://i.imgur.com/FtmHafo.png'></td>
+    <td colspan="3"><a href="https://poloclub.github.io/timbertrek"><img src='https://i.imgur.com/t4qtPPX.png'></a></td>
   </tr>
   <tr></tr>
   <tr>
+    <td><a href="https://youtu.be/3eGqTmsStJM">📺 Video</a></td>
     <td><a href="https://youtu.be/eMlTtloGyho">👨🏻‍🏫 Talk</a></td>
-    <td><a href="https://youtu.be/OKaPmEBzEX0">📺 Video</a></td>
-    <td><a href="https://arxiv.org/abs/2202.11086">📖 "StickyLand: breaking the linear presentation of computational Notebooks"</a></td>
+    <td><a href="https://arxiv.org/abs/2209.09227">📖 "TimberTrek: Exploring and Curating Trustworthy Decision Trees with Interactive Visualization"</a></td>
   </tr>
-</table> -->
+</table>
 
-|<img src='https://i.imgur.com/t4qtPPX.png'>|
+<!-- |<img src='https://i.imgur.com/t4qtPPX.png'>|
 |:---:|
-|<a href="https://youtu.be/3eGqTmsStJM">📺 Demo Video for "TimberTrek: Exploring and Curating Trustworthy Decision Trees with Interactive Visualization"|
+|<a href="https://youtu.be/3eGqTmsStJM">📺 Demo Video for "TimberTrek: Exploring and Curating Trustworthy Decision Trees with Interactive Visualization"| -->
 
 ## Web Demo
 
@@ -77,6 +77,19 @@ Navigate to localhost:3000. You should see TimberTrek running in your browser :)
 ## Credits
 
 Led by <a href='https://zijie.wang/' target='_blank'>Jay Wang</a>, TimberTrek is a result of a collaboration between ML and visualization researchers from Georgia Tech, Duke University, Fujitsu Laboratories, and University of British Columbia. TimberTrek is created by <a href='https://zijie.wang/' target='_blank'>Jay Wang</a>, <a href='https://www.linkedin.com/in/chudizhong' target='_blank'>Chudi Zhong</a>, <a href='https://www.linkedin.com/in/rui-xin-8070181b9' target='_blank'>Rui Xin</a>, <a href='https://scholar.google.com/citations?user=9fY1WVIAAAAJ&hl=en' target='_blank'>Takuya Takagi</a>, <a href='https://users.cs.duke.edu/~zhichen/' target='_blank'>Zhi Chen</a>, <a href='' target='_blank'>Polo Chau</a>, <a href='https://users.cs.duke.edu/~cynthia/' target='_blank'>Cynthia Rudin</a>, and <a href='https://www.seltzer.com/margo/' target='_blank'>Margo Seltzer</a>.
+
+## Citation
+
+To learn more about TimberTrek, please read our [research paper](https://arxiv.org/abs/2209.09227) (published at [IEEE VIS 2022](https://ieeevis.org/year/2022/welcome)). If you find TimberTrek useful for your research, please consider citing our paper. Thanks!
+
+```bibTeX
+@inproceedings{wangTimberTrekExploringCurating2022,
+  title = {{{TimberTrek}}: {{Exploring}} and {{Curating Trustworthy Decision Trees}} with {{Interactive Visualization}}},
+  booktitle = {2022 {{IEEE Visualization Conference}} ({{VIS}})},
+  author = {Wang, Zijie J. and Zhong, Chudi and Xin, Rui and Takagi, Takuya and Chen, Zhi and Chau, Duen Horng and Rudin, Cynthia and Seltzer, Margo},
+  year = {2022}
+}
+```
 
 ## License
 

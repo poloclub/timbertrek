@@ -169,7 +169,7 @@
           class="svg-icon paper-icon"
           title="Research paper"
           target="_blank"
-          href="https://github.com/poloclub/timbertrek"
+          href="https://arxiv.org/abs/2209.09227"
         >
           {@html paperIcon}
         </a>

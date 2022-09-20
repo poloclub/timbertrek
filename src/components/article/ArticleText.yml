@@ -36,7 +36,7 @@ usage:
     the Rashomon JSON file.
 
   p2: >
-    You can directly use TimberTrek in any computational notebooks, such as
+    You can directly use TimberTrek in any computational notebook, such as
     Jupyter Notebook & Lab, Google Colab, and VS Code Notebook. To do that, you
     only need to install TimberTrek's Python package via <code>pip install
     timbertrek</code>. Then you can create a TimberTrek instance by passing your
@@ -65,8 +65,8 @@ tutorial:
           where \(k\) is the height of the tallest tree in the Rashomon set.
           Each ring corresponds to a level of the decision path.
         - >
-          Each ring is split into multiple sectors where each sector correspond
-          to a testing condition of the decision tree. We color code the sectors
+          Each ring is split into multiple sectors, and each sector corresponds
+          to a testing condition of the decision tree. We color-code the sectors
           based on the feature attributes. For example, <span class="feature-tag" style="color:
           #4E79A7">number of prior crime</span>,  <span class="feature-tag" style="color:
           #F28E2C">age</span>, and <span class="feature-tag" style="color:
@@ -180,9 +180,9 @@ development: >
   target='_blank'>Svelte</a> as a framework and <a href='https://d3js.org'
   target='_blank'>D3.js</a> for visualizations. The source code is available on
   <a href='https://github.com/poloclub/timbertrek' target='_blank'>GitHub</a>.
-  The entire app runs locally and privately in your web-browser, and your model
+  The entire app runs locally and privately in your web browser, and your model
   and data would never leave your machine. Anyone can easily access TimberTrek
-  on their desktop or tablets, without a need of setting up dedicated servers or
+  on their desktop or tablets, without the need of setting up dedicated servers or
   writing code. With a flexible design, TimberTrek supports all types of
   computational notebooks, such as Jupyter Notebook & Lab, Google Colab, and VS
   Code Notebook. With the cross-platform support, we hope TimberTrek will fit into
@@ -250,10 +250,11 @@ youtubeTimes:
 
 cite:
   intro: >
-    To learn more about TimberTrek, please read our research paper (published at
-    <a href='https://ieeevis.org/year/2022/welcome' target='_blank'>IEEE VIS
-    2022</a>). If you find TimberTrek useful for your research, please consider
-    citing our paper. Thanks!
+    To learn more about TimberTrek, please read our <a
+    href='https://arxiv.org/abs/2209.09227' target='_blank'>research paper</a>
+    (published at <a href='https://ieeevis.org/year/2022/welcome'
+    target='_blank'>IEEE VIS 2022</a>). If you find TimberTrek useful for your
+    research, please consider citing our paper. Thanks!
   bibtex: >
     @inproceedings{wangTimberTrekExploringCurating2022,
       title = {{{TimberTrek}}: {{Exploring}} and {{Curating Trustworthy Decision Trees}} with {{Interactive Visualization}}},
@@ -265,7 +266,7 @@ cite:
     TimberTrek: Exploring and Curating Sparse Decision Trees with Interactive
     Visualization
   paperLink: >
-    https://poloclub.github.io/timbertrek
+    https://arxiv.org/abs/2209.09227
   venue: >
     IEEE Visualization Conference (VIS) 2022
   venueLink: >
