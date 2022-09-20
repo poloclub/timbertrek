@@ -1,2 +1,0 @@
-"use strict";(self.webpackChunk_JUPYTERLAB_CORE_OUTPUT=self.webpackChunk_JUPYTERLAB_CORE_OUTPUT||[]).push([[4758],{24758:(e,t,r)=>{r.d(t,{O:()=>T,g:()=>i});var n=r(74547);const T=new n.Token("@jupyterlab/settingeditor:ISettingEditorTracker"),i=new n.Token("@jupyterlab/settingeditor:IJSONSettingEditorTracker")}}]);
-//# sourceMappingURL=4758.a9113bf.js.map
