@@ -11,20 +11,21 @@ tool:
     To help ML practitioners build trustworthy models, researchers have very
     recently developed a technique to generate the set of almost-optimal sparse
     interpretable decision trees. This set of high-performing models is called
-    the <a target="_blank" href="https://arxiv.org/abs/1908.01755">Rashomon
+    the <a target="_blank" href="https://arxiv.org/abs/2209.08040">Rashomon
     set</a>, named after the <a target="_blank"
     href="https://projecteuclid.org/journals/statistical-science/volume-16/issue-3/Statistical-Modeling--The-Two-Cultures-with-comments-and-a/10.1214/ss/1009213726.full">Rashomon
-    effect</a> in statistics. A Rashomon set of sparse decision trees can have
-    <em>thousands of inherently interpretable and almost-equally accurate
-    models</em>, providing opportunities for users to choose ones that best
-    align with their knowledge and needs (e.g., fairness, monotonicity,
-    simplicity). However, the large size of Rashomon sets and the diversity of
-    contained models pose challenges for users to effectively explore and
-    compare all these good models. TimberTrek is the first interactive
-    visualization tool designed to tackle this critical challenge through
-    <strong>summarizing the whole Rashomon set</strong> of sparse decision trees
-    and empowering users to <strong>curate accurate and trustworthy
-    models</strong>.
+    effect</a> in statistics. Using the <a
+    href='https://arxiv.org/abs/2209.08040' target='_blank'>TreeFARMS
+    algorithm</a>, we can generate the whole Rashomon set of sparse decision
+    trees. This set can contain <em>thousands of</em> inherently interpretable
+    and almost-equally accurate models, providing opportunities for users to
+    choose ones that best align with their knowledge and needs (e.g., fairness,
+    monotonicity, simplicity). However, the large size of Rashomon sets and the
+    diversity of contained models pose challenges for users to effectively
+    explore and compare all these good models. TimberTrek is the first
+    interactive visualization tool designed to tackle this critical challenge
+    through <strong>summarizing the whole Rashomon set</strong> of sparse
+    decision trees and empowering users to <strong>curate trees</strong> that meet their needs.
 
 usage:
   p1: >
@@ -253,8 +254,11 @@ cite:
     To learn more about TimberTrek, please read our <a
     href='https://arxiv.org/abs/2209.09227' target='_blank'>research paper</a>
     (published at <a href='https://ieeevis.org/year/2022/welcome'
-    target='_blank'>IEEE VIS 2022</a>). If you find TimberTrek useful for your
-    research, please consider citing our paper. Thanks!
+    target='_blank'>IEEE VIS'22</a>). To learn more about the algorithm to
+    generate the whole Rashomon set of sparse decision trees, please read our <a
+    href='https://arxiv.org/abs/2209.08040' target='_blank'>TreeFARMS paper</a>
+    (published at NeurIPS'22). If you find TimberTrek useful for your research,
+    please consider citing our paper. Thanks!
   bibtex: >
     @inproceedings{wangTimberTrekExploringCurating2022,
       title = {{{TimberTrek}}: {{Exploring}} and {{Curating Trustworthy Decision Trees}} with {{Interactive Visualization}}},

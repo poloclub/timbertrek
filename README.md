@@ -80,7 +80,7 @@ Led by <a href='https://zijie.wang/' target='_blank'>Jay Wang</a>, TimberTrek is
 
 ## Citation
 
-To learn more about TimberTrek, please read our [research paper](https://arxiv.org/abs/2209.09227) (published at [IEEE VIS 2022](https://ieeevis.org/year/2022/welcome)). If you find TimberTrek useful for your research, please consider citing our paper. Thanks!
+To learn more about TimberTrek, please read our [research paper](https://arxiv.org/abs/2209.09227) (published at [IEEE VIS 2022](https://ieeevis.org/year/2022/welcome)). To learn more about the algorithm to generate the whole Rashomon set of sparse decision trees, please read our [TreeFARMS paper](https://arxiv.org/abs/2209.08040) (published at NeurIPS'22). If you find TimberTrek useful for your research, please consider citing our paper. Thanks!
 
 ```bibTeX
 @inproceedings{wangTimberTrekExploringCurating2022,
