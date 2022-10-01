@@ -17,7 +17,7 @@ Curate decision trees that align with your knowledge and values!
   <tr></tr>
   <tr>
     <td><a href="https://youtu.be/3eGqTmsStJM">📺 Video</a></td>
-    <td><a href="https://youtu.be/eMlTtloGyho">👨🏻‍🏫 Talk</a></td>
+    <td><a href="https://youtu.be/l1mr9z1TuAk">👨🏻‍🏫 Talk</a></td>
     <td><a href="https://arxiv.org/abs/2209.09227">📖 "TimberTrek: Exploring and Curating Trustworthy Decision Trees with Interactive Visualization"</a></td>
   </tr>
 </table>
