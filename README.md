@@ -32,7 +32,7 @@ For a live web demo, visit: https://poloclub.github.io/timbertrek
 
 You can use the web demo to explore your own Rashomon Sets! You just need to choose the `my own set` tab below the tool and upload a JSON file containing all decision paths in your Rashomon Set.
 
-Check out this [example notebook](https://poloclub.github.io/timbertrek/notebook/retro/notebooks/?path=campas.ipynb) to see how to generate this JSON file.
+Check out this [example notebook](https://github.com/ubc-systopia/treeFarms/blob/main/treefarms/tutorial.ipynb) to see how to generate the whole Rashomon Set and the JSON file.
 
 ## Notebook Demos
 
