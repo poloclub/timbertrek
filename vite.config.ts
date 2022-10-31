@@ -32,24 +32,28 @@ export default defineConfig(({ command, mode }) => {
               emitCss: false
             }),
             {
-              name: 'post-build',
-              writeBundle: options => {
-                // Move target file to the notebook package
-                fs.copyFile(
-                  path.resolve(options.dir, options.entryFileNames as string),
-                  path.resolve(
-                    __dirname,
-                    'notebook-widget/timbertrek/timbertrek.js'
-                  ),
-                  error => {
-                    if (error) throw error;
-                  }
-                );
+              name: 'my-post-build-plugin',
+              writeBundle: {
+                sequential: true,
+                order: 'post',
+                handler(options) {
+                  // Move target file to the notebook package
+                  fs.copyFile(
+                    path.resolve(options.dir, 'timbertrek.js'),
+                    path.resolve(
+                      __dirname,
+                      'notebook-widget/timbertrek/timbertrek.js'
+                    ),
+                    error => {
+                      if (error) throw error;
+                    }
+                  );
 
-                // Delete all other generated files
-                fs.rm(options.dir, { recursive: true }, error => {
-                  if (error) throw error;
-                });
+                  // Delete all other generated files
+                  fs.rm(options.dir, { recursive: true }, error => {
+                    if (error) throw error;
+                  });
+                }
               }
             }
           ]
