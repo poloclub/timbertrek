@@ -12,13 +12,14 @@ Curate decision trees that align with your knowledge and values!
 
 <table>
   <tr>
-    <td colspan="3"><a href="https://poloclub.github.io/timbertrek"><img src='https://i.imgur.com/t4qtPPX.png'></a></td>
+    <td colspan="4"><a href="https://poloclub.github.io/timbertrek"><img src='https://i.imgur.com/t4qtPPX.png'></a></td>
   </tr>
   <tr></tr>
   <tr>
-    <td><a href="https://youtu.be/3eGqTmsStJM">📺 Video</a></td>
-    <td><a href="https://youtu.be/l1mr9z1TuAk">👨🏻‍🏫 Talk</a></td>
-    <td><a href="https://arxiv.org/abs/2209.09227">📖 "TimberTrek: Exploring and Curating Trustworthy Decision Trees with Interactive Visualization"</a></td>
+    <td><a href="https://poloclub.github.io/timbertrek">🚀 Live Demo</a></td>
+    <td><a href="https://youtu.be/3eGqTmsStJM">📺 Demo Video</a></td>
+    <td><a href="https://youtu.be/l1mr9z1TuAk">👨🏻‍🏫 Conference Talk</a></td>
+    <td><a href="https://arxiv.org/abs/2209.09227">📖 Research Paper</a></td>
   </tr>
 </table>
 
@@ -28,7 +29,7 @@ Curate decision trees that align with your knowledge and values!
 
 ## Web Demo
 
-For a live web demo, visit: https://poloclub.github.io/timbertrek
+For a live web demo, visit: https://poloclub.github.io/timbertrek.
 
 You can use the web demo to explore your own Rashomon Sets! You just need to choose the `my own set` tab below the tool and upload a JSON file containing all decision paths in your Rashomon Set.
 
