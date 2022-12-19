@@ -360,41 +360,33 @@ def get_hierarchy_tree(tree_strings):
         cur_string = tree_strings[i]
         cur_string_split = cur_string.split()
 
-        if len(cur_string_split) == 2:
-            # Case 1: there are two values
-            sub_tree["f"] = [cur_feature]
-            sub_tree["c"] = []
+        if len(cur_string_split) % 2 != 0:
+            raise ValueError("Error: current string size is not even.")
 
-            for s in cur_string_split:
-                if s == "-1" or s == "-2":
-                    # We hit a decision node, add a leaf to this branch
-                    sub_tree["c"].append({"f": ["+"] if s == "-2" else ["-"]})
-                else:
-                    new_sub_tree = {}
-                    sub_tree["c"].append(new_sub_tree)
-                    working_queue.append([s, new_sub_tree])
+        # The string can have even number of values: the first two correspond to
+        # the current item, and the second two correspond to the next item in
+        # the queue, and the next two corresponds to the next item in the queue...
+        sub_tree["f"] = [cur_feature]
+        sub_tree["c"] = []
 
-        elif len(cur_string_split) == 4:
-            # Case 2: there are four values: the first two corresponding to the cur item
-            # and the last two corresponding to the next item in the queue
-            sub_tree["f"] = [cur_feature]
-            sub_tree["c"] = []
+        for s in cur_string_split[:2]:
+            if s == "-1" or s == "-2":
+                # We hit a decision node, add a leaf to this branch
+                sub_tree["c"].append({"f": ["+"] if s == "-2" else ["-"]})
+            else:
+                new_sub_tree = {}
+                sub_tree["c"].append(new_sub_tree)
+                working_queue.append([s, new_sub_tree])
 
-            for s in cur_string_split[:2]:
-                if s == "-1" or s == "-2":
-                    # We hit a decision node, add a leaf to this branch
-                    sub_tree["c"].append({"f": ["+"] if s == "-2" else ["-"]})
-                else:
-                    new_sub_tree = {}
-                    sub_tree["c"].append(new_sub_tree)
-                    working_queue.append([s, new_sub_tree])
-
+        # Index for the next pair
+        pair_i = 2
+        while pair_i < len(cur_string_split):
             # Load the next item in the queue
             cur_feature, sub_tree = working_queue.popleft()
             sub_tree["f"] = [cur_feature]
             sub_tree["c"] = []
 
-            for s in cur_string_split[2:]:
+            for s in cur_string_split[pair_i : pair_i + 2]:
                 if s == "-1" or s == "-2":
                     # We hit a decision node, add a leaf to this branch
                     sub_tree["c"].append({"f": ["+"] if s == "-2" else ["-"]})
@@ -403,51 +395,7 @@ def get_hierarchy_tree(tree_strings):
                     sub_tree["c"].append(new_sub_tree)
                     working_queue.append([s, new_sub_tree])
 
-        elif len(cur_string_split) == 6:
-            # Case 3: there are six values: the first two corresponding to the cur item
-            # and the last four corresponding to the next two items in the queue
-            sub_tree["f"] = [cur_feature]
-            sub_tree["c"] = []
-
-            for s in cur_string_split[:2]:
-                if s == "-1" or s == "-2":
-                    # We hit a decision node, add a leaf to this branch
-                    sub_tree["c"].append({"f": ["+"] if s == "-2" else ["-"]})
-                else:
-                    new_sub_tree = {}
-                    sub_tree["c"].append(new_sub_tree)
-                    working_queue.append([s, new_sub_tree])
-
-            # Load the next item in the queue
-            cur_feature, sub_tree = working_queue.popleft()
-            sub_tree["f"] = [cur_feature]
-            sub_tree["c"] = []
-
-            for s in cur_string_split[2:4]:
-                if s == "-1" or s == "-2":
-                    # We hit a decision node, add a leaf to this branch
-                    sub_tree["c"].append({"f": ["+"] if s == "-2" else ["-"]})
-                else:
-                    new_sub_tree = {}
-                    sub_tree["c"].append(new_sub_tree)
-                    working_queue.append([s, new_sub_tree])
-
-            # Load the next item in the queue
-            cur_feature, sub_tree = working_queue.popleft()
-            sub_tree["f"] = [cur_feature]
-            sub_tree["c"] = []
-
-            for s in cur_string_split[4:]:
-                if s == "-1" or s == "-2":
-                    # We hit a decision node, add a leaf to this branch
-                    sub_tree["c"].append({"f": ["+"] if s == "-2" else ["-"]})
-                else:
-                    new_sub_tree = {}
-                    sub_tree["c"].append(new_sub_tree)
-                    working_queue.append([s, new_sub_tree])
-
-        else:
-            raise ValueError("Error: encounter string size either 2 nor 4 nor 6")
+            pair_i += 2
 
         i += 1
 
