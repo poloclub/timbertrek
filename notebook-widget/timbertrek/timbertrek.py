@@ -466,7 +466,6 @@ def get_decision_rule_hierarchy_dict(trie, keep_position=True):
     Returns:
         dict: Hierarchy dict
     """
-
     trie_copy = transform_trie(trie)
 
     # Step 1: build a dictionary to map tree ID to its string description
@@ -482,6 +481,10 @@ def get_decision_rule_hierarchy_dict(trie, keep_position=True):
 
     for i in tree_map["map"]:
         cur_string = tree_map["map"][i][0]
+        if len(cur_string) <= 1:
+            # Skip this subtrie if the root is a decision
+            continue
+
         all_rules = get_decision_rules(cur_string)
 
         # Iterate the set and build the hierarchy dict
@@ -551,6 +554,9 @@ def get_tree_map_hierarchy(tree_map):
     new_tree_map = {}
 
     for i in tree_map["map"]:
+        if len(tree_map["map"][i][0]) <= 1:
+            # Skip this subtrie if the root is a decision
+            continue
         tree_hierarchy = get_hierarchy_tree(tree_map["map"][i][0])
         new_tree_map[i] = [tree_hierarchy, tree_map["map"][i][1]]
 
