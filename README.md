@@ -1,12 +1,12 @@
 # TimberTrek <a href="https://poloclub.github.io/timbertrek/"><img align="right" src="src/imgs/timbertrek-logo-light.svg" height="38"></img></a>
 
 [![Github Actions Status](https://github.com/poloclub/timbertrek/workflows/build/badge.svg)](https://github.com/poloclub/timbertrek/actions/workflows/build.yml)
+[![license](https://img.shields.io/badge/License-MIT-success)](https://github.com/poloclub/timbertrek/blob/master/LICENSE)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/poloclub/timbertrek/master?urlpath=lab/tree/notebook-widget/example/campas.ipynb)
 [![Lite](https://gist.githubusercontent.com/xiaohk/9b9f7c8fa162b2c3bc3251a5c9a799b2/raw/a7fca1d0a2d62c2b49f60c0217dffbd0fe404471/lite-badge-launch-small.svg)](https://poloclub.github.io/timbertrek/notebook)
 [![pypi](https://img.shields.io/pypi/v/timbertrek?color=blue)](https://pypi.python.org/pypi/timbertrek)
-[![license](https://img.shields.io/badge/License-MIT-brightgreen)](https://github.com/poloclub/timbertrek/blob/master/LICENSE)
 [![arxiv badge](https://img.shields.io/badge/arXiv-2209.09227-red)](https://arxiv.org/abs/2209.09227)
-<!-- [![DOI:10.1145/3491101.3519653](https://img.shields.io/badge/DOI-10.1145/3491101.3519653-blue)](https://doi.org/10.1145/3491101.3519653) -->
+[![DOI:10.1109/VIS54862.2022.00021](https://img.shields.io/badge/DOI-10.1109/VIS54862.2022.00021-blue)](https://doi.org/10.1109/VIS54862.2022.00021)
 
 Curate decision trees that align with your knowledge and values!
 
