@@ -44,7 +44,7 @@
     initView();
 </script>
 
-<style type="scss">
+<style lang="scss">
   @import './Dropzone.scss';
 </style>
 
