@@ -23,11 +23,11 @@
 
 <div class="stand-alone-page">
   {#if mode === 'article'}
-    <recommender-overlay
+    <!-- <recommender-overlay
       my-brand="TimberTrek"
       position-left="20"
       display-delay="20000"
-    />
+    /> -->
     <Article />
   {:else}
     <Notebook />
